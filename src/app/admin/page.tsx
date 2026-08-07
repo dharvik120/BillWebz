@@ -33,7 +33,8 @@ export default function AdminPortal() {
     saveAdminSettings, 
     deleteInvoice,
     updateInvoiceStatus,
-    exportBackup
+    exportBackup,
+    loadInvoices
   } = useInvoiceStore();
 
   // Login State
@@ -87,6 +88,7 @@ export default function AdminPortal() {
       sessionStorage.setItem('billwebz_admin_logged_in', 'true');
       setIsLoggedIn(true);
       setLoginError('');
+      loadInvoices();
     } else {
       setLoginError('Invalid Administrator Username or Password.');
     }
@@ -97,6 +99,7 @@ export default function AdminPortal() {
     setIsLoggedIn(false);
     setUsername('');
     setPassword('');
+    loadInvoices();
   };
 
   const handleSaveSettings = () => {

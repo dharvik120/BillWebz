@@ -1,6 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
 import { db } from '../lib/db';
 import { Invoice, SellerDetails, InvoiceStatus, InvoiceType, AdminSettings } from '../types/invoice';
+import { isFirebaseEnabled, db as firebaseDb } from '../lib/firebase';
+import { 
+  doc, 
+  getDoc, 
+  setDoc, 
+  collection, 
+  query, 
+  where, 
+  getDocs, 
+  deleteDoc 
+} from 'firebase/firestore';
+
+const CLIENT_ID_KEY = 'billwebz_client_id';
+let localClientId = '';
+if (typeof window !== 'undefined') {
+  localClientId = localStorage.getItem(CLIENT_ID_KEY) || '';
+  if (!localClientId) {
+    localClientId = 'client_' + Math.random().toString(36).substring(2, 15);
+    localStorage.setItem(CLIENT_ID_KEY, localClientId);
+  }
+}
 
 const DEFAULT_SELLER_KEY = 'billwebz_default_seller';
 const DEFAULT_TERMS_KEY = 'billwebz_default_terms';
@@ -103,29 +124,76 @@ export function useInvoiceStore() {
 
         const storedCurr = localStorage.getItem(DEFAULT_CURRENCY_KEY);
         if (storedCurr) setDefaultCurrency(JSON.parse(storedCurr));
-
-        const storedAdmin = localStorage.getItem(ADMIN_SETTINGS_KEY);
-        if (storedAdmin) {
-          setAdminSettings(JSON.parse(storedAdmin));
-        } else {
-          localStorage.setItem(ADMIN_SETTINGS_KEY, JSON.stringify(defaultAdminSettings));
-        }
       } catch (e) {
         console.error('Failed to load settings from LocalStorage', e);
       }
     }
   }, []);
 
+  // Fetch adminSettings from Firestore (fallback to LocalStorage)
+  useEffect(() => {
+    const fetchAdminSettings = async () => {
+      if (isFirebaseEnabled && firebaseDb) {
+        try {
+          const docRef = doc(firebaseDb, 'settings', 'default');
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setAdminSettings(docSnap.data() as AdminSettings);
+          } else {
+            await setDoc(docRef, defaultAdminSettings);
+            setAdminSettings(defaultAdminSettings);
+          }
+        } catch (e) {
+          console.error('Failed to load settings from Firestore, loading locally', e);
+          const storedAdmin = localStorage.getItem(ADMIN_SETTINGS_KEY);
+          if (storedAdmin) setAdminSettings(JSON.parse(storedAdmin));
+        }
+      } else {
+        const storedAdmin = localStorage.getItem(ADMIN_SETTINGS_KEY);
+        if (storedAdmin) setAdminSettings(JSON.parse(storedAdmin));
+      }
+    };
+    fetchAdminSettings();
+  }, []);
+
   // Fetch all invoices
   const loadInvoices = useCallback(async () => {
     setLoading(true);
     try {
-      const allInvoices = await db.invoices.toArray();
-      // Sort by updatedAt descending
-      allInvoices.sort((a, b) => b.updatedAt - a.updatedAt);
-      setInvoices(allInvoices);
+      const isAdmin = typeof window !== 'undefined' && sessionStorage.getItem('billwebz_admin_logged_in') === 'true';
+
+      if (isFirebaseEnabled && firebaseDb) {
+        const invoicesCol = collection(firebaseDb, 'invoices');
+        let q;
+        if (isAdmin) {
+          // Admin sees all invoices
+          q = query(invoicesCol);
+        } else {
+          // Public clients see only their own invoices
+          q = query(invoicesCol, where('clientId', '==', localClientId));
+        }
+
+        const querySnapshot = await getDocs(q);
+        const cloudInvoices: Invoice[] = [];
+        querySnapshot.forEach((docSnap) => {
+          cloudInvoices.push({ id: docSnap.id, ...docSnap.data() } as Invoice);
+        });
+
+        cloudInvoices.sort((a, b) => b.updatedAt - a.updatedAt);
+        setInvoices(cloudInvoices);
+
+        // Sync local IndexedDB cache with firestore state
+        await db.invoices.clear();
+        for (const inv of cloudInvoices) {
+          await db.invoices.put(inv);
+        }
+      } else {
+        const allInvoices = await db.invoices.toArray();
+        allInvoices.sort((a, b) => b.updatedAt - a.updatedAt);
+        setInvoices(allInvoices);
+      }
     } catch (err) {
-      console.error('Failed to load invoices from IndexedDB', err);
+      console.error('Failed to load invoices', err);
     } finally {
       setLoading(false);
     }
@@ -156,14 +224,23 @@ export function useInvoiceStore() {
   // Create or Update Invoice
   const saveInvoice = useCallback(async (invoice: Invoice) => {
     const timestamp = Date.now();
+    const id = invoice.id || Math.random().toString(36).substring(2, 11);
+    
     const invoiceToSave = {
       ...invoice,
-      id: invoice.id || Math.random().toString(36).substring(2, 11),
+      id,
+      clientId: (invoice as any).clientId || localClientId,
       createdAt: invoice.createdAt || timestamp,
       updatedAt: timestamp,
     };
     
     await db.invoices.put(invoiceToSave);
+
+    if (isFirebaseEnabled && firebaseDb) {
+      const docRef = doc(firebaseDb, 'invoices', id);
+      await setDoc(docRef, invoiceToSave);
+    }
+
     await loadInvoices();
     return invoiceToSave;
   }, [loadInvoices]);
@@ -171,6 +248,12 @@ export function useInvoiceStore() {
   // Delete Invoice
   const deleteInvoice = useCallback(async (id: string) => {
     await db.invoices.delete(id);
+    
+    if (isFirebaseEnabled && firebaseDb) {
+      const docRef = doc(firebaseDb, 'invoices', id);
+      await deleteDoc(docRef);
+    }
+
     await loadInvoices();
   }, [loadInvoices]);
 
@@ -199,6 +282,12 @@ export function useInvoiceStore() {
       invoice.status = status;
       invoice.updatedAt = Date.now();
       await db.invoices.put(invoice);
+      
+      if (isFirebaseEnabled && firebaseDb) {
+        const docRef = doc(firebaseDb, 'invoices', id);
+        await setDoc(docRef, invoice);
+      }
+
       await loadInvoices();
     }
   }, [loadInvoices]);
@@ -303,9 +392,17 @@ export function useInvoiceStore() {
     }
   }, [loadInvoices, saveSettings]);
 
-  const saveAdminSettings = useCallback((settings: AdminSettings) => {
+  const saveAdminSettings = useCallback(async (settings: AdminSettings) => {
     setAdminSettings(settings);
     localStorage.setItem(ADMIN_SETTINGS_KEY, JSON.stringify(settings));
+    if (isFirebaseEnabled && firebaseDb) {
+      try {
+        const docRef = doc(firebaseDb, 'settings', 'default');
+        await setDoc(docRef, settings);
+      } catch (e) {
+        console.error('Failed to save settings to Firestore', e);
+      }
+    }
   }, []);
 
   return {

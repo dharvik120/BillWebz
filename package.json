@@ -12,6 +12,7 @@
     "@hookform/resolvers": "^5.7.1",
     "canvas-confetti": "^1.9.4",
     "dexie": "^4.4.4",
+    "firebase": "^12.17.1",
     "framer-motion": "^13.0.0",
     "html2canvas": "^1.4.1",
     "html2canvas-pro": "^2.3.3",
