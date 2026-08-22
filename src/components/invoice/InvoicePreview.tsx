@@ -289,12 +289,19 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                   {(sellerDetails.state || sellerDetails.country) && (
                     <p className="text-xs pdf-text-muted mt-0.5">
                       {[
-                        sellerDetails.state && sellerDetails.state !== 'NONE' ? `State: ${sellerDetails.state}` : '',
-                        sellerDetails.country && sellerDetails.country !== 'OTHER' 
-                          ? `Country: ${countriesList.find(c => c.code === sellerDetails.country)?.name || sellerDetails.country}` 
-                          : ''
+                        sellerDetails.state && sellerDetails.state !== 'NONE' && sellerDetails.state !== 'OTHER' ? `State: ${sellerDetails.state}` : '',
+                        sellerDetails.country && sellerDetails.country !== 'OTHER' && sellerDetails.country !== 'NONE' ? `Country: ${sellerDetails.country}` : ''
                       ].filter(Boolean).join(' | ')}
                       {sellerDetails.pincode ? ` (${sellerDetails.pincode})` : ''}
+                    </p>
+                  )}
+                  {(sellerDetails.phone || sellerDetails.email || sellerDetails.website) && (
+                    <p className="text-xs pdf-text-muted mt-0.5 font-sans">
+                      {[
+                        sellerDetails.phone ? `Ph: ${sellerDetails.phone}` : '',
+                        sellerDetails.email ? `Email: ${sellerDetails.email}` : '',
+                        sellerDetails.website ? `Web: ${sellerDetails.website}` : ''
+                      ].filter(Boolean).join(' | ')}
                     </p>
                   )}
                 </div>
@@ -327,9 +334,9 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                   {buyerDetails.companyName && <p>{buyerDetails.companyName}</p>}
                   {buyerDetails.gstin && <p className="font-mono">GSTIN: {buyerDetails.gstin}</p>}
                   <p>{buyerDetails.billingAddress}</p>
-                  {buyerDetails.state && buyerDetails.state !== 'NONE' && <p>State: {buyerDetails.state}</p>}
-                  {buyerDetails.country && buyerDetails.country !== 'OTHER' && (
-                    <p>Country: {countriesList.find(c => c.code === buyerDetails.country)?.name || buyerDetails.country}</p>
+                  {buyerDetails.state && buyerDetails.state !== 'NONE' && buyerDetails.state !== 'OTHER' && <p>State: {buyerDetails.state}</p>}
+                  {buyerDetails.country && buyerDetails.country !== 'OTHER' && buyerDetails.country !== 'NONE' && (
+                    <p>Country: {buyerDetails.country}</p>
                   )}
                   {buyerDetails.phone && <p>Ph: {buyerDetails.phone}</p>}
                   {buyerDetails.email && <p>Email: {buyerDetails.email}</p>}

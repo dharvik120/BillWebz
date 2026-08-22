@@ -581,39 +581,26 @@ function QuotationForm() {
 
                   <div>
                     <label className="block text-slate-500 font-semibold mb-1">Country</label>
-                    <select
-                      value={invoiceData.sellerDetails.country || 'IN'}
-                      onChange={(e) => {
-                        const newCountry = e.target.value;
-                        const availableStates = statesByCountry[newCountry] || [];
-                        const defaultState = availableStates[0] || 'NONE';
-                        
-                        setInvoiceData((prev: any) => ({
-                          ...prev,
-                          sellerDetails: {
-                            ...prev.sellerDetails,
-                            country: newCountry,
-                            state: defaultState
-                          }
-                        }));
-                      }}
+                    <input
+                      type="text"
+                      list="countries-list"
+                      placeholder="e.g. India"
+                      value={invoiceData.sellerDetails.country || ''}
+                      onChange={(e) => updateField('sellerDetails', 'country', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {countriesList.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
-                    </select>
+                    />
                   </div>
 
                   <div>
                     <label className="block text-slate-500 font-semibold mb-1">State</label>
-                    <select
-                      value={invoiceData.sellerDetails.state}
+                    <input
+                      type="text"
+                      list="states-list"
+                      placeholder="e.g. Delhi"
+                      value={invoiceData.sellerDetails.state || ''}
                       onChange={(e) => updateField('sellerDetails', 'state', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {(statesByCountry[invoiceData.sellerDetails.country || 'IN'] || ['NONE']).map(st => (
-                        <option key={st} value={st}>{st === 'NONE' ? 'None / Not Applicable' : st}</option>
-                      ))}
-                    </select>
+                    />
                   </div>
 
                   <div>
@@ -729,53 +716,38 @@ function QuotationForm() {
 
                   <div>
                     <label className="block text-slate-500 font-semibold mb-1">Country</label>
-                    <select
-                      value={invoiceData.buyerDetails.country || 'IN'}
-                      onChange={(e) => {
-                        const newCountry = e.target.value;
-                        const availableStates = statesByCountry[newCountry] || [];
-                        const defaultState = availableStates[0] || 'NONE';
-                        
-                        setInvoiceData((prev: any) => ({
-                          ...prev,
-                          buyerDetails: {
-                            ...prev.buyerDetails,
-                            country: newCountry,
-                            state: defaultState,
-                            placeOfSupply: defaultState
-                          }
-                        }));
-                      }}
+                    <input
+                      type="text"
+                      list="countries-list"
+                      placeholder="e.g. India"
+                      value={invoiceData.buyerDetails.country || ''}
+                      onChange={(e) => updateField('buyerDetails', 'country', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {countriesList.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
-                    </select>
+                    />
                   </div>
 
                   <div>
                     <label className="block text-slate-500 font-semibold mb-1">Billing State</label>
-                    <select
-                      value={invoiceData.buyerDetails.state}
+                    <input
+                      type="text"
+                      list="states-list"
+                      placeholder="e.g. Delhi"
+                      value={invoiceData.buyerDetails.state || ''}
                       onChange={(e) => updateField('buyerDetails', 'state', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {(statesByCountry[invoiceData.buyerDetails.country || 'IN'] || ['NONE']).map(st => (
-                        <option key={st} value={st}>{st === 'NONE' ? 'None / Not Applicable' : st}</option>
-                      ))}
-                    </select>
+                    />
                   </div>
 
                   <div>
                     <label className="block text-slate-500 font-semibold mb-1">Place of Supply (State)</label>
-                    <select
-                      value={invoiceData.buyerDetails.placeOfSupply}
+                    <input
+                      type="text"
+                      list="states-list"
+                      placeholder="e.g. Delhi"
+                      value={invoiceData.buyerDetails.placeOfSupply || ''}
                       onChange={(e) => updateField('buyerDetails', 'placeOfSupply', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {(statesByCountry[invoiceData.buyerDetails.country || 'IN'] || ['NONE']).map(st => (
-                        <option key={st} value={st}>{st === 'NONE' ? 'None / Not Applicable' : st}</option>
-                      ))}
-                    </select>
+                    />
                   </div>
                 </div>
               )}
@@ -1157,6 +1129,43 @@ function QuotationForm() {
           </div>
         </div>
       )}
+
+      {/* Autocomplete Datalists */}
+      <datalist id="countries-list">
+        <option value="India" />
+        <option value="United States" />
+        <option value="United Kingdom" />
+        <option value="United Arab Emirates" />
+        <option value="Canada" />
+        <option value="Australia" />
+      </datalist>
+
+      <datalist id="states-list">
+        <option value="Delhi" />
+        <option value="Maharashtra" />
+        <option value="Karnataka" />
+        <option value="Tamil Nadu" />
+        <option value="Gujarat" />
+        <option value="Uttar Pradesh" />
+        <option value="West Bengal" />
+        <option value="Telangana" />
+        <option value="Andhra Pradesh" />
+        <option value="Rajasthan" />
+        <option value="Punjab" />
+        <option value="Haryana" />
+        <option value="California" />
+        <option value="New York" />
+        <option value="Texas" />
+        <option value="Florida" />
+        <option value="London" />
+        <option value="Dubai" />
+        <option value="Abu Dhabi" />
+        <option value="Ontario" />
+        <option value="Quebec" />
+        <option value="British Columbia" />
+        <option value="New South Wales" />
+        <option value="Victoria" />
+      </datalist>
     </div>
   );
 }
