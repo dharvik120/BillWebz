@@ -5,7 +5,8 @@ export interface SellerDetails {
   email?: string;
   website?: string;
   address?: string;
-  state: string;
+  state?: string;
+  country?: string;
   pincode?: string;
   logoUrl?: string;
   signatureUrl?: string;
@@ -25,8 +26,9 @@ export interface BuyerDetails {
   email?: string;
   billingAddress?: string;
   shippingAddress?: string;
-  state: string;
-  placeOfSupply: string;
+  state?: string;
+  country?: string;
+  placeOfSupply?: string;
 }
 
 export interface LineItem {

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Invoice, LineItem } from '../../types/invoice';
 import { generateUpiQrCode } from '../../utils/qrCodeGenerator';
+import { countriesList } from '../../utils/locationData';
 
 // A simple offline Barcode component generating vertical SVG lines based on invoice number
 function Barcode({ value }: { value: string }) {
@@ -285,7 +286,17 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                     <p className="text-xs pdf-text-muted font-mono mt-0.5">GSTIN: {sellerDetails.gstin}</p>
                   )}
                   <p className="text-xs pdf-text-muted max-w-sm mt-1">{sellerDetails.address}</p>
-                  <p className="text-xs pdf-text-muted mt-0.5">State: {sellerDetails.state} {sellerDetails.pincode ? `(${sellerDetails.pincode})` : ''}</p>
+                  {(sellerDetails.state || sellerDetails.country) && (
+                    <p className="text-xs pdf-text-muted mt-0.5">
+                      {[
+                        sellerDetails.state && sellerDetails.state !== 'NONE' ? `State: ${sellerDetails.state}` : '',
+                        sellerDetails.country && sellerDetails.country !== 'OTHER' 
+                          ? `Country: ${countriesList.find(c => c.code === sellerDetails.country)?.name || sellerDetails.country}` 
+                          : ''
+                      ].filter(Boolean).join(' | ')}
+                      {sellerDetails.pincode ? ` (${sellerDetails.pincode})` : ''}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -316,7 +327,10 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                   {buyerDetails.companyName && <p>{buyerDetails.companyName}</p>}
                   {buyerDetails.gstin && <p className="font-mono">GSTIN: {buyerDetails.gstin}</p>}
                   <p>{buyerDetails.billingAddress}</p>
-                  <p>State: {buyerDetails.state}</p>
+                  {buyerDetails.state && buyerDetails.state !== 'NONE' && <p>State: {buyerDetails.state}</p>}
+                  {buyerDetails.country && buyerDetails.country !== 'OTHER' && (
+                    <p>Country: {countriesList.find(c => c.code === buyerDetails.country)?.name || buyerDetails.country}</p>
+                  )}
                   {buyerDetails.phone && <p>Ph: {buyerDetails.phone}</p>}
                   {buyerDetails.email && <p>Email: {buyerDetails.email}</p>}
                 </div>

@@ -35,6 +35,7 @@ import { downloadInvoicePdf } from '@/utils/pdfGenerator';
 import { InvoicePreview } from '@/components/invoice/InvoicePreview';
 import { LineItemsTable } from '@/components/invoice/LineItemsTable';
 import { Invoice, LineItem, InvoiceStatus, InvoiceTheme, PaperSize } from '@/types/invoice';
+import { countriesList, statesByCountry } from '@/utils/locationData';
 import confetti from 'canvas-confetti';
 
 const emptyInvoice = (defaultSeller: any, defaultTerms: any, defaultDec: any, defaultCurr: any): Invoice => ({
@@ -54,6 +55,7 @@ const emptyInvoice = (defaultSeller: any, defaultTerms: any, defaultDec: any, de
     billingAddress: '',
     shippingAddress: '',
     state: defaultSeller.state || 'Delhi',
+    country: 'IN',
     placeOfSupply: defaultSeller.state || 'Delhi',
   },
   metadata: {
@@ -174,7 +176,11 @@ function GstInvoiceForm() {
       // Mark as exported and save immediately
       const updatedInvoice = { ...invoiceData, isExported: true };
       setInvoiceData(updatedInvoice);
-      await saveInvoice(updatedInvoice);
+      try {
+        await saveInvoice(updatedInvoice);
+      } catch (dbErr) {
+        console.warn("Database save failed, downloading PDF anyway:", dbErr);
+      }
 
       const blob = await downloadInvoicePdf(
         'invoice-pdf-export-sheet', 
@@ -249,8 +255,8 @@ function GstInvoiceForm() {
       ) {
         const calcs = calculateInvoiceTotals(
           next.items,
-          next.sellerDetails.state,
-          next.buyerDetails.placeOfSupply,
+          next.sellerDetails.state || '',
+          next.buyerDetails.placeOfSupply || '',
           next.currency.code,
           next.showTax
         );
@@ -268,8 +274,8 @@ function GstInvoiceForm() {
       const next = { ...prev };
       const calcs = calculateInvoiceTotals(
         newItems,
-        next.sellerDetails.state,
-        next.buyerDetails.placeOfSupply,
+        next.sellerDetails.state || '',
+        next.buyerDetails.placeOfSupply || '',
         next.currency.code,
         next.showTax
       );
@@ -310,14 +316,7 @@ function GstInvoiceForm() {
     window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
   };
 
-  const statesList = [
-    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Delhi', 'Goa', 
-    'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 
-    'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 
-    'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 
-    'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 
-    'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Lakshadweep', 'Puducherry'
-  ];
+
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
@@ -402,8 +401,8 @@ function GstInvoiceForm() {
                 };
                 const calcs = calculateInvoiceTotals(
                   next.items,
-                  next.sellerDetails.state,
-                  next.buyerDetails.placeOfSupply,
+                  next.sellerDetails.state || '',
+                  next.buyerDetails.placeOfSupply || '',
                   next.currency.code,
                   next.showTax
                 );
@@ -475,8 +474,8 @@ function GstInvoiceForm() {
                     }));
                     const calcs = calculateInvoiceTotals(
                       nextItems,
-                      prev.sellerDetails.state,
-                      prev.buyerDetails.placeOfSupply,
+                      prev.sellerDetails.state || '',
+                      prev.buyerDetails.placeOfSupply || '',
                       prev.currency.code,
                       isGst
                     );
@@ -580,13 +579,39 @@ function GstInvoiceForm() {
                   </div>
 
                   <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Country</label>
+                    <select
+                      value={invoiceData.sellerDetails.country || 'IN'}
+                      onChange={(e) => {
+                        const newCountry = e.target.value;
+                        const availableStates = statesByCountry[newCountry] || [];
+                        const defaultState = availableStates[0] || 'NONE';
+                        
+                        setInvoiceData((prev: any) => ({
+                          ...prev,
+                          sellerDetails: {
+                            ...prev.sellerDetails,
+                            country: newCountry,
+                            state: defaultState
+                          }
+                        }));
+                      }}
+                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {countriesList.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                    </select>
+                  </div>
+
+                  <div>
                     <label className="block text-slate-500 font-semibold mb-1">State</label>
                     <select
                       value={invoiceData.sellerDetails.state}
                       onChange={(e) => updateField('sellerDetails', 'state', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      {statesList.map(st => <option key={st} value={st}>{st}</option>)}
+                      {(statesByCountry[invoiceData.sellerDetails.country || 'IN'] || ['NONE']).map(st => (
+                        <option key={st} value={st}>{st === 'NONE' ? 'None / Not Applicable' : st}</option>
+                      ))}
                     </select>
                   </div>
 
@@ -701,13 +726,40 @@ function GstInvoiceForm() {
                   </div>
 
                   <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Country</label>
+                    <select
+                      value={invoiceData.buyerDetails.country || 'IN'}
+                      onChange={(e) => {
+                        const newCountry = e.target.value;
+                        const availableStates = statesByCountry[newCountry] || [];
+                        const defaultState = availableStates[0] || 'NONE';
+                        
+                        setInvoiceData((prev: any) => ({
+                          ...prev,
+                          buyerDetails: {
+                            ...prev.buyerDetails,
+                            country: newCountry,
+                            state: defaultState,
+                            placeOfSupply: defaultState
+                          }
+                        }));
+                      }}
+                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {countriesList.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                    </select>
+                  </div>
+
+                  <div>
                     <label className="block text-slate-500 font-semibold mb-1">Billing State</label>
                     <select
                       value={invoiceData.buyerDetails.state}
                       onChange={(e) => updateField('buyerDetails', 'state', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      {statesList.map(st => <option key={st} value={st}>{st}</option>)}
+                      {(statesByCountry[invoiceData.buyerDetails.country || 'IN'] || ['NONE']).map(st => (
+                        <option key={st} value={st}>{st === 'NONE' ? 'None / Not Applicable' : st}</option>
+                      ))}
                     </select>
                   </div>
 
@@ -718,7 +770,9 @@ function GstInvoiceForm() {
                       onChange={(e) => updateField('buyerDetails', 'placeOfSupply', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      {statesList.map(st => <option key={st} value={st}>{st}</option>)}
+                      {(statesByCountry[invoiceData.buyerDetails.country || 'IN'] || ['NONE']).map(st => (
+                        <option key={st} value={st}>{st === 'NONE' ? 'None / Not Applicable' : st}</option>
+                      ))}
                     </select>
                   </div>
                 </div>

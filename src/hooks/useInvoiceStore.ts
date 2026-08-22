@@ -86,6 +86,7 @@ const defaultSellerInitial: SellerDetails = {
   website: '',
   address: '',
   state: 'Delhi',
+  country: 'IN',
   pincode: '',
   bankName: '',
   accountNumber: '',

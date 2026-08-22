@@ -34,7 +34,7 @@ export async function downloadInvoicePdf(
     const canvas = await html2canvas(element, {
       scale: 2.2, // High resolution scale factor
       useCORS: true, // Support logo images loaded via URL
-      allowTaint: true,
+      allowTaint: false,
       logging: false,
       backgroundColor: '#ffffff',
     });

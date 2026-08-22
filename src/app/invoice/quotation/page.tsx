@@ -34,6 +34,7 @@ import { downloadInvoicePdf } from '@/utils/pdfGenerator';
 import { InvoicePreview } from '@/components/invoice/InvoicePreview';
 import { LineItemsTable } from '@/components/invoice/LineItemsTable';
 import { Invoice, LineItem, InvoiceStatus, InvoiceTheme, PaperSize } from '@/types/invoice';
+import { countriesList, statesByCountry } from '@/utils/locationData';
 import confetti from 'canvas-confetti';
 
 const emptyQuotation = (defaultSeller: any, defaultTerms: any, defaultDec: any, defaultCurr: any): Invoice => ({
@@ -53,6 +54,7 @@ const emptyQuotation = (defaultSeller: any, defaultTerms: any, defaultDec: any, 
     billingAddress: '',
     shippingAddress: '',
     state: defaultSeller.state || 'Delhi',
+    country: 'IN',
     placeOfSupply: defaultSeller.state || 'Delhi',
   },
   metadata: {
@@ -175,7 +177,11 @@ function QuotationForm() {
       // Mark as exported and save immediately
       const updatedInvoice = { ...invoiceData, isExported: true };
       setInvoiceData(updatedInvoice);
-      await saveInvoice(updatedInvoice);
+      try {
+        await saveInvoice(updatedInvoice);
+      } catch (dbErr) {
+        console.warn("Database save failed, downloading PDF anyway:", dbErr);
+      }
 
       const blob = await downloadInvoicePdf(
         'invoice-pdf-export-sheet', 
@@ -249,8 +255,8 @@ function QuotationForm() {
       ) {
         const calcs = calculateInvoiceTotals(
           next.items,
-          next.sellerDetails.state,
-          next.buyerDetails.placeOfSupply,
+          next.sellerDetails.state || '',
+          next.buyerDetails.placeOfSupply || '',
           next.currency.code,
           next.showTax
         );
@@ -270,8 +276,8 @@ function QuotationForm() {
       const next = { ...prev };
       const calcs = calculateInvoiceTotals(
         newItems,
-        prev.sellerDetails.state,
-        prev.buyerDetails.placeOfSupply,
+        prev.sellerDetails.state || '',
+        prev.buyerDetails.placeOfSupply || '',
         prev.currency.code,
         prev.showTax
       );
@@ -279,6 +285,19 @@ function QuotationForm() {
       next.totals = calcs.totals;
       return next;
     });
+  };
+
+  // File to Base64 encoder for Logos/Signatures
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, field: 'logoUrl' | 'signatureUrl') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      updateField('sellerDetails', field, base64);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSaveDraft = async (manual: boolean = false) => {
@@ -299,14 +318,7 @@ function QuotationForm() {
     window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
   };
 
-  const statesList = [
-    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Delhi', 'Goa', 
-    'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 
-    'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 
-    'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 
-    'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 
-    'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Lakshadweep', 'Puducherry'
-  ];
+
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
@@ -389,8 +401,8 @@ function QuotationForm() {
                 const next = { ...prev, currency: { code, symbol } };
                 const calcs = calculateInvoiceTotals(
                   next.items,
-                  next.sellerDetails.state,
-                  next.buyerDetails.placeOfSupply,
+                  next.sellerDetails.state || '',
+                  next.buyerDetails.placeOfSupply || '',
                   code,
                   next.showTax
                 );
@@ -463,8 +475,8 @@ function QuotationForm() {
                     }));
                     const calcs = calculateInvoiceTotals(
                       nextItems,
-                      prev.sellerDetails.state,
-                      prev.buyerDetails.placeOfSupply,
+                      prev.sellerDetails.state || '',
+                      prev.buyerDetails.placeOfSupply || '',
                       prev.currency.code,
                       isShow
                     );
@@ -568,13 +580,39 @@ function QuotationForm() {
                   </div>
 
                   <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Country</label>
+                    <select
+                      value={invoiceData.sellerDetails.country || 'IN'}
+                      onChange={(e) => {
+                        const newCountry = e.target.value;
+                        const availableStates = statesByCountry[newCountry] || [];
+                        const defaultState = availableStates[0] || 'NONE';
+                        
+                        setInvoiceData((prev: any) => ({
+                          ...prev,
+                          sellerDetails: {
+                            ...prev.sellerDetails,
+                            country: newCountry,
+                            state: defaultState
+                          }
+                        }));
+                      }}
+                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {countriesList.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                    </select>
+                  </div>
+
+                  <div>
                     <label className="block text-slate-500 font-semibold mb-1">State</label>
                     <select
                       value={invoiceData.sellerDetails.state}
                       onChange={(e) => updateField('sellerDetails', 'state', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      {statesList.map(st => <option key={st} value={st}>{st}</option>)}
+                      {(statesByCountry[invoiceData.sellerDetails.country || 'IN'] || ['NONE']).map(st => (
+                        <option key={st} value={st}>{st === 'NONE' ? 'None / Not Applicable' : st}</option>
+                      ))}
                     </select>
                   </div>
 
@@ -585,6 +623,26 @@ function QuotationForm() {
                       value={invoiceData.sellerDetails.pincode || ''}
                       onChange={(e) => updateField('sellerDetails', 'pincode', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Upload Logo</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, 'logoUrl')}
+                      className="w-full file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Upload Signature</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, 'signatureUrl')}
+                      className="w-full file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                     />
                   </div>
                 </div>
@@ -670,13 +728,40 @@ function QuotationForm() {
                   </div>
 
                   <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Country</label>
+                    <select
+                      value={invoiceData.buyerDetails.country || 'IN'}
+                      onChange={(e) => {
+                        const newCountry = e.target.value;
+                        const availableStates = statesByCountry[newCountry] || [];
+                        const defaultState = availableStates[0] || 'NONE';
+                        
+                        setInvoiceData((prev: any) => ({
+                          ...prev,
+                          buyerDetails: {
+                            ...prev.buyerDetails,
+                            country: newCountry,
+                            state: defaultState,
+                            placeOfSupply: defaultState
+                          }
+                        }));
+                      }}
+                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {countriesList.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+                    </select>
+                  </div>
+
+                  <div>
                     <label className="block text-slate-500 font-semibold mb-1">Billing State</label>
                     <select
                       value={invoiceData.buyerDetails.state}
                       onChange={(e) => updateField('buyerDetails', 'state', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      {statesList.map(st => <option key={st} value={st}>{st}</option>)}
+                      {(statesByCountry[invoiceData.buyerDetails.country || 'IN'] || ['NONE']).map(st => (
+                        <option key={st} value={st}>{st === 'NONE' ? 'None / Not Applicable' : st}</option>
+                      ))}
                     </select>
                   </div>
 
@@ -687,7 +772,9 @@ function QuotationForm() {
                       onChange={(e) => updateField('buyerDetails', 'placeOfSupply', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      {statesList.map(st => <option key={st} value={st}>{st}</option>)}
+                      {(statesByCountry[invoiceData.buyerDetails.country || 'IN'] || ['NONE']).map(st => (
+                        <option key={st} value={st}>{st === 'NONE' ? 'None / Not Applicable' : st}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
