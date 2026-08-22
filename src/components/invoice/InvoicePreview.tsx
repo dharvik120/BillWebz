@@ -296,13 +296,26 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                     </p>
                   )}
                   {(sellerDetails.phone || sellerDetails.email || sellerDetails.website) && (
-                    <p className="text-xs pdf-text-muted mt-0.5 font-sans">
-                      {[
-                        sellerDetails.phone ? `Ph: ${sellerDetails.phone}` : '',
-                        sellerDetails.email ? `Email: ${sellerDetails.email}` : '',
-                        sellerDetails.website ? `Web: ${sellerDetails.website}` : ''
-                      ].filter(Boolean).join(' | ')}
-                    </p>
+                    <div className="mt-2.5 pt-2 border-t border-slate-200/60 max-w-sm text-[11px] pdf-text-muted space-y-0.5">
+                      {sellerDetails.phone && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-400 font-medium">Phone:</span>
+                          <span className="pdf-text-dark font-medium">{sellerDetails.phone}</span>
+                        </div>
+                      )}
+                      {sellerDetails.email && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-400 font-medium">Email:</span>
+                          <span className="pdf-text-dark font-medium break-all">{sellerDetails.email}</span>
+                        </div>
+                      )}
+                      {sellerDetails.website && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-400 font-medium">Website:</span>
+                          <span className="pdf-text-dark font-medium break-all">{sellerDetails.website}</span>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
@@ -338,8 +351,22 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                   {buyerDetails.country && buyerDetails.country !== 'OTHER' && buyerDetails.country !== 'NONE' && (
                     <p>Country: {buyerDetails.country}</p>
                   )}
-                  {buyerDetails.phone && <p>Ph: {buyerDetails.phone}</p>}
-                  {buyerDetails.email && <p>Email: {buyerDetails.email}</p>}
+                  {(buyerDetails.phone || buyerDetails.email) && (
+                    <div className="mt-2 pt-1.5 border-t border-slate-200/50 max-w-sm text-[11px] pdf-text-muted space-y-0.5">
+                      {buyerDetails.phone && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-400 font-medium">Phone:</span>
+                          <span className="pdf-text-dark font-medium">{buyerDetails.phone}</span>
+                        </div>
+                      )}
+                      {buyerDetails.email && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-400 font-medium">Email:</span>
+                          <span className="pdf-text-dark font-medium break-all">{buyerDetails.email}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
