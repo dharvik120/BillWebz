@@ -38,8 +38,14 @@ export function calculateLineItem(
     const baseGrossTaxable = Number((grossInclusive / (1 + totalTaxRate)).toFixed(2));
     discountAmount = Number((baseGrossTaxable - taxableValue).toFixed(2));
 
+    const totalTaxAmount = Number((netInclusive - taxableValue).toFixed(2));
     const isInterState = normalizeState(sellerState) !== normalizeState(placeOfSupply);
-    const totalGstAmount = Number((taxableValue * (gstPercent / 100)).toFixed(2));
+
+    if (cessPercent > 0) {
+      cessAmount = Number((taxableValue * (cessPercent / 100)).toFixed(2));
+    }
+
+    const totalGstAmount = Number((totalTaxAmount - cessAmount).toFixed(2));
 
     if (isInterState) {
       igst = totalGstAmount;
@@ -51,11 +57,7 @@ export function calculateLineItem(
       sgst = Number((totalGstAmount - cgst).toFixed(2));
     }
 
-    if (cessPercent > 0) {
-      cessAmount = Number((taxableValue * (cessPercent / 100)).toFixed(2));
-    }
-
-    finalAmount = Number((taxableValue + cgst + sgst + igst + cessAmount).toFixed(2));
+    finalAmount = Number(netInclusive.toFixed(2));
   } else {
     // 1. Calculate Base Total
     const baseTotal = quantity * rawRate;
