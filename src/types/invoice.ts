@@ -39,6 +39,7 @@ export interface LineItem {
   quantity: number;
   unit: string;
   rate: number;
+  isTaxInclusive?: boolean;
   discountPercent: number;
   discountAmount: number;
   gstPercent: number;

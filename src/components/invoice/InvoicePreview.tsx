@@ -173,7 +173,7 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                   {item.hsnSac && <span className="text-[8px] pdf-text-muted">HSN: {item.hsnSac}</span>}
                 </td>
                 <td className="py-1 text-right">{item.quantity}</td>
-                <td className="py-1 text-right">{currency.symbol}{item.rate.toFixed(2)}</td>
+                <td className="py-1 text-right">{currency.symbol}{(item.isTaxInclusive && showTax ? (item.taxableValue / (item.quantity || 1)) : item.rate).toFixed(2)}</td>
                 <td className="py-1 text-right">{currency.symbol}{item.finalAmount.toFixed(2)}</td>
               </tr>
             ))}
@@ -416,7 +416,14 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                       <td className="px-3 py-3 text-right font-semibold pdf-text-dark">
                         {item.quantity} <span className="text-[9px] font-normal pdf-text-muted block">{item.unit}</span>
                       </td>
-                      <td className="px-3 py-3 text-right pdf-text-medium">{currency.symbol}{item.rate.toFixed(2)}</td>
+                      <td className="px-3 py-3 text-right pdf-text-medium">
+                        {currency.symbol}{(item.isTaxInclusive && showTax ? (item.taxableValue / (item.quantity || 1)) : item.rate).toFixed(2)}
+                        {item.isTaxInclusive && showTax && item.gstPercent > 0 && (
+                          <span className="text-[9px] block text-blue-600 dark:text-blue-400 font-normal">
+                            ({currency.symbol}{item.rate.toFixed(2)} with GST)
+                          </span>
+                        )}
+                      </td>
                       <td className="px-3 py-3 text-right pdf-text-muted">
                         {item.discountPercent > 0 ? (
                           <>

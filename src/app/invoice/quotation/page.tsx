@@ -74,6 +74,7 @@ const emptyQuotation = (defaultSeller: any, defaultTerms: any, defaultDec: any, 
       quantity: 1,
       unit: 'Service',
       rate: 35000,
+      isTaxInclusive: false,
       discountPercent: 0,
       discountAmount: 0,
       gstPercent: 18,
@@ -801,10 +802,16 @@ function QuotationForm() {
                   <div>
                     <label className="block text-slate-500 font-semibold mb-1">Validity (Days)</label>
                     <input
-                      type="number"
-                      value={invoiceData.metadata.validityDays || 30}
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="30"
+                      value={invoiceData.metadata.validityDays === 0 ? '' : (invoiceData.metadata.validityDays || '')}
+                      onFocus={(e) => e.target.select()}
                       onChange={(e) => {
-                        const val = parseInt(e.target.value, 10) || 0;
+                        let raw = e.target.value;
+                        if (!/^\d*$/.test(raw)) return;
+                        if (/^0\d+/.test(raw)) raw = raw.replace(/^0+/, '');
+                        const val = raw === '' ? 0 : parseInt(raw, 10) || 0;
                         const dateLimit = new Date(new Date(invoiceData.metadata.invoiceDate).getTime() + val * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
                         setInvoiceData((prev: Invoice | null) => {
                           if (!prev) return prev;

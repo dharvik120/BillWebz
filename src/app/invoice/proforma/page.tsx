@@ -75,6 +75,7 @@ const emptyProforma = (defaultSeller: any, defaultTerms: any, defaultDec: any, d
       quantity: 1,
       unit: 'Service',
       rate: 35000,
+      isTaxInclusive: false,
       discountPercent: 0,
       discountAmount: 0,
       gstPercent: 18,
@@ -729,10 +730,16 @@ function ProformaInvoiceForm() {
                   <div>
                     <label className="block text-slate-500 font-semibold mb-1">Validity Days</label>
                     <input
-                      type="number"
-                      value={invoiceData.metadata.validityDays || 0}
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="0"
+                      value={invoiceData.metadata.validityDays === 0 ? '' : (invoiceData.metadata.validityDays || '')}
+                      onFocus={(e) => e.target.select()}
                       onChange={(e) => {
-                        const days = parseInt(e.target.value, 10) || 0;
+                        let raw = e.target.value;
+                        if (!/^\d*$/.test(raw)) return;
+                        if (/^0\d+/.test(raw)) raw = raw.replace(/^0+/, '');
+                        const days = raw === '' ? 0 : parseInt(raw, 10) || 0;
                         const date = new Date(invoiceData.metadata.invoiceDate || Date.now());
                         date.setDate(date.getDate() + days);
                         

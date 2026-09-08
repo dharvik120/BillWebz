@@ -4,6 +4,75 @@ import React from 'react';
 import { Trash2, Copy, Plus, ArrowUp, ArrowDown, GripVertical } from 'lucide-react';
 import { LineItem } from '../../types/invoice';
 
+interface NumberInputProps {
+  value: number;
+  onChange: (val: number) => void;
+  placeholder?: string;
+  className?: string;
+  min?: number;
+  max?: number;
+}
+
+function NumberInput({ value, onChange, placeholder = '0', className, max }: NumberInputProps) {
+  const [displayValue, setDisplayValue] = React.useState<string>(value === 0 ? '' : String(value));
+
+  React.useEffect(() => {
+    const num = parseFloat(displayValue) || 0;
+    if (num !== value) {
+      setDisplayValue(value === 0 ? '' : String(value));
+    }
+  }, [value]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let raw = e.target.value;
+
+    if (raw === '') {
+      setDisplayValue('');
+      onChange(0);
+      return;
+    }
+
+    if (!/^\d*\.?\d*$/.test(raw)) return;
+
+    if (/^0\d+/.test(raw)) {
+      raw = raw.replace(/^0+/, '');
+      if (raw === '') raw = '0';
+    }
+
+    setDisplayValue(raw);
+    let parsed = parseFloat(raw) || 0;
+    if (max !== undefined && parsed > max) {
+      parsed = max;
+      setDisplayValue(String(max));
+    }
+    onChange(parsed);
+  };
+
+  const handleBlur = () => {
+    if (displayValue === '' || displayValue === '.') {
+      setDisplayValue('');
+      onChange(0);
+    } else {
+      const parsed = parseFloat(displayValue) || 0;
+      setDisplayValue(parsed === 0 ? '' : String(parsed));
+      onChange(parsed);
+    }
+  };
+
+  return (
+    <input
+      type="text"
+      inputMode="decimal"
+      placeholder={placeholder}
+      value={displayValue}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      onFocus={(e) => e.target.select()}
+      className={className}
+    />
+  );
+}
+
 interface LineItemsTableProps {
   items: LineItem[];
   onChange: (items: LineItem[]) => void;
@@ -31,6 +100,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
       quantity: 1,
       unit: 'Pcs',
       rate: 0,
+      isTaxInclusive: false,
       discountPercent: 0,
       discountAmount: 0,
       gstPercent: 18, // default 18% GST standard
@@ -98,17 +168,40 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-2">
         <h3 className="font-bold text-sm text-foreground/80 uppercase tracking-wider">Product Line Items</h3>
-        <button
-          type="button"
-          onClick={addItem}
-          className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
-        >
-          <Plus className="h-3.5 w-3.5" /> Add Product Item
-        </button>
+        <div className="flex items-center gap-2">
+          {showTax && items.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                const anyUnchecked = items.some((i) => !i.isTaxInclusive);
+                const updated = items.map((item) => ({
+                  ...item,
+                  isTaxInclusive: anyUnchecked,
+                }));
+                onChange(updated);
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all ${
+                items.every((i) => i.isTaxInclusive)
+                  ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-300 border-blue-300 dark:border-blue-800'
+                  : 'bg-secondary hover:bg-secondary/80 text-muted-foreground border-border/60'
+              }`}
+              title="Toggle all items to include GST in their rates"
+            >
+              <span>{items.every((i) => i.isTaxInclusive) ? '✓ All Rates With GST' : 'Make All With GST'}</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={addItem}
+            className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
+          >
+            <Plus className="h-3.5 w-3.5" /> Add Product Item
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto border border-border/60 rounded-xl">
-        <table className="w-full text-left text-xs border-collapse min-w-[1050px]">
+        <table className="w-full text-left text-xs border-collapse min-w-[1080px]">
           <thead>
             <tr className="bg-secondary/40 border-b border-border/50 text-muted-foreground font-semibold uppercase text-[10px] tracking-wider">
               <th className="px-2 py-3 w-[40px]"></th>
@@ -116,7 +209,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
               {showTax && <th className="px-3 py-3 w-[120px]">HSN/SAC</th>}
               <th className="px-3 py-3 w-[90px]">Qty</th>
               <th className="px-3 py-3 w-[100px]">Unit</th>
-              <th className="px-3 py-3 w-[130px]">Rate ({currencySymbol})</th>
+              <th className="px-3 py-3 w-[170px]">Rate ({currencySymbol})</th>
               <th className="px-3 py-3 w-[90px]">Discount %</th>
               {showTax && <th className="px-3 py-3 w-[110px]">GST %</th>}
               <th className="px-3 py-3 w-[130px] text-right">Actions</th>
@@ -177,13 +270,10 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
 
                   {/* Quantity */}
                   <td className="px-3 py-3">
-                    <input
-                      type="number"
-                      placeholder="Qty"
+                    <NumberInput
                       value={item.quantity}
-                      min="0"
-                      step="any"
-                      onChange={(e) => handleItemChange(idx, 'quantity', parseFloat(e.target.value) || 0)}
+                      onChange={(val) => handleItemChange(idx, 'quantity', val)}
+                      placeholder="1"
                       className="w-full px-3 py-2 border border-border/80 rounded-md text-[13px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
                     />
                   </td>
@@ -209,26 +299,42 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
 
                   {/* Rate */}
                   <td className="px-3 py-3">
-                    <input
-                      type="number"
-                      placeholder="Rate"
+                    <NumberInput
                       value={item.rate}
-                      min="0"
-                      step="any"
-                      onChange={(e) => handleItemChange(idx, 'rate', parseFloat(e.target.value) || 0)}
+                      onChange={(val) => handleItemChange(idx, 'rate', val)}
+                      placeholder="0"
                       className="w-full px-3 py-2 border border-border/80 rounded-md text-[13px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
                     />
+                    {showTax && (
+                      <div className="mt-1.5 space-y-1">
+                        <label className="flex items-center gap-1.5 cursor-pointer select-none text-[11px] hover:text-foreground">
+                          <input
+                            type="checkbox"
+                            checked={!!item.isTaxInclusive}
+                            onChange={(e) => handleItemChange(idx, 'isTaxInclusive', e.target.checked)}
+                            className="rounded border-border h-3.5 w-3.5 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                          />
+                          <span className={item.isTaxInclusive ? "font-bold text-blue-600 dark:text-blue-400" : "text-muted-foreground"}>
+                            With GST (Incl.)
+                          </span>
+                        </label>
+                        {item.isTaxInclusive && item.rate > 0 && item.gstPercent > 0 && (
+                          <div className="text-[10px] text-muted-foreground font-mono bg-blue-50/60 dark:bg-blue-950/40 p-1 rounded border border-blue-200/50 dark:border-blue-800/50">
+                            <div>Base: {currencySymbol}{(item.rate / (1 + (item.gstPercent + (item.cessPercent || 0)) / 100)).toFixed(2)}</div>
+                            <div className="text-blue-600 dark:text-blue-400">GST: {currencySymbol}{(item.rate - (item.rate / (1 + (item.gstPercent + (item.cessPercent || 0)) / 100))).toFixed(2)}</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </td>
 
                   {/* Discount */}
                   <td className="px-3 py-3">
-                    <input
-                      type="number"
-                      placeholder="%"
+                    <NumberInput
                       value={item.discountPercent}
-                      min="0"
-                      max="100"
-                      onChange={(e) => handleItemChange(idx, 'discountPercent', parseFloat(e.target.value) || 0)}
+                      onChange={(val) => handleItemChange(idx, 'discountPercent', val)}
+                      placeholder="0"
+                      max={100}
                       className="w-full px-3 py-2 border border-border/80 rounded-md text-[13px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </td>

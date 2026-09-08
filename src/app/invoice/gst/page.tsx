@@ -73,6 +73,7 @@ const emptyInvoice = (defaultSeller: any, defaultTerms: any, defaultDec: any, de
       quantity: 1,
       unit: 'Service',
       rate: 15000,
+      isTaxInclusive: false,
       discountPercent: 5,
       discountAmount: 750,
       gstPercent: 18,

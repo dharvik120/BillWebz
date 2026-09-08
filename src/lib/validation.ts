@@ -50,6 +50,7 @@ export const lineItemSchema = z.object({
   quantity: z.number().min(0.0001, 'Qty must be > 0'),
   unit: z.string().min(1, 'Unit is required'),
   rate: z.number().min(0, 'Rate must be >= 0'),
+  isTaxInclusive: z.boolean().optional().default(false),
   discountPercent: z.number().min(0).max(100).default(0),
   discountAmount: z.number().default(0),
   gstPercent: z.number().min(0).max(100).default(0),
