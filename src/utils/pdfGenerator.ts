@@ -2,16 +2,81 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 import { PaperSize } from '../types/invoice';
 
+/**
+ * Generate a clean, descriptive PDF filename based on document type and document number.
+ * e.g. GST_Invoice_GST-2026-0001.pdf, Quotation_QT-2026-0001.pdf, Proforma_Invoice_PI-2026-0001.pdf, Invoice_INV-2026-0001.pdf
+ */
+export function getDocumentPdfFilename(invoiceData?: any, fallbackName?: string): string {
+  if (fallbackName && fallbackName !== 'invoice.pdf' && fallbackName !== 'invoice') {
+    return fallbackName.endsWith('.pdf') ? fallbackName : `${fallbackName}.pdf`;
+  }
+
+  const type = invoiceData?.type;
+  const isTax = invoiceData?.showTax !== false;
+  const rawNum = (invoiceData?.metadata?.invoiceNumber || invoiceData?.metadata?.referenceNumber || '').trim();
+  const safeNum = rawNum ? `_${rawNum.replace(/[/\\?%*:|"<> ]/g, '-')}` : '';
+
+  if (type === 'gst') {
+    return isTax ? `GST_Invoice${safeNum}.pdf` : `Invoice${safeNum}.pdf`;
+  } else if (type === 'quotation') {
+    return `Quotation${safeNum}.pdf`;
+  } else if (type === 'proforma') {
+    return `Proforma_Invoice${safeNum}.pdf`;
+  } else if (type === 'nongst') {
+    return `Invoice${safeNum}.pdf`;
+  }
+
+  return `Invoice${safeNum}.pdf`;
+}
+
+/**
+ * Robust cross-platform blob trigger that forces download to the Downloads folder
+ * across desktop browsers, mobile Chrome, Safari, and Android WebViews.
+ */
+export function triggerBlobDownload(blob: Blob, filename: string): string {
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = blobUrl;
+  a.download = filename;
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+
+  setTimeout(() => {
+    try {
+      document.body.removeChild(a);
+    } catch (e) {}
+    // Keep blob URL in memory for 60 seconds so user can click "Open PDF"
+    setTimeout(() => {
+      try {
+        URL.revokeObjectURL(blobUrl);
+      } catch (e) {}
+    }, 60000);
+  }, 1000);
+
+  return blobUrl;
+}
+
+export interface PdfExportResult {
+  blob: Blob | null;
+  blobUrl: string | null;
+  filename: string;
+}
+
 export async function downloadInvoicePdf(
   elementId: string,
-  filename: string, // Kept for compatibility, but we force 'invoice'
-  paperSize: PaperSize,
-  invoiceData?: any // Kept for compatibility
-): Promise<Blob | null> {
+  filename?: string,
+  paperSize: PaperSize = 'a4',
+  invoiceData?: any,
+  autoDownload: boolean = true
+): Promise<PdfExportResult> {
+  const targetFilename = getDocumentPdfFilename(invoiceData, filename);
+
   const element = document.getElementById(elementId);
   if (!element) {
     console.error(`Element with id ${elementId} not found`);
-    return null;
+    return { blob: null, blobUrl: null, filename: targetFilename };
   }
 
   try {
@@ -130,14 +195,32 @@ export async function downloadInvoicePdf(
       }
     });
 
-    // Save/Download file as "invoice.pdf" only
-    pdf.save('invoice.pdf');
+    // 3. Generate the binary Blob
+    const blob = pdf.output('blob');
+    let blobUrl: string | null = null;
 
-    // Output raw blob for WhatsApp/Email sharing
-    return pdf.output('blob');
+    if (autoDownload) {
+      blobUrl = triggerBlobDownload(blob, targetFilename);
+      // Dispatch notification event for user feedback banner / toast
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('billwebz-download-notification', {
+            detail: {
+              filename: targetFilename,
+              blobUrl,
+              message: `Saved to your Downloads folder as "${targetFilename}".`,
+            },
+          })
+        );
+      }
+    } else {
+      blobUrl = URL.createObjectURL(blob);
+    }
+
+    return { blob, blobUrl, filename: targetFilename };
   } catch (error) {
     console.error('Error generating PDF', error);
-    return null;
+    return { blob: null, blobUrl: null, filename: targetFilename };
   }
 }
 

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { User } from 'lucide-react';
-import { StateSelector } from '@/components/invoice/StateSelector';
+import { INDIAN_STATES } from '@/components/invoice/StateSelector';
 import { BentoCard } from '@/components/invoice/BentoCard';
 
 interface BuyerSectionProps {
@@ -165,13 +165,27 @@ export function BuyerSection({
 
         <div>
           <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-            Billing State / UT (Manual or Dropdown)
+            Billing State / UT
           </label>
-          <StateSelector
+          <input
+            type="text"
+            list="buyer-states-list"
+            placeholder="Type state (e.g. Maharashtra, Delhi, Gujarat...)"
             value={buyerDetails.state || ''}
-            onChange={(val) => onUpdateField('state', val)}
-            placeholder="Type or select client state..."
+            onChange={(e) => {
+              const val = e.target.value;
+              onUpdateField('state', val);
+              if (!buyerDetails.placeOfSupply || buyerDetails.placeOfSupply === buyerDetails.state) {
+                onUpdateField('placeOfSupply', val);
+              }
+            }}
+            className="w-full h-11 px-3.5 bg-background border border-border/80 rounded-xl text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs"
           />
+          <datalist id="buyer-states-list">
+            {INDIAN_STATES.map((s) => (
+              <option key={s} value={s} />
+            ))}
+          </datalist>
         </div>
 
         <div>
@@ -204,11 +218,19 @@ export function BuyerSection({
           <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
             Place of Supply (State)
           </label>
-          <StateSelector
+          <input
+            type="text"
+            list="pos-states-list"
+            placeholder="Type place of supply state..."
             value={buyerDetails.placeOfSupply || ''}
-            onChange={(val) => onUpdateField('placeOfSupply', val)}
-            placeholder="Type or select place of supply..."
+            onChange={(e) => onUpdateField('placeOfSupply', e.target.value)}
+            className="w-full h-11 px-3.5 bg-background border border-border/80 rounded-xl text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs"
           />
+          <datalist id="pos-states-list">
+            {INDIAN_STATES.map((s) => (
+              <option key={s} value={s} />
+            ))}
+          </datalist>
         </div>
       </div>
     </BentoCard>

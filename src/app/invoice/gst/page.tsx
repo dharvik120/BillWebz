@@ -37,11 +37,11 @@ import { useInvoiceStore } from '@/hooks/useInvoiceStore';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { calculateInvoiceTotals } from '@/utils/gstCalculator';
-import { downloadInvoicePdf } from '@/utils/pdfGenerator';
+import { downloadInvoicePdf, triggerBlobDownload } from '@/utils/pdfGenerator';
+import { DownloadNotificationToast } from '@/components/invoice/DownloadNotificationToast';
 import { InvoicePreview } from '@/components/invoice/InvoicePreview';
 import { InvoicePreviewViewport } from '@/components/invoice/InvoicePreviewViewport';
 import { LineItemsTable } from '@/components/invoice/LineItemsTable';
-import { StateSelector } from '@/components/invoice/StateSelector';
 import { BentoNav } from '@/components/invoice/BentoNav';
 import { BentoCard } from '@/components/invoice/BentoCard';
 import { SellerSection } from '@/components/invoice/sections/SellerSection';
@@ -54,28 +54,44 @@ import { countriesList, statesByCountry } from '@/utils/locationData';
 import { getNextDocumentNumber } from '@/utils/documentNumbering';
 import confetti from 'canvas-confetti';
 
-const emptyInvoice = (defaultSeller: any, defaultTerms: any, defaultDec: any, defaultCurr: any, existingInvoices: Invoice[] = []): Invoice => ({
-  type: 'gst',
-  status: 'Draft',
-  theme: 'blue',
-  paperSize: 'a4',
-  currency: { symbol: defaultCurr?.symbol || '₹', code: defaultCurr?.code || 'INR' },
-  watermark: true,
-  sellerDetails: { 
-    ...defaultSeller,
-    state: (defaultSeller?.state === 'Delhi' ? '' : defaultSeller?.state) || '',
-    country: (defaultSeller?.country === 'IN' ? '' : defaultSeller?.country) || '',
-  },
-  paymentDetails: {
-    bankName: defaultSeller?.bankName || '',
-    accountNumber: defaultSeller?.accountNumber || '',
-    accountHolderName: defaultSeller?.name || '',
-    ifsc: defaultSeller?.ifsc || '',
-    branch: defaultSeller?.branch || '',
-    accountType: 'Current',
-    upiId: defaultSeller?.upiId || '',
-    paymentInstructions: ''
-  },
+const getInitialSellerProfile = (fallback: any) => {
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('billwebz_default_seller');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.state === 'Delhi') parsed.state = '';
+        return { ...fallback, ...parsed };
+      }
+    } catch (e) {}
+  }
+  return fallback;
+};
+
+const emptyInvoice = (defaultSeller: any, defaultTerms: any, defaultDec: any, defaultCurr: any, existingInvoices: Invoice[] = []): Invoice => {
+  const seller = getInitialSellerProfile(defaultSeller);
+  return {
+    type: 'gst',
+    status: 'Draft',
+    theme: 'blue',
+    paperSize: 'a4',
+    currency: { symbol: defaultCurr?.symbol || '₹', code: defaultCurr?.code || 'INR' },
+    watermark: true,
+    sellerDetails: { 
+      ...seller,
+      state: (seller?.state === 'Delhi' ? '' : seller?.state) || '',
+      country: (seller?.country === 'IN' ? '' : seller?.country) || '',
+    },
+    paymentDetails: {
+      bankName: seller?.bankName || '',
+      accountNumber: seller?.accountNumber || '',
+      accountHolderName: seller?.name || '',
+      ifsc: seller?.ifsc || '',
+      branch: seller?.branch || '',
+      accountType: 'Current',
+      upiId: seller?.upiId || '',
+      paymentInstructions: ''
+    },
   buyerDetails: {
     name: '',
     companyName: '',
@@ -139,7 +155,8 @@ const emptyInvoice = (defaultSeller: any, defaultTerms: any, defaultDec: any, de
   showTax: true,
   createdAt: 0,
   updatedAt: 0
-});
+  };
+};
 
 function GstInvoiceForm() {
   const router = useRouter();
@@ -219,11 +236,12 @@ function GstInvoiceForm() {
         console.warn("Database save failed, downloading PDF anyway:", dbErr);
       }
 
-      const blob = await downloadInvoicePdf(
+      const { blob } = await downloadInvoicePdf(
         'invoice-pdf-export-sheet', 
-        'invoice',
+        undefined,
         invoiceData.paperSize,
-        updatedInvoice
+        updatedInvoice,
+        true
       );
       if (blob) {
         confetti({
@@ -246,14 +264,51 @@ function GstInvoiceForm() {
     onSave: () => handleSaveDraft(true),
   });
 
-  // Background Auto-Save
+  // Background Auto-Save to IndexedDB
   useEffect(() => {
     if (!invoiceData) return;
     const timer = setTimeout(() => {
       saveInvoice(invoiceData);
-    }, 3000); // Auto-saves changes to IndexedDB after 3s idle time
+    }, 3000);
     return () => clearTimeout(timer);
   }, [invoiceData, saveInvoice]);
+
+  // Auto-persist business seller profile & settings to localStorage
+  useEffect(() => {
+    if (!invoiceData?.sellerDetails) return;
+    const timer = setTimeout(() => {
+      try {
+        const sellerProfile = {
+          ...invoiceData.sellerDetails,
+          bankName: invoiceData.paymentDetails?.bankName || invoiceData.sellerDetails.bankName,
+          accountNumber: invoiceData.paymentDetails?.accountNumber || invoiceData.sellerDetails.accountNumber,
+          accountHolderName: invoiceData.paymentDetails?.accountHolderName || invoiceData.sellerDetails.accountHolderName,
+          ifsc: invoiceData.paymentDetails?.ifsc || invoiceData.sellerDetails.ifsc,
+          branch: invoiceData.paymentDetails?.branch || invoiceData.sellerDetails.branch,
+          upiId: invoiceData.paymentDetails?.upiId || invoiceData.sellerDetails.upiId,
+        };
+        localStorage.setItem('billwebz_default_seller', JSON.stringify(sellerProfile));
+        if (invoiceData.termsAndConditions) {
+          localStorage.setItem('billwebz_default_terms', invoiceData.termsAndConditions);
+        }
+        if (invoiceData.declaration) {
+          localStorage.setItem('billwebz_default_declaration', invoiceData.declaration);
+        }
+        if (invoiceData.currency) {
+          localStorage.setItem('billwebz_default_currency', JSON.stringify(invoiceData.currency));
+        }
+      } catch (e) {
+        console.error('Error auto-saving seller defaults:', e);
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [
+    invoiceData?.sellerDetails,
+    invoiceData?.paymentDetails,
+    invoiceData?.termsAndConditions,
+    invoiceData?.declaration,
+    invoiceData?.currency
+  ]);
 
   if (!invoiceData) {
     return (
@@ -376,10 +431,70 @@ function GstInvoiceForm() {
     }
   };
 
-  const handleShareWhatsApp = () => {
-    const text = `Hi, please find attached the Invoice from ${invoiceData.sellerDetails.name}. Total amount due is ${invoiceData.currency.symbol}${invoiceData.totals.grandTotal}.`;
-    const encodedText = encodeURIComponent(text);
-    window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
+  const [isSharingWhatsApp, setIsSharingWhatsApp] = useState(false);
+
+  const handleShareWhatsApp = async () => {
+    if (!invoiceData) return;
+    setIsSharingWhatsApp(true);
+    try {
+      const clientName = invoiceData.buyerDetails?.name || 'Customer';
+      const grandTotal = `${invoiceData.currency?.symbol || '₹'}${invoiceData.totals?.grandTotal || 0}`;
+      const docTitle = invoiceData.showTax ? 'GST Tax Invoice' : 'Invoice';
+      const docNo = invoiceData.metadata?.invoiceNumber || '';
+      const shareText = `Hi ${clientName},\n\nPlease find attached ${docTitle} #${docNo} from ${invoiceData.sellerDetails?.name || 'BillWebz'}.\nTotal Amount Due: ${grandTotal}.\n\nThank you for your business!`;
+
+      // 1. Generate the PDF
+      const { blob, blobUrl, filename } = await downloadInvoicePdf(
+        'invoice-pdf-export-sheet',
+        undefined,
+        invoiceData.paperSize,
+        invoiceData,
+        false
+      );
+
+      // 2. Mobile Web Share API with attached PDF file
+      if (blob && typeof navigator !== 'undefined' && navigator.canShare) {
+        const file = new File([blob], filename, { type: 'application/pdf' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: filename,
+            text: shareText
+          });
+          return;
+        }
+      }
+
+      // 3. Fallback for Desktop / non-file sharing: Download file and open WhatsApp
+      if (blob) {
+        triggerBlobDownload(blob, filename);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('billwebz-download-notification', {
+              detail: {
+                filename,
+                blobUrl,
+                message: `PDF saved to Downloads! Opening WhatsApp so you can attach it to your chat.`
+              }
+            })
+          );
+        }
+      }
+
+      const encodedText = encodeURIComponent(shareText);
+      const rawPhone = (invoiceData.buyerDetails?.phone || '').replace(/[^0-9]/g, '');
+      const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
+      const waUrl = cleanPhone 
+        ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedText}` 
+        : `https://api.whatsapp.com/send?text=${encodedText}`;
+      window.open(waUrl, '_blank');
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') {
+        console.error('WhatsApp share error', err);
+      }
+    } finally {
+      setIsSharingWhatsApp(false);
+    }
   };
 
 
@@ -509,9 +624,11 @@ function GstInvoiceForm() {
 
           <button
             onClick={handleShareWhatsApp}
-            className="h-10 px-4 text-xs sm:text-sm font-bold bg-green-600 hover:bg-green-700 text-white rounded-xl flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+            disabled={isSharingWhatsApp}
+            className="h-10 px-4 text-xs sm:text-sm font-bold bg-green-600 hover:bg-green-700 text-white rounded-xl flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
           >
-            <Share2 className="h-4 w-4" /> <span>WhatsApp</span>
+            {isSharingWhatsApp ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
+            <span>{isSharingWhatsApp ? 'Sharing...' : 'WhatsApp'}</span>
           </button>
         </div>
       </header>
@@ -860,6 +977,9 @@ function GstInvoiceForm() {
         <option value="New South Wales" />
         <option value="Victoria" />
       </datalist>
+
+      {/* Floating Download Notification Toast */}
+      <DownloadNotificationToast />
     </div>
   );
 }

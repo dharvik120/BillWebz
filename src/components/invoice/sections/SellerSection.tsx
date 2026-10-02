@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Building, ChevronDown, ChevronUp } from 'lucide-react';
-import { StateSelector } from '@/components/invoice/StateSelector';
+import { INDIAN_STATES } from '@/components/invoice/StateSelector';
 import { BentoCard } from '@/components/invoice/BentoCard';
 
 interface SellerSectionProps {
@@ -139,13 +139,21 @@ export function SellerSection({
 
         <div>
           <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-            State / UT (Manual or Dropdown)
+            State / UT
           </label>
-          <StateSelector
+          <input
+            type="text"
+            list="seller-states-list"
+            placeholder="Type state (e.g. Maharashtra, Gujarat...)"
             value={sellerDetails.state || ''}
-            onChange={(val) => onUpdateField('state', val)}
-            placeholder="Type or select seller state..."
+            onChange={(e) => onUpdateField('state', e.target.value)}
+            className="w-full h-11 px-3.5 bg-background border border-border/80 rounded-xl text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs"
           />
+          <datalist id="seller-states-list">
+            {INDIAN_STATES.map((s) => (
+              <option key={s} value={s} />
+            ))}
+          </datalist>
         </div>
 
         <div>

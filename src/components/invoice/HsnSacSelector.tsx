@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, ChevronDown, Check, BookOpen } from 'lucide-react';
@@ -9,9 +9,18 @@ interface HsnSacSelectorProps {
   onChange: (code: string) => void;
   onSelectRate?: (rate: number) => void;
   currentGstPercent?: number;
+  className?: string;
+  inputClassName?: string;
 }
 
-export function HsnSacSelector({ value, onChange, onSelectRate, currentGstPercent }: HsnSacSelectorProps) {
+export function HsnSacSelector({
+  value,
+  onChange,
+  onSelectRate,
+  currentGstPercent,
+  className = '',
+  inputClassName = ''
+}: HsnSacSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'goods' | 'services'>('all');
@@ -42,22 +51,25 @@ export function HsnSacSelector({ value, onChange, onSelectRate, currentGstPercen
   }, [search, activeTab]);
 
   return (
-    <div className="relative w-full" ref={dropdownRef}>
-      <div className="flex items-center gap-1">
+    <div className={`relative w-full ${className}`} ref={dropdownRef}>
+      <div className="flex items-center gap-1.5 w-full">
         <input
           type="text"
           placeholder="HSN/SAC"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full px-2.5 py-1.5 border border-border/80 rounded-md text-[12px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono"
+          className={
+            inputClassName ||
+            'w-full px-2.5 py-1.5 border border-border/80 rounded-md text-[12px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono'
+          }
         />
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="p-1.5 border border-border/80 rounded-md bg-secondary/60 hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors shrink-0"
+          className="h-11 px-3 border border-border/80 rounded-xl bg-secondary/70 hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors shrink-0 flex items-center justify-center shadow-2xs"
           title="Browse HSN / SAC catalogue"
         >
-          <BookOpen className="h-3.5 w-3.5" />
+          <BookOpen className="h-4 w-4" />
         </button>
       </div>
 
