@@ -1,0 +1,907 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-primary-container":"#dad7ff","tertiary-fixed":"#acedff","on-secondary":"#ffffff","surface-tint":"#4d44e3","primary-container":"#4f46e5","secondary-container":"#316bf3","inverse-surface":"#293040","on-primary-fixed":"#0f0069","on-secondary-fixed":"#00174b","on-background":"#141b2b","secondary-fixed":"#dbe1ff","primary":"#3525cd","on-error-container":"#93000a","tertiary-fixed-dim":"#4cd7f6","tertiary-container":"#006a7c","error":"#ba1a1a","surface-variant":"#dce2f7","primary-fixed":"#e2dfff","on-primary":"#ffffff","on-surface":"#141b2b","inverse-primary":"#c3c0ff","on-primary-fixed-variant":"#3323cc","on-secondary-fixed-variant":"#003ea8","secondary-fixed-dim":"#b4c5ff","outline-variant":"#c7c4d8","surface-container-low":"#f1f3ff","surface-container-highest":"#dce2f7","outline":"#777587","surface":"#f9f9ff","surface-container-lowest":"#ffffff","on-secondary-container":"#fefcff","background":"#f9f9ff","on-tertiary-container":"#93e8ff","error-container":"#ffdad6","surface-dim":"#d3daef","tertiary":"#00505f","primary-fixed-dim":"#c3c0ff","on-tertiary":"#ffffff","on-tertiary-fixed":"#001f26","surface-container-high":"#e1e8fd","on-error":"#ffffff","on-tertiary-fixed-variant":"#004e5c","surface-bright":"#f9f9ff","secondary":"#0051d5","inverse-on-surface":"#edf0ff","surface-container":"#e9edff","on-surface-variant":"#464555"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin-desktop":"2rem","gutter":"1rem","space-xs":"0.25rem","margin-tablet":"1.5rem","space-xl":"2rem","space-sm":"0.5rem","gutter-desktop":"1.5rem","margin":"1rem","space-lg":"1.25rem","space-md":"0.75rem"},"fontFamily":{"currency-display":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"currency-table":["Plus Jakarta Sans"],"display-lg-mobile":["Plus Jakarta Sans"],"label-sm":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],"display-lg":["Plus Jakarta Sans"],"title-md":["Plus Jakarta Sans"],"title-lg":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"]},"fontSize":{"currency-display":["28px",{"lineHeight":"34px","letterSpacing":"-0.01em","fontWeight":"700"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.005em","fontWeight":"600"}],"currency-table":["14px",{"lineHeight":"20px","fontWeight":"600"}],"display-lg-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.015em","fontWeight":"700"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.04em","fontWeight":"600"}],"label-md":["13px",{"lineHeight":"18px","fontWeight":"500"}],"display-lg":["36px",{"lineHeight":"44px","letterSpacing":"-0.02em","fontWeight":"700"}],"title-md":["16px",{"lineHeight":"22px","fontWeight":"600"}],"title-lg":["18px",{"lineHeight":"24px","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"body-lg":["15px",{"lineHeight":"22px","fontWeight":"400"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-72 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col"><div class="h-16 px-space-lg flex items-center justify-between bg-surface-container-lowest"><div class="flex items-center gap-space-sm"><img alt="BillWebz Brand Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1V3Yel0edVljemP6zpQsCBjd_W4TvSYxc_P368xlGnbfD4K9kOwtD7z-AfLPi_AiT-2wib3iuZQmRHMu7Xl91-UCIApsI0cbNJOJMvleyL8Qm2LjXs-YblZzk8_7Lhq_XDThKFbyemCopdvdELOOqlGlNHNnKKTeVui0nq2qBGfN_4P1LAQeQHh_M7SgPMbEEhy6AxHp26NYIfuKG7gsOIqEu6RAmE_5GRZQLRbdqULENv3lZeCWrJrZjo"><span class="font-headline-md text-headline-md font-bold tracking-tight text-primary">BillWebz</span></div><span class="px-space-xs py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-primary font-semibold uppercase tracking-wider">GST v2.4</span></div><div class="px-space-md py-space-sm"><nav class="flex flex-col gap-1" data-active-classes="bg-primary-container text-on-primary font-title-md font-semibold shadow-[0_1px_3px_0_rgba(17,24,39,0.04)] rounded-lg"><div class="px-space-sm pt-space-md pb-space-xs font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Main</div><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[20px]">grid_view</span><span>Dashboard</span></a><div class="flex flex-col"><div class="flex items-center justify-between px-space-md py-space-sm text-on-surface-variant font-title-md text-title-md"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[20px]">note_add</span><span>Create Document</span></div><span class="material-symbols-outlined text-[16px] text-outline">expand_more</span></div><div class="pl-8 pr-space-xs flex flex-col gap-0.5"><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="gst-tax-invoice" href="#">GST Tax Invoice</a><a class="flex items-center px-space-md py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="regular-invoice" href="#">Regular Invoice</a><a class="flex items-center px-space-md py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="quotation" href="#">Quotation / Estimate</a><a class="flex items-center px-space-md py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="proforma-invoice" href="#">Proforma Invoice</a></div></div><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="all-documents" href="#"><span class="material-symbols-outlined text-[20px]">receipt_long</span><span>All Documents</span></a><div class="px-space-sm pt-space-lg pb-space-xs font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Management</div><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="customers" href="#"><span class="material-symbols-outlined text-[20px]">group</span><span>Customers</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="products-hsn-sac" href="#"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span>Products &amp; HSN/SAC</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="document-history" href="#"><span class="material-symbols-outlined text-[20px]">manage_history</span><span>Document History</span></a><div class="px-space-sm pt-space-lg pb-space-xs font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Insights &amp; Customization</div><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="reports-analytics" href="#"><span class="material-symbols-outlined text-[20px]">query_stats</span><span>Reports &amp; Analytics</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="document-themes" href="#"><span class="material-symbols-outlined text-[20px]">palette</span><span>Document Themes</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="business-profile" href="#"><span class="material-symbols-outlined text-[20px]">domain</span><span>Business Profile</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined text-[20px]">tune</span><span>Settings</span></a></nav></div></div><div class="p-space-md bg-surface-container-lowest flex flex-col gap-space-xs"><div class="flex items-center justify-between px-space-md py-space-sm rounded-lg bg-surface-container-low"><div class="flex items-center gap-space-xs"><span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface font-semibold">GST Portal Connected</span></div><span class="material-symbols-outlined text-[16px] text-tertiary-container">verified_user</span></div><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="help-support" href="#"><span class="material-symbols-outlined text-[18px]">help_center</span><span>Help &amp; Support</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-body-sm text-body-sm text-error hover:bg-error-container hover:text-on-error-container transition-colors" data-path="login" href="#"><span class="material-symbols-outlined text-[18px]">logout</span><span>Sign Out</span></a></div></aside><div class="pl-72 flex flex-col min-h-screen"><header class="fixed top-0 left-72 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 px-gutter-desktop flex items-center justify-between gap-space-lg"><div class="flex items-center gap-space-md flex-1 max-w-xl"><div class="relative flex items-center bg-surface-container-low hover:bg-surface-container px-space-md py-space-xs rounded-lg transition-colors cursor-pointer"><div class="flex flex-col text-left"><span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Active Enterprise</span><div class="flex items-center gap-space-xs"><span class="font-title-md text-title-md font-semibold text-on-surface truncate max-w-[240px]">Bharat Technologies Pvt Ltd</span><span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container-highest px-1.5 py-0.5 rounded font-mono">27AABCB1234D1Z2</span><span class="material-symbols-outlined text-[18px] text-outline">unfold_more</span></div></div></div><div class="flex-1 relative"><div class="flex items-center w-full bg-surface-container-low px-space-md py-2 rounded-lg text-on-surface-variant cursor-pointer hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-[18px] mr-space-sm text-outline">search</span><span class="font-body-sm text-body-sm text-outline flex-1">Search invoices, clients, HSN...</span><kbd class="hidden sm:inline-block px-1.5 py-0.5 font-label-sm text-label-sm font-semibold text-outline bg-surface-container-lowest rounded shadow-[0_1px_2px_rgba(0,0,0,0.05)]">⌘K</kbd></div></div></div><div class="flex items-center gap-space-md"><button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-primary-container text-on-primary font-title-md text-title-md font-semibold shadow-[0_1px_3px_0_rgba(17,24,39,0.04)] hover:bg-primary transition-colors" type="button"><span class="material-symbols-outlined text-[18px]">add</span><span>Create</span><span class="material-symbols-outlined text-[16px]">arrow_drop_down</span></button><button class="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span></button><div class="flex items-center gap-space-sm pl-space-sm"><div class="flex flex-col items-end text-right"><span class="font-title-md text-title-md font-semibold text-on-surface leading-tight">Rajesh Varma</span><span class="font-label-sm text-label-sm text-outline font-medium">Executive Admin</span></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-[0_1px_3px_0_rgba(17,24,39,0.04)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPJa6H0yZH1U5NDH95TuBGTyivle3h4LSmwh2XZAuMvJNkUBCGL_6BXqRykYsuUksj3Zs-qpgIA2s1SKFBGmBD1ozW2XTeOJFVSmuywuB44-vCsEPLk8kyzFxn2K_WozAW3ijL6-Hd498a1iAeLB3y7G0TjGV6g2cgNIz9DXTjpE1WPG7cpIulhxE-8S8TtYtqlmklDMoVRw-_gj8XXPPprbE1jl2maQT1K6AGCIA1D4urLlyf5ecB"></div></div></header><main class="w-full pt-16 bg-background flex-1"><div class="flex flex-col w-full">
+<!-- Document Type Selector & Context Bar -->
+<div class="w-full bg-surface-container-lowest px-margin-desktop py-space-md shadow-sm sticky top-16 z-30 flex flex-wrap items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<div class="flex p-1 bg-surface-container-low rounded-xl">
+<button class="px-space-md py-1.5 rounded-lg font-title-md text-title-md transition-all duration-200 bg-primary-container text-on-primary shadow-sm flex items-center gap-space-xs" id="doc-type-gst" onclick="setDocType('gst')">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>GST Tax Invoice</span>
+</button>
+<button class="px-space-md py-1.5 rounded-lg font-title-md text-title-md transition-all duration-200 text-on-surface-variant hover:text-on-surface flex items-center gap-space-xs" id="doc-type-regular" onclick="setDocType('regular')">
+<span class="material-symbols-outlined text-[18px]">receipt</span>
+<span>Commercial Invoice (Non-GST)</span>
+</button>
+<button class="px-space-md py-1.5 rounded-lg font-title-md text-title-md transition-all duration-200 text-on-surface-variant hover:text-on-surface flex items-center gap-space-xs" id="doc-type-quote" onclick="setDocType('quote')">
+<span class="material-symbols-outlined text-[18px]">request_quote</span>
+<span>Quotation / Estimate</span>
+</button>
+</div>
+<span class="h-6 w-[1px] bg-surface-variant hidden md:block"></span>
+<div class="hidden lg:flex items-center gap-space-xs text-outline font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+<span>Autosaved draft • <span id="clock-timestamp">Just now</span></span>
+</div>
+</div>
+<!-- Quick Actions in Header -->
+<div class="flex items-center gap-space-sm">
+<button class="flex items-center gap-space-xs px-space-md py-1.5 bg-surface-container text-primary font-title-md text-title-md rounded-lg hover:bg-surface-variant transition-colors" onclick="applySamplePreset()" title="Load real Indian SaaS business demo dataset">
+<span class="material-symbols-outlined text-[18px]">auto_fix_high</span>
+<span class="hidden sm:inline">Load Sample Data</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-sm py-1.5 text-on-surface-variant hover:text-error transition-colors rounded-lg font-label-md text-label-md" onclick="resetWorkspace()">
+<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+<span>Reset</span>
+</button>
+</div>
+</div>
+<!-- Main Split Canvas -->
+<div class="w-full max-w-[1536px] mx-auto px-gutter-desktop py-space-xl grid grid-cols-1 xl:grid-cols-12 gap-space-xl">
+<!-- LEFT PANEL: Dynamic Multi-Section Form (Cols 1-7) -->
+<div class="xl:col-span-7 flex flex-col gap-space-lg">
+<!-- Section 1: Document Metadata & Fiscal Parameters -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg">
+<div class="flex items-center justify-between pb-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">assignment</span>
+</span>
+<div>
+<h2 class="font-title-lg text-title-lg text-on-surface">Document Details</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Core serial tracking and dispatch terms</p>
+</div>
+</div>
+<span class="px-space-sm py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm uppercase" id="active-doc-badge">GST Tax Invoice</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-md pt-space-xs">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1">Invoice / Doc Number</label>
+<input class="w-full bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:bg-surface-container-lowest transition-all" id="doc-number" oninput="updatePreview()" type="text" value="BW-2025-0842">
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1">Issue Date</label>
+<input class="w-full bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:bg-surface-container-lowest transition-all" id="doc-date" oninput="updatePreview()" type="date" value="2025-05-14">
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1">Due Date / Valid Until</label>
+<input class="w-full bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:bg-surface-container-lowest transition-all" id="doc-due-date" oninput="updatePreview()" type="date" value="2025-06-13">
+</div>
+</div>
+<!-- Tax Treatment Configuration (Only in GST mode) -->
+<div class="mt-space-md p-space-md bg-surface-container-low rounded-xl flex flex-wrap items-center justify-between gap-space-md" id="gst-mode-controls">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[22px]">tune</span>
+<div>
+<p class="font-title-md text-title-md text-on-surface">Tax Calculation Mode</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Switch pricing behavior for all line items</p>
+</div>
+</div>
+<div class="flex items-center gap-space-xs bg-surface-container-lowest p-1 rounded-lg">
+<button class="px-space-md py-1 rounded font-label-md text-label-md bg-primary-container text-on-primary shadow-sm transition-all" id="tax-exclusive-btn" onclick="setTaxCalculationMode('exclusive')" type="button">
+              Tax Exclusive (+ GST)
+            </button>
+<button class="px-space-md py-1 rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all" id="tax-inclusive-btn" onclick="setTaxCalculationMode('inclusive')" type="button">
+              Tax Inclusive (Reverse GST)
+            </button>
+</div>
+</div>
+</div>
+<!-- Section 2: Parties Information (Zero Shipping!) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">
+<!-- Seller Entity (Your Organization) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-space-sm mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">storefront</span>
+<span class="font-title-md text-title-md text-on-surface">Seller (Issued By)</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded">Primary Biz</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Company / Entity Name</label>
+<input class="w-full bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="seller-name" oninput="updatePreview()" type="text" value="Bharat Cloud Infra Technologies Pvt Ltd">
+</div>
+<div id="seller-gstin-row">
+<label class="block font-label-sm text-label-sm text-outline mb-1">GSTIN (15 Alpha-Numeric)</label>
+<input class="w-full uppercase font-mono bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="seller-gstin" maxlength="15" oninput="handleSellerGstinChange()" type="text" value="27AABCB1234D1Z2">
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Country</label>
+<select class="w-full bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="seller-country" onchange="updatePreview()">
+<option selected="" value="India">India (IN)</option>
+<option value="United States">United States (US)</option>
+<option value="United Arab Emirates">United Arab Emirates (UAE)</option>
+<option value="Singapore">Singapore (SG)</option>
+<option value="United Kingdom">United Kingdom (UK)</option>
+<option value="Custom">Manual Override / Other</option>
+</select>
+</div>
+<div class="grid grid-cols-2 gap-space-xs">
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">State / GST State Code</label>
+<select class="w-full bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="seller-state" onchange="updateTaxJurisdiction()">
+<option selected="" value="27 - Maharashtra">27 - Maharashtra</option>
+<option value="29 - Karnataka">29 - Karnataka</option>
+<option value="07 - Delhi">07 - Delhi</option>
+<option value="24 - Gujarat">24 - Gujarat</option>
+<option value="33 - Tamil Nadu">33 - Tamil Nadu</option>
+<option value="19 - West Bengal">19 - West Bengal</option>
+<option value="09 - Uttar Pradesh">09 - Uttar Pradesh</option>
+<option value="36 - Telangana">36 - Telangana</option>
+<option value="06 - Haryana">06 - Haryana</option>
+<option value="Manual">Manual State Entry</option>
+</select>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">6-Digit PIN Code</label>
+<input class="w-full font-mono bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="seller-pin" maxlength="6" oninput="updatePreview()" placeholder="e.g. 400051" type="text" value="400051">
+</div>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Premises / Street Address</label>
+<input class="w-full bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="seller-address" oninput="updatePreview()" type="text" value="Level 4, Platina Tower, Bandra Kurla Complex, Bandra East, Mumbai">
+</div>
+</div>
+</div>
+</div>
+<!-- Buyer Entity (Billed To - Explicitly NO shipping) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-space-sm mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary-container text-[20px]">person_pin</span>
+<span class="font-title-md text-title-md text-on-surface">Client / Billed To</span>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary-container bg-surface-container px-2 py-0.5 rounded">Verified Recipient</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Client Business / Person Name</label>
+<input class="w-full bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="buyer-name" oninput="updatePreview()" type="text" value="Apex Dynamics FinTech Solutions LLP">
+</div>
+<div id="buyer-gstin-row">
+<div class="flex items-center justify-between mb-1">
+<label class="font-label-sm text-label-sm text-outline">Client GSTIN / UIN</label>
+<span class="font-label-sm text-label-sm text-secondary bg-surface-container px-1.5 rounded" id="buyer-inter-state-badge">Intra-State (CGST+SGST)</span>
+</div>
+<input class="w-full uppercase font-mono bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="buyer-gstin" maxlength="15" oninput="handleBuyerGstinChange()" type="text" value="27AAFFA9988C1Z4">
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Country</label>
+<select class="w-full bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="buyer-country" onchange="updatePreview()">
+<option selected="" value="India">India (IN)</option>
+<option value="United States">United States (US)</option>
+<option value="United Arab Emirates">United Arab Emirates (UAE)</option>
+<option value="Singapore">Singapore (SG)</option>
+<option value="Custom">Manual Override / Other</option>
+</select>
+</div>
+<div class="grid grid-cols-2 gap-space-xs">
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">State / Place of Supply</label>
+<select class="w-full bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="buyer-state" onchange="updateTaxJurisdiction()">
+<option selected="" value="27 - Maharashtra">27 - Maharashtra</option>
+<option value="29 - Karnataka">29 - Karnataka</option>
+<option value="07 - Delhi">07 - Delhi</option>
+<option value="24 - Gujarat">24 - Gujarat</option>
+<option value="33 - Tamil Nadu">33 - Tamil Nadu</option>
+<option value="19 - West Bengal">19 - West Bengal</option>
+<option value="09 - Uttar Pradesh">09 - Uttar Pradesh</option>
+<option value="36 - Telangana">36 - Telangana</option>
+<option value="06 - Haryana">06 - Haryana</option>
+<option value="Manual">Manual State Entry</option>
+</select>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">PIN / Postal Code</label>
+<input class="w-full font-mono bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="buyer-pin" maxlength="6" oninput="updatePreview()" placeholder="e.g. 411001" type="text" value="411001">
+</div>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Billing Street Address</label>
+<input class="w-full bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="buyer-address" oninput="updatePreview()" type="text" value="Tech Hub One, Koregaon Park Road, Pune">
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 3: Line Items Matrix (No '#' header, strict 'No.', preloaded HSN/SAC) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">list_alt</span>
+</span>
+<div>
+<h2 class="font-title-lg text-title-lg text-on-surface">Items, Services &amp; HSN/SAC</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Standardized tax slabs (0%, 5%, 12%, 18%, 28%)</p>
+</div>
+</div>
+<button class="flex items-center gap-space-xs px-space-md py-1.5 bg-primary-container text-on-primary rounded-lg font-title-md text-title-md shadow-sm hover:bg-primary transition-all" onclick="addLineItem()">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span>Add Item</span>
+</button>
+</div>
+<!-- HSN Quick Directory Pills -->
+<div class="p-space-sm bg-surface-container-low rounded-lg flex flex-wrap items-center gap-space-xs text-body-sm text-body-sm" id="hsn-quick-pill-container">
+<span class="font-label-sm text-label-sm uppercase font-semibold text-outline mr-1">Quick Codes:</span>
+<button class="px-2 py-0.5 rounded bg-surface-container-lowest hover:bg-surface-variant text-on-surface font-mono text-[12px] transition-colors" onclick="quickFillHSN('998314', 'Custom Enterprise Cloud Software Development', 18)">
+            998314 (Software Dev 18%)
+          </button>
+<button class="px-2 py-0.5 rounded bg-surface-container-lowest hover:bg-surface-variant text-on-surface font-mono text-[12px] transition-colors" onclick="quickFillHSN('998313', 'IT Infrastructure Architecture Consulting', 18)">
+            998313 (IT Consult 18%)
+          </button>
+<button class="px-2 py-0.5 rounded bg-surface-container-lowest hover:bg-surface-variant text-on-surface font-mono text-[12px] transition-colors" onclick="quickFillHSN('847130', 'Dedicated AI Server Node Rackmount Units', 18)">
+            847130 (Computing Hardware 18%)
+          </button>
+<button class="px-2 py-0.5 rounded bg-surface-container-lowest hover:bg-surface-variant text-on-surface font-mono text-[12px] transition-colors" onclick="quickFillHSN('998211', 'Legal &amp; Tax Regulatory Advisory Services', 18)">
+            998211 (Legal 18%)
+          </button>
+<button class="px-2 py-0.5 rounded bg-surface-container-lowest hover:bg-surface-variant text-on-surface font-mono text-[12px] transition-colors" onclick="quickFillHSN('490110', 'Technical Documentation Handbook', 0)">
+            490110 (Docs 0%)
+          </button>
+</div>
+<!-- Line Item Table Rows -->
+<div class="overflow-x-auto">
+<table class="w-full text-left" id="line-items-table">
+<thead>
+<tr class="bg-surface-container-low text-outline font-label-sm text-label-sm uppercase">
+<th class="py-2.5 px-3 rounded-l-lg w-10 text-center">No.</th>
+<th class="py-2.5 px-3 min-w-[200px]">Item Description</th>
+<th class="py-2.5 px-3 w-32 hsn-column">HSN / SAC</th>
+<th class="py-2.5 px-3 w-20 text-right">Qty</th>
+<th class="py-2.5 px-3 w-28 text-right">Rate (₹)</th>
+<th class="py-2.5 px-3 w-28 text-right tax-column">GST Slab</th>
+<th class="py-2.5 px-3 w-28 text-right">Amount (₹)</th>
+<th class="py-2.5 px-2 rounded-r-lg w-10 text-center"></th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md divide-y divide-surface-container" id="line-items-body">
+<!-- Dynamically populated via JS -->
+</tbody>
+</table>
+</div>
+</div>
+<!-- Section 4: Remittance & Banking Information (Zero Shipping!) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">account_balance</span>
+</span>
+<div>
+<h2 class="font-title-lg text-title-lg text-on-surface">Payment &amp; Remittance Information</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Bank settlement coordinates for instant NEFT/RTGS/UPI transfers</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">lock</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md pt-space-xs">
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Bank Name</label>
+<input class="w-full bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="bank-name" oninput="updatePreview()" type="text" value="HDFC Bank Limited">
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Account Number</label>
+<input class="w-full font-mono bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="bank-acc" oninput="updatePreview()" type="text" value="50200034981102">
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">IFSC Code</label>
+<input class="w-full font-mono uppercase bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="bank-ifsc" maxlength="11" oninput="updatePreview()" type="text" value="HDFC0000060">
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Instant UPI ID</label>
+<input class="w-full font-mono bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="bank-upi" oninput="updatePreview()" type="text" value="bharatcloud@hdfcbank">
+</div>
+</div>
+<div class="mt-space-md">
+<label class="block font-label-sm text-label-sm text-outline mb-1">Commercial Notes &amp; Payment Terms</label>
+<textarea class="w-full bg-surface-container-low px-space-md py-1.5 rounded-lg font-body-md text-body-md text-on-surface" id="doc-notes" oninput="updatePreview()" placeholder="E.g., Payment due within 30 days. Late settlement subject to 1.5% monthly interest." rows="2">Payment due within 30 days via Direct Bank Transfer or UPI. All disputes subject to Mumbai Jurisdiction.</textarea>
+</div>
+</div>
+</div>
+<!-- RIGHT PANEL: Live Centered A4 Document Simulator (Cols 8-12) -->
+<div class="xl:col-span-5 flex flex-col gap-space-md">
+<!-- Preview Control Toolbar -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm px-space-lg py-space-sm flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="font-title-md text-title-md text-on-surface">Live Document Canvas</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="p-2 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors" onclick="window.print()" title="Print Document">
+<span class="material-symbols-outlined text-[18px]">print</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-primary text-on-primary font-title-md text-title-md shadow-sm hover:bg-primary-container transition-all" onclick="alert('Exporting cryptographically signed GST PDF...')">
+<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+<span>Download</span>
+</button>
+</div>
+</div>
+<!-- Simulated Sheet Container with soft backdrop -->
+<div class="bg-surface-container-low p-space-md rounded-2xl flex justify-center overflow-x-auto shadow-inner">
+<!-- Exact A4 Simulation Sheet -->
+<div class="w-full max-w-[620px] min-h-[877px] bg-surface-container-lowest rounded-lg p-space-lg shadow-md flex flex-col justify-between text-on-surface select-none font-body-md text-body-md" id="invoice-sheet">
+<div>
+<!-- Document Top Header -->
+<div class="flex items-start justify-between pb-space-lg">
+<div>
+<div class="flex items-center gap-space-xs mb-1">
+<div class="w-6 h-6 rounded bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[16px]">receipt_long</span>
+</div>
+<span class="font-title-lg text-title-lg font-bold text-on-surface tracking-tight leading-tight" id="preview-seller-name">Bharat Cloud Infra Technologies Pvt Ltd</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-[320px] leading-relaxed" id="preview-seller-address">Level 4, Platina Tower, Bandra Kurla Complex, Bandra East, Mumbai - 400051, Maharashtra, India</p>
+<div class="mt-1 flex items-center gap-1" id="preview-seller-gstin-block">
+<span class="font-label-sm text-label-sm font-semibold text-outline">GSTIN:</span>
+<span class="font-label-sm text-label-sm font-mono font-bold text-primary" id="preview-seller-gstin">27AABCB1234D1Z2</span>
+</div>
+</div>
+<div class="text-right flex flex-col items-end">
+<span class="font-headline-md text-headline-md font-bold uppercase text-primary tracking-tight" id="preview-doc-title">GST Tax Invoice</span>
+<span class="font-mono font-bold text-title-md text-on-surface" id="preview-doc-number">BW-2025-0842</span>
+<div class="mt-1 text-right font-body-sm text-body-sm text-on-surface-variant">
+<p>Date: <span class="font-semibold text-on-surface" id="preview-doc-date">14 May 2025</span></p>
+<p>Due: <span class="font-semibold text-on-surface" id="preview-doc-due-date">13 Jun 2025</span></p>
+</div>
+</div>
+</div>
+<!-- Client Billing Coordinates (NO Shipping Information) -->
+<div class="bg-surface-container-low rounded-lg p-space-md mb-space-md grid grid-cols-2 gap-space-md">
+<div>
+<span class="font-label-sm text-label-sm uppercase font-semibold text-outline block mb-1">Billed To (Client):</span>
+<p class="font-title-md text-title-md font-bold text-on-surface" id="preview-buyer-name">Apex Dynamics FinTech Solutions LLP</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-relaxed" id="preview-buyer-address">Tech Hub One, Koregaon Park Road, Pune - 411001, Maharashtra, India</p>
+<div class="mt-1 flex items-center gap-1" id="preview-buyer-gstin-block">
+<span class="font-label-sm text-label-sm font-semibold text-outline">GSTIN / UIN:</span>
+<span class="font-label-sm text-label-sm font-mono font-bold text-on-surface" id="preview-buyer-gstin">27AAFFA9988C1Z4</span>
+</div>
+</div>
+<div class="text-right flex flex-col justify-between">
+<div>
+<span class="font-label-sm text-label-sm uppercase font-semibold text-outline block mb-1">Place of Supply:</span>
+<p class="font-title-md text-title-md font-semibold text-on-surface" id="preview-place-of-supply">27 - Maharashtra</p>
+<p class="font-body-sm text-body-sm text-secondary font-medium" id="preview-tax-regime-desc">Intra-State (CGST + SGST)</p>
+</div>
+<div>
+<span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-on-surface-variant font-medium" id="preview-pricing-nature">Rates are Tax Exclusive</span>
+</div>
+</div>
+</div>
+<!-- Items Table in Preview -->
+<div class="w-full mb-space-md overflow-hidden rounded-lg">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container font-label-sm text-label-sm uppercase text-outline">
+<th class="py-2 px-2 text-center w-8">No.</th>
+<th class="py-2 px-3">Description</th>
+<th class="py-2 px-2 text-center preview-hsn-cell">HSN/SAC</th>
+<th class="py-2 px-2 text-right">Qty</th>
+<th class="py-2 px-2 text-right">Rate</th>
+<th class="py-2 px-3 text-right">Total</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-low font-body-sm text-body-sm" id="preview-items-body">
+<!-- Rendered dynamically -->
+</tbody>
+</table>
+</div>
+<!-- Ledger Summary Math Grid -->
+<div class="flex justify-end pt-space-xs">
+<div class="w-full max-w-[280px] bg-surface-container-low p-space-md rounded-xl flex flex-col gap-1.5">
+<div class="flex justify-between items-center font-body-sm text-body-sm">
+<span class="text-on-surface-variant">Taxable Subtotal</span>
+<span class="font-mono font-semibold text-on-surface" id="preview-subtotal">₹0.00</span>
+</div>
+<div class="flex justify-between items-center font-body-sm text-body-sm" id="preview-cgst-row">
+<span class="text-on-surface-variant">CGST Breakdown</span>
+<span class="font-mono text-on-surface" id="preview-cgst-amount">₹0.00</span>
+</div>
+<div class="flex justify-between items-center font-body-sm text-body-sm" id="preview-sgst-row">
+<span class="text-on-surface-variant">SGST Breakdown</span>
+<span class="font-mono text-on-surface" id="preview-sgst-amount">₹0.00</span>
+</div>
+<div class="hidden flex justify-between items-center font-body-sm text-body-sm" id="preview-igst-row">
+<span class="text-on-surface-variant">IGST Breakdown</span>
+<span class="font-mono text-on-surface" id="preview-igst-amount">₹0.00</span>
+</div>
+<div class="h-[1px] bg-surface-variant my-1"></div>
+<div class="flex justify-between items-baseline">
+<span class="font-title-md text-title-md font-bold text-on-surface">Grand Total</span>
+<span class="font-currency-display text-currency-display font-bold text-primary" id="preview-grand-total">₹0.00</span>
+</div>
+<p class="font-label-sm text-label-sm italic text-on-surface-variant text-right leading-tight" id="preview-amount-words">Zero Rupees Only</p>
+</div>
+</div>
+</div>
+<!-- Bottom Payment & Verification Coordinates -->
+<div class="pt-space-lg">
+<div class="p-space-sm bg-surface-container-low rounded-lg grid grid-cols-2 gap-space-sm mb-space-sm">
+<div>
+<span class="font-label-sm text-label-sm font-semibold uppercase text-outline block mb-0.5">Remittance Account Coordinates:</span>
+<p class="font-body-sm text-body-sm font-semibold text-on-surface" id="preview-bank-name">HDFC Bank Limited</p>
+<p class="font-label-sm text-label-sm font-mono text-on-surface-variant">A/C: <span id="preview-bank-acc">50200034981102</span> | IFSC: <span id="preview-bank-ifsc">HDFC0000060</span></p>
+<p class="font-label-sm text-label-sm font-mono text-primary">UPI: <span id="preview-bank-upi">bharatcloud@hdfcbank</span></p>
+</div>
+<div class="text-right flex flex-col justify-end items-end">
+<span class="font-label-sm text-label-sm text-outline">Authorized Signatory</span>
+<p class="font-title-md text-title-md font-semibold text-on-surface mt-4">Bharat Cloud Infra Tech</p>
+<span class="font-label-sm text-label-sm text-outline">Digitally Signed &amp; Timestamped</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-outline italic text-center" id="preview-notes">Payment due within 30 days via Direct Bank Transfer or UPI. All disputes subject to Mumbai Jurisdiction.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Inline Script Orchestrating Live Calculations, HSN Pickers, State Tax Matrix -->
+<script>
+    // State store
+    let currentDocType = 'gst'; // 'gst' | 'regular' | 'quote'
+    let currentTaxMode = 'exclusive'; // 'exclusive' | 'inclusive'
+    let isInterState = false;
+
+    // Sample initial items
+    let lineItems = [
+      {
+        id: 1,
+        name: "Custom Enterprise Cloud Software Development",
+        hsn: "998314",
+        qty: 1,
+        rate: 185000,
+        taxSlab: 18
+      },
+      {
+        id: 2,
+        name: "High-Availability Dedicated Kubernetes Cluster Pods",
+        hsn: "847170",
+        qty: 2,
+        rate: 24000,
+        taxSlab: 18
+      }
+    ];
+
+    function setDocType(type) {
+      currentDocType = type;
+      
+      const btnGst = document.getElementById('doc-type-gst');
+      const btnReg = document.getElementById('doc-type-regular');
+      const btnQuote = document.getElementById('doc-type-quote');
+      const activeBadge = document.getElementById('active-doc-badge');
+      const previewTitle = document.getElementById('preview-doc-title');
+      const gstControls = document.getElementById('gst-mode-controls');
+      const sellerGstinRow = document.getElementById('seller-gstin-row');
+      const buyerGstinRow = document.getElementById('buyer-gstin-row');
+      const hsnPills = document.getElementById('hsn-quick-pill-container');
+      const previewSellerGstinBlock = document.getElementById('preview-seller-gstin-block');
+      const previewBuyerGstinBlock = document.getElementById('preview-buyer-gstin-block');
+      const previewCgst = document.getElementById('preview-cgst-row');
+      const previewSgst = document.getElementById('preview-sgst-row');
+      const previewIgst = document.getElementById('preview-igst-row');
+      const previewRegimeDesc = document.getElementById('preview-tax-regime-desc');
+
+      // Reset button styles
+      [btnGst, btnReg, btnQuote].forEach(btn => {
+        btn.className = "px-space-md py-1.5 rounded-lg font-title-md text-title-md transition-all duration-200 text-on-surface-variant hover:text-on-surface flex items-center gap-space-xs";
+      });
+
+      if (type === 'gst') {
+        btnGst.className = "px-space-md py-1.5 rounded-lg font-title-md text-title-md transition-all duration-200 bg-primary-container text-on-primary shadow-sm flex items-center gap-space-xs";
+        activeBadge.textContent = "GST Tax Invoice";
+        previewTitle.textContent = "GST Tax Invoice";
+        gstControls.classList.remove('hidden');
+        sellerGstinRow.classList.remove('hidden');
+        buyerGstinRow.classList.remove('hidden');
+        hsnPills.classList.remove('hidden');
+        previewSellerGstinBlock.classList.remove('hidden');
+        previewBuyerGstinBlock.classList.remove('hidden');
+        document.querySelectorAll('.hsn-column, .preview-hsn-cell').forEach(el => el.classList.remove('hidden'));
+        document.querySelectorAll('.tax-column').forEach(el => el.classList.remove('hidden'));
+        previewRegimeDesc.classList.remove('hidden');
+      } else if (type === 'regular') {
+        btnReg.className = "px-space-md py-1.5 rounded-lg font-title-md text-title-md transition-all duration-200 bg-primary-container text-on-primary shadow-sm flex items-center gap-space-xs";
+        activeBadge.textContent = "Commercial Invoice";
+        previewTitle.textContent = "Commercial Invoice";
+        gstControls.classList.add('hidden');
+        sellerGstinRow.classList.add('hidden');
+        buyerGstinRow.classList.add('hidden');
+        hsnPills.classList.add('hidden');
+        previewSellerGstinBlock.classList.add('hidden');
+        previewBuyerGstinBlock.classList.add('hidden');
+        previewCgst.classList.add('hidden');
+        previewSgst.classList.add('hidden');
+        previewIgst.classList.add('hidden');
+        document.querySelectorAll('.hsn-column, .preview-hsn-cell').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.tax-column').forEach(el => el.classList.add('hidden'));
+        previewRegimeDesc.classList.add('hidden');
+      } else if (type === 'quote') {
+        btnQuote.className = "px-space-md py-1.5 rounded-lg font-title-md text-title-md transition-all duration-200 bg-primary-container text-on-primary shadow-sm flex items-center gap-space-xs";
+        activeBadge.textContent = "Formal Quotation";
+        previewTitle.textContent = "Formal Quotation";
+        gstControls.classList.remove('hidden');
+        sellerGstinRow.classList.remove('hidden');
+        buyerGstinRow.classList.remove('hidden');
+        hsnPills.classList.remove('hidden');
+        previewSellerGstinBlock.classList.remove('hidden');
+        previewBuyerGstinBlock.classList.remove('hidden');
+        document.querySelectorAll('.hsn-column, .preview-hsn-cell').forEach(el => el.classList.remove('hidden'));
+        document.querySelectorAll('.tax-column').forEach(el => el.classList.remove('hidden'));
+        previewRegimeDesc.classList.remove('hidden');
+      }
+
+      renderLineItems();
+      updatePreview();
+    }
+
+    function setTaxCalculationMode(mode) {
+      currentTaxMode = mode;
+      const exBtn = document.getElementById('tax-exclusive-btn');
+      const incBtn = document.getElementById('tax-inclusive-btn');
+      const previewNature = document.getElementById('preview-pricing-nature');
+
+      if (mode === 'exclusive') {
+        exBtn.className = "px-space-md py-1 rounded font-label-md text-label-md bg-primary-container text-on-primary shadow-sm transition-all";
+        incBtn.className = "px-space-md py-1 rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all";
+        previewNature.textContent = "Rates are Tax Exclusive (+GST)";
+      } else {
+        incBtn.className = "px-space-md py-1 rounded font-label-md text-label-md bg-primary-container text-on-primary shadow-sm transition-all";
+        exBtn.className = "px-space-md py-1 rounded font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all";
+        previewNature.textContent = "Rates are Tax Inclusive (Reverse GST)";
+      }
+
+      renderLineItems();
+      updatePreview();
+    }
+
+    function updateTaxJurisdiction() {
+      const sellerState = document.getElementById('seller-state').value;
+      const buyerState = document.getElementById('buyer-state').value;
+      const badge = document.getElementById('buyer-inter-state-badge');
+      const regimeDesc = document.getElementById('preview-tax-regime-desc');
+
+      // Compare State Codes (e.g. "27 - Maharashtra" -> "27")
+      const sellerCode = sellerState.split(' ')[0];
+      const buyerCode = buyerState.split(' ')[0];
+
+      if (sellerCode && buyerCode && sellerCode === buyerCode) {
+        isInterState = false;
+        badge.textContent = "Intra-State (CGST + SGST)";
+        badge.className = "font-label-sm text-label-sm text-secondary bg-surface-container px-1.5 rounded";
+        regimeDesc.textContent = "Intra-State (CGST + SGST)";
+      } else {
+        isInterState = true;
+        badge.textContent = "Inter-State (IGST)";
+        badge.className = "font-label-sm text-label-sm text-primary bg-primary-fixed px-1.5 rounded";
+        regimeDesc.textContent = "Inter-State (Integrated IGST)";
+      }
+
+      updatePreview();
+    }
+
+    function handleSellerGstinChange() {
+      const gstin = document.getElementById('seller-gstin').value.trim();
+      if (gstin.length >= 2) {
+        const code = gstin.substring(0, 2);
+        const stateSelect = document.getElementById('seller-state');
+        for (let i = 0; i < stateSelect.options.length; i++) {
+          if (stateSelect.options[i].value.startsWith(code)) {
+            stateSelect.selectedIndex = i;
+            break;
+          }
+        }
+      }
+      updateTaxJurisdiction();
+      updatePreview();
+    }
+
+    function handleBuyerGstinChange() {
+      const gstin = document.getElementById('buyer-gstin').value.trim();
+      if (gstin.length >= 2) {
+        const code = gstin.substring(0, 2);
+        const stateSelect = document.getElementById('buyer-state');
+        for (let i = 0; i < stateSelect.options.length; i++) {
+          if (stateSelect.options[i].value.startsWith(code)) {
+            stateSelect.selectedIndex = i;
+            break;
+          }
+        }
+      }
+      updateTaxJurisdiction();
+      updatePreview();
+    }
+
+    function addLineItem() {
+      const newItem = {
+        id: Date.now(),
+        name: "New Enterprise Professional Service",
+        hsn: "998313",
+        qty: 1,
+        rate: 15000,
+        taxSlab: 18
+      };
+      lineItems.push(newItem);
+      renderLineItems();
+      updatePreview();
+    }
+
+    function removeLineItem(index) {
+      if (lineItems.length <= 1) {
+        alert("Invoice must contain at least one line item.");
+        return;
+      }
+      lineItems.splice(index, 1);
+      renderLineItems();
+      updatePreview();
+    }
+
+    function updateItemField(index, field, value) {
+      if (field === 'qty' || field === 'rate' || field === 'taxSlab') {
+        lineItems[index][field] = parseFloat(value) || 0;
+      } else {
+        lineItems[index][field] = value;
+      }
+      updatePreview();
+    }
+
+    function quickFillHSN(code, name, slab) {
+      lineItems.push({
+        id: Date.now(),
+        name: name,
+        hsn: code,
+        qty: 1,
+        rate: 25000,
+        taxSlab: slab
+      });
+      renderLineItems();
+      updatePreview();
+    }
+
+    function renderLineItems() {
+      const tbody = document.getElementById('line-items-body');
+      tbody.innerHTML = '';
+
+      lineItems.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-surface-container-low/50 transition-colors";
+
+        const isGstActive = currentDocType !== 'regular';
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 text-center font-mono text-outline font-semibold">${index + 1}</td>
+          <td class="py-2.5 px-3">
+            <input type="text" value="${item.name}" oninput="updateItemField(${index}, 'name', this.value)" class="w-full bg-surface-container-low px-2 py-1 rounded text-body-md text-on-surface" placeholder="Item name" />
+          </td>
+          <td class="py-2.5 px-3 hsn-column ${isGstActive ? '' : 'hidden'}">
+            <input type="text" value="${item.hsn}" oninput="updateItemField(${index}, 'hsn', this.value)" class="w-full font-mono bg-surface-container-low px-2 py-1 rounded text-body-md text-on-surface" placeholder="Code" />
+          </td>
+          <td class="py-2.5 px-3 text-right">
+            <input type="number" min="1" value="${item.qty}" oninput="updateItemField(${index}, 'qty', this.value)" class="w-full text-right bg-surface-container-low px-2 py-1 rounded text-body-md text-on-surface font-mono" />
+          </td>
+          <td class="py-2.5 px-3 text-right">
+            <input type="number" min="0" step="100" value="${item.rate}" oninput="updateItemField(${index}, 'rate', this.value)" class="w-full text-right bg-surface-container-low px-2 py-1 rounded text-body-md text-on-surface font-mono" />
+          </td>
+          <td class="py-2.5 px-3 text-right tax-column ${isGstActive ? '' : 'hidden'}">
+            <select onchange="updateItemField(${index}, 'taxSlab', this.value)" class="w-full bg-surface-container-low px-1 py-1 rounded text-body-md text-on-surface font-mono text-right">
+              <option value="0" ${item.taxSlab === 0 ? 'selected' : ''}>0% (Exempt)</option>
+              <option value="5" ${item.taxSlab === 5 ? 'selected' : ''}>5%</option>
+              <option value="12" ${item.taxSlab === 12 ? 'selected' : ''}>12%</option>
+              <option value="18" ${item.taxSlab === 18 ? 'selected' : ''}>18%</option>
+              <option value="28" ${item.taxSlab === 28 ? 'selected' : ''}>28%</option>
+            </select>
+          </td>
+          <td class="py-2.5 px-3 text-right font-mono font-semibold text-on-surface" id="item-total-${index}">
+            ₹${(item.qty * item.rate).toLocaleString('en-IN', {minimumFractionDigits: 2})}
+          </td>
+          <td class="py-2.5 px-2 text-center">
+            <button onclick="removeLineItem(${index})" class="text-outline hover:text-error transition-colors p-1" title="Remove Item">
+              <span class="material-symbols-outlined text-[18px]">delete</span>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function numberToWords(num) {
+      if (num === 0) return 'Zero Rupees Only';
+      const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+      const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+      
+      const inWords = (n) => {
+        let str = '';
+        if (n > 9999999) {
+          str += inWords(Math.floor(n / 10000000)) + 'Crore ';
+          n %= 10000000;
+        }
+        if (n > 99999) {
+          str += inWords(Math.floor(n / 100000)) + 'Lakh ';
+          n %= 100000;
+        }
+        if (n > 999) {
+          str += inWords(Math.floor(n / 1000)) + 'Thousand ';
+          n %= 1000;
+        }
+        if (n > 99) {
+          str += inWords(Math.floor(n / 100)) + 'Hundred ';
+          n %= 100;
+        }
+        if (n > 0) {
+          if (n < 20) str += a[n];
+          else str += b[Math.floor(n / 10)] + ' ' + a[n % 10];
+        }
+        return str;
+      };
+
+      const rupees = Math.floor(num);
+      return (inWords(rupees).trim() + ' Rupees Only');
+    }
+
+    function updatePreview() {
+      // Sync basic text
+      document.getElementById('preview-seller-name').textContent = document.getElementById('seller-name').value || 'Seller Organization';
+      document.getElementById('preview-seller-address').textContent = `${document.getElementById('seller-address').value || ''} - ${document.getElementById('seller-pin').value || ''}, ${document.getElementById('seller-state').value || ''}, ${document.getElementById('seller-country').value || ''}`;
+      document.getElementById('preview-seller-gstin').textContent = document.getElementById('seller-gstin').value || 'N/A';
+
+      document.getElementById('preview-buyer-name').textContent = document.getElementById('buyer-name').value || 'Client Name';
+      document.getElementById('preview-buyer-address').textContent = `${document.getElementById('buyer-address').value || ''} - ${document.getElementById('buyer-pin').value || ''}, ${document.getElementById('buyer-state').value || ''}, ${document.getElementById('buyer-country').value || ''}`;
+      document.getElementById('preview-buyer-gstin').textContent = document.getElementById('buyer-gstin').value || 'N/A';
+
+      document.getElementById('preview-doc-number').textContent = document.getElementById('doc-number').value || 'BW-DOC-001';
+      document.getElementById('preview-doc-date').textContent = document.getElementById('doc-date').value || 'N/A';
+      document.getElementById('preview-doc-due-date').textContent = document.getElementById('doc-due-date').value || 'N/A';
+      document.getElementById('preview-place-of-supply').textContent = document.getElementById('buyer-state').value || 'N/A';
+
+      document.getElementById('preview-bank-name').textContent = document.getElementById('bank-name').value || '';
+      document.getElementById('preview-bank-acc').textContent = document.getElementById('bank-acc').value || '';
+      document.getElementById('preview-bank-ifsc').textContent = document.getElementById('bank-ifsc').value || '';
+      document.getElementById('preview-bank-upi').textContent = document.getElementById('bank-upi').value || '';
+      document.getElementById('preview-notes').textContent = document.getElementById('doc-notes').value || '';
+
+      // Math calculations
+      let taxableSubtotal = 0;
+      let totalTax = 0;
+
+      const previewBody = document.getElementById('preview-items-body');
+      previewBody.innerHTML = '';
+
+      lineItems.forEach((item, idx) => {
+        let itemTaxable = 0;
+        let itemTax = 0;
+        const grossRaw = item.qty * item.rate;
+
+        if (currentDocType === 'regular') {
+          itemTaxable = grossRaw;
+          itemTax = 0;
+        } else {
+          if (currentTaxMode === 'exclusive') {
+            itemTaxable = grossRaw;
+            itemTax = grossRaw * (item.taxSlab / 100);
+          } else {
+            // Inclusive reverse calculation
+            itemTaxable = grossRaw / (1 + (item.taxSlab / 100));
+            itemTax = grossRaw - itemTaxable;
+          }
+        }
+
+        taxableSubtotal += itemTaxable;
+        totalTax += itemTax;
+
+        // Render preview table row
+        const row = document.createElement('tr');
+        const isGstActive = currentDocType !== 'regular';
+        row.innerHTML = `
+          <td class="py-1.5 px-2 text-center font-mono text-outline">${idx + 1}</td>
+          <td class="py-1.5 px-3 font-medium text-on-surface">${item.name}</td>
+          <td class="py-1.5 px-2 text-center font-mono text-outline preview-hsn-cell ${isGstActive ? '' : 'hidden'}">${item.hsn || '-'}</td>
+          <td class="py-1.5 px-2 text-right font-mono">${item.qty}</td>
+          <td class="py-1.5 px-2 text-right font-mono">₹${item.rate.toLocaleString('en-IN')}</td>
+          <td class="py-1.5 px-3 text-right font-mono font-semibold">₹${(currentTaxMode === 'exclusive' ? (grossRaw + itemTax) : grossRaw).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+        `;
+        previewBody.appendChild(row);
+
+        // Update corresponding input row item total indicator
+        const itemTotalEl = document.getElementById(`item-total-${idx}`);
+        if (itemTotalEl) {
+          const displayedRowAmount = currentTaxMode === 'exclusive' ? (grossRaw + itemTax) : grossRaw;
+          itemTotalEl.textContent = `₹${displayedRowAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+      });
+
+      const grandTotal = taxableSubtotal + totalTax;
+
+      // Update Ledger Panel
+      document.getElementById('preview-subtotal').textContent = `₹${taxableSubtotal.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      document.getElementById('preview-grand-total').textContent = `₹${grandTotal.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      document.getElementById('preview-amount-words').textContent = numberToWords(grandTotal);
+
+      // Tax Splits (Intra vs Inter)
+      const previewCgst = document.getElementById('preview-cgst-row');
+      const previewSgst = document.getElementById('preview-sgst-row');
+      const previewIgst = document.getElementById('preview-igst-row');
+
+      if (currentDocType === 'regular' || totalTax === 0) {
+        previewCgst.classList.add('hidden');
+        previewSgst.classList.add('hidden');
+        previewIgst.classList.add('hidden');
+      } else if (isInterState) {
+        previewCgst.classList.add('hidden');
+        previewSgst.classList.add('hidden');
+        previewIgst.classList.remove('hidden');
+        document.getElementById('preview-igst-amount').textContent = `₹${totalTax.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      } else {
+        previewCgst.classList.remove('hidden');
+        previewSgst.classList.remove('hidden');
+        previewIgst.classList.add('hidden');
+        const half = totalTax / 2;
+        document.getElementById('preview-cgst-amount').textContent = `₹${half.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('preview-sgst-amount').textContent = `₹${half.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      }
+    }
+
+    function applySamplePreset() {
+      document.getElementById('seller-name').value = "Bharat Cloud Infra Technologies Pvt Ltd";
+      document.getElementById('seller-gstin').value = "27AABCB1234D1Z2";
+      document.getElementById('seller-state').value = "27 - Maharashtra";
+      document.getElementById('seller-pin').value = "400051";
+      document.getElementById('seller-address').value = "Level 4, Platina Tower, Bandra Kurla Complex, Bandra East, Mumbai";
+
+      document.getElementById('buyer-name').value = "Apex Dynamics FinTech Solutions LLP";
+      document.getElementById('buyer-gstin').value = "27AAFFA9988C1Z4";
+      document.getElementById('buyer-state').value = "27 - Maharashtra";
+      document.getElementById('buyer-pin').value = "411001";
+      document.getElementById('buyer-address').value = "Tech Hub One, Koregaon Park Road, Pune";
+
+      lineItems = [
+        {
+          id: 1,
+          name: "Custom Enterprise Cloud Software Development",
+          hsn: "998314",
+          qty: 1,
+          rate: 185000,
+          taxSlab: 18
+        },
+        {
+          id: 2,
+          name: "High-Availability Dedicated Kubernetes Cluster Pods",
+          hsn: "847170",
+          qty: 2,
+          rate: 24000,
+          taxSlab: 18
+        }
+      ];
+
+      updateTaxJurisdiction();
+      renderLineItems();
+      updatePreview();
+    }
+
+    function resetWorkspace() {
+      if (!confirm("Are you sure you want to reset this billing document workspace?")) return;
+      lineItems = [
+        {
+          id: Date.now(),
+          name: "Consulting & Implementation Services",
+          hsn: "998313",
+          qty: 1,
+          rate: 10000,
+          taxSlab: 18
+        }
+      ];
+      document.getElementById('doc-number').value = "BW-2025-" + Math.floor(1000 + Math.random() * 9000);
+      renderLineItems();
+      updatePreview();
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      updateTaxJurisdiction();
+      renderLineItems();
+      updatePreview();
+    });
+  </script>
+</div></main></div></body></html>

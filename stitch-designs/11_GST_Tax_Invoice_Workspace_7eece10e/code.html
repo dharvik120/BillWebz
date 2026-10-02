@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-primary-container":"#dad7ff","tertiary-fixed":"#acedff","on-secondary":"#ffffff","surface-tint":"#4d44e3","primary-container":"#4f46e5","secondary-container":"#316bf3","inverse-surface":"#293040","on-primary-fixed":"#0f0069","on-secondary-fixed":"#00174b","on-background":"#141b2b","secondary-fixed":"#dbe1ff","primary":"#3525cd","on-error-container":"#93000a","tertiary-fixed-dim":"#4cd7f6","tertiary-container":"#006a7c","error":"#ba1a1a","surface-variant":"#dce2f7","primary-fixed":"#e2dfff","on-primary":"#ffffff","on-surface":"#141b2b","inverse-primary":"#c3c0ff","on-primary-fixed-variant":"#3323cc","on-secondary-fixed-variant":"#003ea8","secondary-fixed-dim":"#b4c5ff","outline-variant":"#c7c4d8","surface-container-low":"#f1f3ff","surface-container-highest":"#dce2f7","outline":"#777587","surface":"#f9f9ff","surface-container-lowest":"#ffffff","on-secondary-container":"#fefcff","background":"#f9f9ff","on-tertiary-container":"#93e8ff","error-container":"#ffdad6","surface-dim":"#d3daef","tertiary":"#00505f","primary-fixed-dim":"#c3c0ff","on-tertiary":"#ffffff","on-tertiary-fixed":"#001f26","surface-container-high":"#e1e8fd","on-error":"#ffffff","on-tertiary-fixed-variant":"#004e5c","surface-bright":"#f9f9ff","secondary":"#0051d5","inverse-on-surface":"#edf0ff","surface-container":"#e9edff","on-surface-variant":"#464555"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin-desktop":"2rem","gutter":"1rem","space-xs":"0.25rem","margin-tablet":"1.5rem","space-xl":"2rem","space-sm":"0.5rem","gutter-desktop":"1.5rem","margin":"1rem","space-lg":"1.25rem","space-md":"0.75rem"},"fontFamily":{"currency-display":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"currency-table":["Plus Jakarta Sans"],"display-lg-mobile":["Plus Jakarta Sans"],"label-sm":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],"display-lg":["Plus Jakarta Sans"],"title-md":["Plus Jakarta Sans"],"title-lg":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"]},"fontSize":{"currency-display":["28px",{"lineHeight":"34px","letterSpacing":"-0.01em","fontWeight":"700"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.005em","fontWeight":"600"}],"currency-table":["14px",{"lineHeight":"20px","fontWeight":"600"}],"display-lg-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.015em","fontWeight":"700"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.04em","fontWeight":"600"}],"label-md":["13px",{"lineHeight":"18px","fontWeight":"500"}],"display-lg":["36px",{"lineHeight":"44px","letterSpacing":"-0.02em","fontWeight":"700"}],"title-md":["16px",{"lineHeight":"22px","fontWeight":"600"}],"title-lg":["18px",{"lineHeight":"24px","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"body-lg":["15px",{"lineHeight":"22px","fontWeight":"400"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"headline-lg":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"600"}]}}}};</script></head><body class="bg-background font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-72 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col"><div class="h-16 px-space-lg flex items-center justify-between bg-surface-container-lowest"><div class="flex items-center gap-space-sm"><img alt="BillWebz Brand Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1V3Yel0edVljemP6zpQsCBjd_W4TvSYxc_P368xlGnbfD4K9kOwtD7z-AfLPi_AiT-2wib3iuZQmRHMu7Xl91-UCIApsI0cbNJOJMvleyL8Qm2LjXs-YblZzk8_7Lhq_XDThKFbyemCopdvdELOOqlGlNHNnKKTeVui0nq2qBGfN_4P1LAQeQHh_M7SgPMbEEhy6AxHp26NYIfuKG7gsOIqEu6RAmE_5GRZQLRbdqULENv3lZeCWrJrZjo"/><span class="font-headline-md text-headline-md font-bold tracking-tight text-primary">BillWebz</span></div><span class="px-space-xs py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-primary font-semibold uppercase tracking-wider">GST v2.4</span></div><div class="px-space-md py-space-sm"><nav class="flex flex-col gap-1" data-active-classes="bg-primary-container text-on-primary font-title-md font-semibold shadow-[0_1px_3px_0_rgba(17,24,39,0.04)] rounded-lg"><div class="px-space-sm pt-space-md pb-space-xs font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Main</div><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[20px]">grid_view</span><span>Dashboard</span></a><div class="flex flex-col"><div class="flex items-center justify-between px-space-md py-space-sm text-on-surface-variant font-title-md text-title-md"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[20px]">note_add</span><span>Create Document</span></div><span class="material-symbols-outlined text-[16px] text-outline">expand_more</span></div><div class="pl-8 pr-space-xs flex flex-col gap-0.5"><a aria-current="page" class="flex items-center px-space-md py-1.5 transition-colors bg-primary-container text-on-primary font-title-md font-semibold shadow-[0_1px_3px_0_rgba(17,24,39,0.04)] rounded-lg" data-path="gst-tax-invoice" href="#">GST Tax Invoice</a><a class="flex items-center px-space-md py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="regular-invoice" href="#">Regular Invoice</a><a class="flex items-center px-space-md py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="quotation" href="#">Quotation / Estimate</a><a class="flex items-center px-space-md py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="proforma-invoice" href="#">Proforma Invoice</a></div></div><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="all-documents" href="#"><span class="material-symbols-outlined text-[20px]">receipt_long</span><span>All Documents</span></a><div class="px-space-sm pt-space-lg pb-space-xs font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Management</div><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="customers" href="#"><span class="material-symbols-outlined text-[20px]">group</span><span>Customers</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="products-hsn-sac" href="#"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span>Products &amp; HSN/SAC</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="document-history" href="#"><span class="material-symbols-outlined text-[20px]">manage_history</span><span>Document History</span></a><div class="px-space-sm pt-space-lg pb-space-xs font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Insights &amp; Customization</div><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="reports-analytics" href="#"><span class="material-symbols-outlined text-[20px]">query_stats</span><span>Reports &amp; Analytics</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="document-themes" href="#"><span class="material-symbols-outlined text-[20px]">palette</span><span>Document Themes</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="business-profile" href="#"><span class="material-symbols-outlined text-[20px]">domain</span><span>Business Profile</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-title-md text-title-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined text-[20px]">tune</span><span>Settings</span></a></nav></div></div><div class="p-space-md bg-surface-container-lowest flex flex-col gap-space-xs"><div class="flex items-center justify-between px-space-md py-space-sm rounded-lg bg-surface-container-low"><div class="flex items-center gap-space-xs"><span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface font-semibold">GST Portal Connected</span></div><span class="material-symbols-outlined text-[16px] text-tertiary-container">verified_user</span></div><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="help-support" href="#"><span class="material-symbols-outlined text-[18px]">help_center</span><span>Help &amp; Support</span></a><a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg font-body-sm text-body-sm text-error hover:bg-error-container hover:text-on-error-container transition-colors" data-path="login" href="#"><span class="material-symbols-outlined text-[18px]">logout</span><span>Sign Out</span></a></div></aside><div class="pl-72 flex flex-col min-h-screen"><header class="fixed top-0 left-72 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 px-gutter-desktop flex items-center justify-between gap-space-lg"><div class="flex items-center gap-space-md flex-1 max-w-xl"><div class="relative flex items-center bg-surface-container-low hover:bg-surface-container px-space-md py-space-xs rounded-lg transition-colors cursor-pointer"><div class="flex flex-col text-left"><span class="font-label-sm text-label-sm uppercase tracking-wider text-outline font-semibold">Active Enterprise</span><div class="flex items-center gap-space-xs"><span class="font-title-md text-title-md font-semibold text-on-surface truncate max-w-[240px]">Bharat Technologies Pvt Ltd</span><span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container-highest px-1.5 py-0.5 rounded font-mono">27AABCB1234D1Z2</span><span class="material-symbols-outlined text-[18px] text-outline">unfold_more</span></div></div></div><div class="flex-1 relative"><div class="flex items-center w-full bg-surface-container-low px-space-md py-2 rounded-lg text-on-surface-variant cursor-pointer hover:bg-surface-container transition-colors"><span class="material-symbols-outlined text-[18px] mr-space-sm text-outline">search</span><span class="font-body-sm text-body-sm text-outline flex-1">Search invoices, clients, HSN...</span><kbd class="hidden sm:inline-block px-1.5 py-0.5 font-label-sm text-label-sm font-semibold text-outline bg-surface-container-lowest rounded shadow-[0_1px_2px_rgba(0,0,0,0.05)]">⌘K</kbd></div></div></div><div class="flex items-center gap-space-md"><button class="flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-primary-container text-on-primary font-title-md text-title-md font-semibold shadow-[0_1px_3px_0_rgba(17,24,39,0.04)] hover:bg-primary transition-colors" type="button"><span class="material-symbols-outlined text-[18px]">add</span><span>Create</span><span class="material-symbols-outlined text-[16px]">arrow_drop_down</span></button><button class="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span></button><div class="flex items-center gap-space-sm pl-space-sm"><div class="flex flex-col items-end text-right"><span class="font-title-md text-title-md font-semibold text-on-surface leading-tight">Rajesh Varma</span><span class="font-label-sm text-label-sm text-outline font-medium">Executive Admin</span></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover shadow-[0_1px_3px_0_rgba(17,24,39,0.04)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPJa6H0yZH1U5NDH95TuBGTyivle3h4LSmwh2XZAuMvJNkUBCGL_6BXqRykYsuUksj3Zs-qpgIA2s1SKFBGmBD1ozW2XTeOJFVSmuywuB44-vCsEPLk8kyzFxn2K_WozAW3ijL6-Hd498a1iAeLB3y7G0TjGV6g2cgNIz9DXTjpE1WPG7cpIulhxE-8S8TtYtqlmklDMoVRw-_gj8XXPPprbE1jl2maQT1K6AGCIA1D4urLlyf5ecB"/></div></div></header><main class="w-full pt-16 bg-background flex-1"><div class="flex flex-col w-full">
+<div class="w-full max-w-[1440px] mx-auto px-gutter-desktop py-space-md">
+<!-- Top Workspace Action Bar -->
+<div class="flex flex-wrap items-center justify-between gap-space-md mb-space-md bg-surface-container-lowest p-space-md rounded-xl shadow-sm">
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-space-xs bg-surface-container-low px-space-md py-1.5 rounded-lg">
+<span class="material-symbols-outlined text-primary text-[20px]">description</span>
+<span class="font-headline-md text-headline-md text-on-surface">GST Tax Invoice Editor</span>
+</div>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container font-label-sm text-label-sm text-primary font-semibold">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          Sequential: GST-2026-0042
+        </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-low text-tertiary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+          Inter-state (IGST 18%)
+        </span>
+</div>
+<div class="flex items-center gap-space-sm">
+<button class="flex items-center gap-1.5 px-space-md py-2 rounded-lg bg-surface-container-low text-on-surface font-title-md text-title-md hover:bg-surface-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+<span>Reset</span>
+</button>
+<button class="flex items-center gap-1.5 px-space-md py-2 rounded-lg bg-surface-container-high text-primary font-title-md text-title-md hover:bg-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">save</span>
+<span>Save Draft</span>
+</button>
+<button class="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary-container text-on-primary font-title-md text-title-md hover:bg-primary transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+<span>Finalize &amp; Issue</span>
+</button>
+</div>
+</div>
+<!-- 2-Column Split Workspace (Form vs Print A4 Canvas) -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-gutter-desktop items-start">
+<!-- ================= LEFT COLUMN: INVOICE CONFIGURATION FORM ================= -->
+<div class="xl:col-span-7 flex flex-col gap-space-lg">
+<!-- SECTION 1: Document Details -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-md bg-surface-container-high flex items-center justify-center font-label-sm text-primary font-bold">1</span>
+<span class="font-title-lg text-title-lg text-on-surface">Document Details</span>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm">Official GST Tax Invoice</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-md">
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Document Sequence</label>
+<div class="flex items-center bg-surface-container-low px-space-md py-2 rounded-lg">
+<span class="material-symbols-outlined text-[18px] text-outline mr-2">tag</span>
+<input class="bg-transparent font-title-md text-title-md text-on-surface font-semibold w-full focus:outline-none" readonly="" type="text" value="GST-2026-0042"/>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Invoice Date</label>
+<div class="flex items-center bg-surface-container-low px-space-md py-2 rounded-lg">
+<span class="material-symbols-outlined text-[18px] text-outline mr-2">calendar_today</span>
+<input class="bg-transparent font-body-md text-body-md text-on-surface w-full focus:outline-none" type="text" value="26 Oct 2026"/>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Due Date</label>
+<div class="flex items-center bg-surface-container-low px-space-md py-2 rounded-lg">
+<span class="material-symbols-outlined text-[18px] text-outline mr-2">event_available</span>
+<input class="bg-transparent font-body-md text-body-md text-on-surface w-full focus:outline-none" type="text" value="10 Nov 2026 (Net 15)"/>
+</div>
+</div>
+<div class="flex flex-col gap-1 sm:col-span-2">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Place of Supply (POS)</label>
+<div class="flex items-center bg-surface-container-low px-space-md py-2 rounded-lg cursor-pointer">
+<span class="material-symbols-outlined text-[18px] text-primary mr-2">location_on</span>
+<span class="font-body-md text-body-md text-on-surface flex-1">27 - Maharashtra (Originating State)</span>
+<span class="material-symbols-outlined text-[18px] text-outline">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Base Currency</label>
+<div class="flex items-center bg-surface-container-low px-space-md py-2 rounded-lg">
+<span class="font-body-md text-body-md font-bold text-primary mr-2">₹</span>
+<input class="bg-transparent font-body-md text-body-md text-on-surface w-full focus:outline-none" readonly="" type="text" value="INR (₹)"/>
+</div>
+</div>
+</div>
+</div>
+<!-- SECTION 2: Seller / Business Details -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-md bg-surface-container-high flex items-center justify-center font-label-sm text-primary font-bold">2</span>
+<span class="font-title-lg text-title-lg text-on-surface">Seller / Business Details</span>
+</div>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-tertiary-container bg-tertiary-fixed px-2 py-0.5 rounded-full font-semibold">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+              GSTIN Verified
+            </span>
+</div>
+<!-- Logo Management Row -->
+<div class="flex items-center justify-between p-space-md bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-space-md">
+<div class="w-24 h-12 bg-surface-container-lowest rounded-lg flex items-center justify-center p-2 shadow-xs">
+<img alt="Seller Brand Logo" class="max-h-full max-w-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1V3Yel0edVljemP6zpQsCBjd_W4TvSYxc_P368xlGnbfD4K9kOwtD7z-AfLPi_AiT-2wib3iuZQmRHMu7Xl91-UCIApsI0cbNJOJMvleyL8Qm2LjXs-YblZzk8_7Lhq_XDThKFbyemCopdvdELOOqlGlNHNnKKTeVui0nq2qBGfN_4P1LAQeQHh_M7SgPMbEEhy6AxHp26NYIfuKG7gsOIqEu6RAmE_5GRZQLRbdqULENv3lZeCWrJrZjo"/>
+</div>
+<div>
+<span class="font-title-md text-title-md text-on-surface block">Enterprise Branding Logo</span>
+<span class="font-body-sm text-body-sm text-outline">Appears on print canvas header</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-highest transition-colors" type="button">Replace</button>
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container-low text-error font-label-md text-label-md hover:bg-error-container transition-colors" type="button">Remove</button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-1 sm:col-span-2">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Legal Business Name</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-title-md text-title-md text-on-surface focus:outline-none" type="text" value="Bharat Technologies Solutions Pvt Ltd"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">GSTIN</label>
+<div class="flex items-center bg-surface-container-low px-space-md py-2 rounded-lg">
+<input class="bg-transparent font-body-md text-body-md font-mono text-on-surface flex-1 focus:outline-none" type="text" value="27AABCB1234D1Z2"/>
+<span class="material-symbols-outlined text-[18px] text-emerald-600">check_circle</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Phone</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none" type="text" value="+91 98201 44521"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Email</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none" type="text" value="billing@bharattech.in"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Website</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none" type="text" value="https://bharattech.in"/>
+</div>
+<div class="flex flex-col gap-1 sm:col-span-2">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Registered Principal Address</label>
+<textarea class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none resize-none" rows="2">Unit 402, Signature Cyber Park, Bandra Kurla Complex, Mumbai, Maharashtra, 400051, India</textarea>
+</div>
+</div>
+</div>
+<!-- SECTION 3: Customer / Buyer Details -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-md bg-surface-container-high flex items-center justify-center font-label-sm text-primary font-bold">3</span>
+<span class="font-title-lg text-title-lg text-on-surface">Customer / Buyer Details</span>
+</div>
+<div class="flex items-center gap-space-xs bg-surface-container-low px-space-md py-1 rounded-lg cursor-pointer hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary text-[18px]">contacts</span>
+<span class="font-label-md text-label-md text-on-surface">Customer: <strong>Zenith Enterprises Ltd</strong></span>
+<span class="material-symbols-outlined text-[16px] text-outline">swap_horiz</span>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-1 sm:col-span-2">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Customer Legal Name</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-title-md text-title-md text-on-surface focus:outline-none" type="text" value="Zenith Enterprises Private Limited"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Buyer GSTIN</label>
+<div class="flex items-center bg-surface-container-low px-space-md py-2 rounded-lg">
+<input class="bg-transparent font-body-md text-body-md font-mono text-on-surface flex-1 focus:outline-none" type="text" value="29AAFZZ9876C1Z5"/>
+<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm">Karnataka</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Phone</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none" type="text" value="+91 80 4123 9900"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Email</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none" type="text" value="accounts@zenithenterprises.com"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Website</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none" type="text" value="https://zenithenterprises.com"/>
+</div>
+<div class="flex flex-col gap-1 sm:col-span-2">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Billing Address</label>
+<textarea class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none resize-none" rows="2">Plot 18B, Tech Corridor, Phase 2, Electronic City, Bengaluru, Karnataka, 560100, India</textarea>
+</div>
+</div>
+</div>
+<!-- SECTION 4: Payment Information (Strictly NO SHIPPING DETAILS) -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-md bg-surface-container-high flex items-center justify-center font-label-sm text-primary font-bold">4</span>
+<span class="font-title-lg text-title-lg text-on-surface">Payment &amp; Settlement Details</span>
+</div>
+<div class="flex items-center gap-space-sm bg-surface-container-low p-1 rounded-lg">
+<button class="px-space-md py-1 rounded-md bg-primary-container text-on-primary font-label-sm text-label-sm font-semibold" type="button">Bank NEFT/RTGS</button>
+<button class="px-space-md py-1 rounded-md text-on-surface-variant font-label-sm text-label-sm hover:text-on-surface" type="button">UPI QR Direct</button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Bank Name</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none" type="text" value="HDFC Bank Ltd"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Branch</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none" type="text" value="BKC Executive Branch, Mumbai"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Account Holder Name</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none" type="text" value="Bharat Technologies Solutions Pvt Ltd"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Account Number</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md font-mono text-on-surface focus:outline-none" type="text" value="50200049281729"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">IFSC Code</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md font-mono text-on-surface focus:outline-none" type="text" value="HDFC0000060"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">UPI Virtual Payment Address</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md font-mono text-on-surface focus:outline-none" type="text" value="bharattech@okhdfcbank"/>
+</div>
+<div class="flex flex-col gap-1 sm:col-span-2">
+<label class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Payment Terms &amp; Settlement Clauses</label>
+<input class="bg-surface-container-low px-space-md py-2 rounded-lg font-body-md text-body-md text-on-surface focus:outline-none" type="text" value="Payment due within 15 days of invoice date. 1.5% monthly late fee thereafter."/>
+</div>
+</div>
+</div>
+<!-- SECTION 5: Line Items Editor -->
+<!-- Strict rules: 'No.' header, NO secondary product description field, searchable HSN/SAC selector -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-md bg-surface-container-high flex items-center justify-center font-label-sm text-primary font-bold">5</span>
+<span class="font-title-lg text-title-lg text-on-surface">Line Items &amp; Taxable Services</span>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low text-primary font-label-md text-label-md font-semibold hover:bg-surface-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">menu_book</span>
+<span>HSN / SAC Catalog</span>
+</button>
+</div>
+<!-- Items Table Wrapper -->
+<div class="overflow-x-auto">
+<div class="min-w-[700px] flex flex-col gap-space-sm">
+<!-- Table Headers -->
+<div class="grid grid-cols-12 gap-2 px-space-md py-2 bg-surface-container-low rounded-lg font-label-sm text-label-sm text-outline uppercase font-semibold">
+<div class="col-span-1 text-center">No.</div>
+<div class="col-span-4">Item Name / Service</div>
+<div class="col-span-2">HSN/SAC</div>
+<div class="col-span-1 text-right">Qty</div>
+<div class="col-span-1">Unit</div>
+<div class="col-span-1 text-right">Rate (₹)</div>
+<div class="col-span-1 text-right">Disc%</div>
+<div class="col-span-1 text-right">Total (₹)</div>
+</div>
+<!-- Item Row 1 -->
+<div class="grid grid-cols-12 gap-2 p-space-md bg-surface rounded-xl items-center shadow-xs">
+<div class="col-span-1 font-label-sm text-label-sm text-center font-semibold text-outline">1</div>
+<div class="col-span-4">
+<input class="w-full bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface font-medium focus:outline-none" type="text" value="Enterprise Cloud ERP Implementation"/>
+</div>
+<div class="col-span-2">
+<div class="flex items-center bg-surface-container-low px-space-sm py-1.5 rounded-lg">
+<span class="font-body-sm text-body-sm font-mono text-on-surface flex-1">998313</span>
+<span class="material-symbols-outlined text-[14px] text-outline">search</span>
+</div>
+</div>
+<div class="col-span-1">
+<input class="w-full text-right bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none" type="number" value="1"/>
+</div>
+<div class="col-span-1">
+<input class="w-full bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none" type="text" value="Service"/>
+</div>
+<div class="col-span-1 text-right">
+<input class="w-full text-right bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface font-medium focus:outline-none" type="text" value="1,80,000"/>
+</div>
+<div class="col-span-1 text-right">
+<input class="w-full text-right bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none" type="text" value="5%"/>
+</div>
+<div class="col-span-1 text-right font-currency-table text-currency-table text-primary">
+                  2,01,780.00
+                </div>
+</div>
+<!-- Item Row 2 -->
+<div class="grid grid-cols-12 gap-2 p-space-md bg-surface rounded-xl items-center shadow-xs">
+<div class="col-span-1 font-label-sm text-label-sm text-center font-semibold text-outline">2</div>
+<div class="col-span-4">
+<input class="w-full bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface font-medium focus:outline-none" type="text" value="Secure API Gateway Architecture"/>
+</div>
+<div class="col-span-2">
+<div class="flex items-center bg-surface-container-low px-space-sm py-1.5 rounded-lg">
+<span class="font-body-sm text-body-sm font-mono text-on-surface flex-1">998314</span>
+<span class="material-symbols-outlined text-[14px] text-outline">search</span>
+</div>
+</div>
+<div class="col-span-1">
+<input class="w-full text-right bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none" type="number" value="40"/>
+</div>
+<div class="col-span-1">
+<input class="w-full bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none" type="text" value="Hours"/>
+</div>
+<div class="col-span-1 text-right">
+<input class="w-full text-right bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface font-medium focus:outline-none" type="text" value="2,500"/>
+</div>
+<div class="col-span-1 text-right">
+<input class="w-full text-right bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none" type="text" value="0%"/>
+</div>
+<div class="col-span-1 text-right font-currency-table text-currency-table text-primary">
+                  1,18,000.00
+                </div>
+</div>
+<!-- Item Row 3 -->
+<div class="grid grid-cols-12 gap-2 p-space-md bg-surface rounded-xl items-center shadow-xs">
+<div class="col-span-1 font-label-sm text-label-sm text-center font-semibold text-outline">3</div>
+<div class="col-span-4">
+<input class="w-full bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface font-medium focus:outline-none" type="text" value="Dedicated Hardware Security Module (HSM)"/>
+</div>
+<div class="col-span-2">
+<div class="flex items-center bg-surface-container-low px-space-sm py-1.5 rounded-lg">
+<span class="font-body-sm text-body-sm font-mono text-on-surface flex-1">847170</span>
+<span class="material-symbols-outlined text-[14px] text-outline">search</span>
+</div>
+</div>
+<div class="col-span-1">
+<input class="w-full text-right bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none" type="number" value="2"/>
+</div>
+<div class="col-span-1">
+<input class="w-full bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none" type="text" value="Units"/>
+</div>
+<div class="col-span-1 text-right">
+<input class="w-full text-right bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface font-medium focus:outline-none" type="text" value="45,000"/>
+</div>
+<div class="col-span-1 text-right">
+<input class="w-full text-right bg-surface-container-low px-space-sm py-1.5 rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none" type="text" value="10%"/>
+</div>
+<div class="col-span-1 text-right font-currency-table text-currency-table text-primary">
+                  95,580.00
+                </div>
+</div>
+</div>
+</div>
+<button class="w-full py-2.5 rounded-xl bg-surface-container-low text-primary font-title-md text-title-md font-semibold flex items-center justify-center gap-2 hover:bg-surface-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+<span>+ Add Line Item</span>
+</button>
+</div>
+<!-- SECTION 6: Tax & Totals Calculation Summary -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-md bg-surface-container-high flex items-center justify-center font-label-sm text-primary font-bold">6</span>
+<span class="font-title-lg text-title-lg text-on-surface">Tax Liability &amp; Totals</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Automated GST Computation</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">
+<div class="flex flex-col justify-between p-space-md bg-surface-container-low rounded-xl">
+<div>
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider block mb-1">Total in Words</span>
+<p class="font-title-md text-title-md font-semibold text-on-surface">INR Four Lakh Fifteen Thousand Three Hundred Sixty Only</p>
+</div>
+<div class="pt-space-md flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary-container text-[18px]">verified</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Validated against GSTN Rule 46 invoice standards</span>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between py-1">
+<span class="font-body-md text-body-md text-on-surface-variant">Taxable Subtotal</span>
+<span class="font-currency-table text-currency-table text-on-surface">₹3,52,000.00</span>
+</div>
+<div class="flex items-center justify-between py-1">
+<span class="font-body-md text-body-md text-on-surface-variant">Total Discount Applied</span>
+<span class="font-currency-table text-currency-table text-emerald-600">- ₹18,000.00</span>
+</div>
+<div class="flex items-center justify-between py-1">
+<div class="flex items-center gap-1.5">
+<span class="font-body-md text-body-md text-on-surface-variant">IGST (18%)</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-surface-container font-mono text-outline">Inter-State</span>
+</div>
+<span class="font-currency-table text-currency-table text-on-surface">₹63,360.00</span>
+</div>
+<div class="flex items-center justify-between py-1 opacity-60">
+<span class="font-body-sm text-body-sm text-outline">CGST (0%) + SGST (0%)</span>
+<span class="font-currency-table text-currency-table text-outline">₹0.00</span>
+</div>
+<div class="flex items-center justify-between p-space-md rounded-lg bg-surface-container-high mt-1">
+<span class="font-title-lg text-title-lg text-primary font-bold">Grand Total (INR)</span>
+<span class="font-currency-display text-currency-display text-primary">₹4,15,360.00</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ================= RIGHT COLUMN: LIVE PRINT-READY A4 PREVIEW ================= -->
+<div class="xl:col-span-5 flex flex-col gap-space-md sticky top-20">
+<!-- Preview Canvas Toolbar -->
+<div class="bg-surface-container-lowest px-space-md py-space-sm rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px] text-outline">visibility</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface">Live Preview</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface-variant">100%</span>
+</div>
+<div class="flex items-center gap-1.5">
+<button class="p-1.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors" title="Download PDF" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors" title="Print Document" type="button">
+<span class="material-symbols-outlined text-[18px]">print</span>
+</button>
+<button class="p-1.5 rounded-lg bg-emerald-100 text-emerald-800 hover:bg-emerald-200 transition-colors" title="WhatsApp Share" type="button">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+</button>
+<span class="w-px h-4 bg-outline-variant mx-1"></span>
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary-container text-on-primary font-label-sm text-label-sm" type="button">
+<span>PDF Ready</span>
+</button>
+</div>
+</div>
+<!-- Realistic A4 Paper Canvas Container -->
+<div class="p-space-lg bg-surface-dim rounded-2xl flex justify-center items-start overflow-hidden">
+<!-- A4 Document Simulation Surface -->
+<div class="w-full max-w-[560px] bg-surface-container-lowest rounded-md shadow-xl p-6 sm:p-8 flex flex-col gap-6 font-sans text-on-surface">
+<!-- Document Header -->
+<div class="flex items-start justify-between gap-4">
+<div class="flex flex-col gap-2">
+<div class="h-10 w-28 flex items-center">
+<img alt="Brand Logo" class="max-h-full max-w-full object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1V3Yel0edVljemP6zpQsCBjd_W4TvSYxc_P368xlGnbfD4K9kOwtD7z-AfLPi_AiT-2wib3iuZQmRHMu7Xl91-UCIApsI0cbNJOJMvleyL8Qm2LjXs-YblZzk8_7Lhq_XDThKFbyemCopdvdELOOqlGlNHNnKKTeVui0nq2qBGfN_4P1LAQeQHh_M7SgPMbEEhy6AxHp26NYIfuKG7gsOIqEu6RAmE_5GRZQLRbdqULENv3lZeCWrJrZjo"/>
+</div>
+<div>
+<h3 class="font-title-md text-title-md font-bold text-on-surface leading-snug">Bharat Technologies Solutions Pvt Ltd</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">BKC, Mumbai, Maharashtra 400051</p>
+<p class="font-label-sm text-label-sm text-outline font-mono">GSTIN: 27AABCB1234D1Z2</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">billing@bharattech.in</p>
+</div>
+</div>
+<div class="flex flex-col items-end text-right">
+<span class="px-2.5 py-0.5 bg-primary-container text-on-primary font-label-sm text-label-sm font-bold uppercase tracking-wider rounded">TAX INVOICE</span>
+<span class="font-title-md text-title-md font-mono font-bold text-on-surface mt-2">GST-2026-0042</span>
+<span class="font-body-sm text-body-sm text-outline">Date: <strong class="text-on-surface font-medium">26 Oct 2026</strong></span>
+<span class="font-body-sm text-body-sm text-outline">Due: <strong class="text-on-surface font-medium">10 Nov 2026</strong></span>
+<span class="font-label-sm text-label-sm text-primary font-semibold mt-1">POS: 27-Maharashtra</span>
+</div>
+</div>
+<!-- Billed To Section -->
+<div class="p-3 bg-surface-container-low rounded-lg flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-outline uppercase font-semibold">Billed To (Recipient / Buyer):</span>
+<span class="font-title-md text-title-md font-bold text-on-surface">Zenith Enterprises Private Limited</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Plot 18B, Tech Corridor, Phase 2, Electronic City, Bengaluru, Karnataka, 560100</p>
+<div class="flex flex-wrap gap-x-4 gap-y-1 font-body-sm text-body-sm text-outline pt-1">
+<span>GSTIN: <strong class="font-mono text-on-surface">29AAFZZ9876C1Z5</strong></span>
+<span>State: <strong class="text-on-surface">29-Karnataka</strong></span>
+<span>Contact: <strong class="text-on-surface">+91 80 4123 9900</strong></span>
+</div>
+</div>
+<!-- Strict Line Items Table (Columns: No., Product / Service Name, HSN/SAC, Qty, Unit, Rate, Taxable, IGST, Amount) -->
+<div class="flex flex-col">
+<div class="grid grid-cols-12 gap-1 py-1.5 px-2 bg-surface-container font-label-sm text-[10px] uppercase text-outline font-bold rounded-t">
+<div class="col-span-1 text-center">No.</div>
+<div class="col-span-4">Product / Service</div>
+<div class="col-span-2">HSN/SAC</div>
+<div class="col-span-1 text-right">Qty</div>
+<div class="col-span-1 text-right">Rate(₹)</div>
+<div class="col-span-1 text-right">IGST</div>
+<div class="col-span-2 text-right">Amount(₹)</div>
+</div>
+<!-- Row 1 -->
+<div class="grid grid-cols-12 gap-1 py-2 px-2 items-center text-[11px] bg-surface-container-lowest">
+<div class="col-span-1 text-center font-medium text-outline">1</div>
+<div class="col-span-4 font-semibold text-on-surface">Enterprise Cloud ERP Implementation</div>
+<div class="col-span-2 font-mono text-outline">998313</div>
+<div class="col-span-1 text-right font-medium">1 Srv</div>
+<div class="col-span-1 text-right font-medium">1.80L</div>
+<div class="col-span-1 text-right text-outline">18%</div>
+<div class="col-span-2 text-right font-bold text-on-surface">2,01,780.00</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-12 gap-1 py-2 px-2 items-center text-[11px] bg-surface-container-low/40">
+<div class="col-span-1 text-center font-medium text-outline">2</div>
+<div class="col-span-4 font-semibold text-on-surface">Secure API Gateway Architecture</div>
+<div class="col-span-2 font-mono text-outline">998314</div>
+<div class="col-span-1 text-right font-medium">40 Hrs</div>
+<div class="col-span-1 text-right font-medium">2,500</div>
+<div class="col-span-1 text-right text-outline">18%</div>
+<div class="col-span-2 text-right font-bold text-on-surface">1,18,000.00</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-12 gap-1 py-2 px-2 items-center text-[11px] bg-surface-container-lowest">
+<div class="col-span-1 text-center font-medium text-outline">3</div>
+<div class="col-span-4 font-semibold text-on-surface">Hardware Security Module (HSM)</div>
+<div class="col-span-2 font-mono text-outline">847170</div>
+<div class="col-span-1 text-right font-medium">2 Units</div>
+<div class="col-span-1 text-right font-medium">45,000</div>
+<div class="col-span-1 text-right text-outline">18%</div>
+<div class="col-span-2 text-right font-bold text-on-surface">95,580.00</div>
+</div>
+</div>
+<!-- Settlement & Ledger Calculations -->
+<div class="grid grid-cols-12 gap-3 pt-2">
+<div class="col-span-6 flex flex-col gap-1 p-2 bg-surface-container-low rounded-lg text-[11px]">
+<span class="font-bold text-on-surface uppercase tracking-wider text-[10px]">Bank Settlement Info:</span>
+<span class="text-outline">Bank: <strong class="text-on-surface">HDFC Bank Ltd</strong></span>
+<span class="text-outline">A/C: <strong class="text-on-surface font-mono">50200049281729</strong></span>
+<span class="text-outline">IFSC: <strong class="text-on-surface font-mono">HDFC0000060</strong></span>
+<span class="text-outline">UPI: <strong class="text-on-surface font-mono">bharattech@okhdfcbank</strong></span>
+</div>
+<div class="col-span-6 flex flex-col gap-1 text-[11px]">
+<div class="flex justify-between text-outline">
+<span>Taxable Subtotal:</span>
+<span class="font-semibold text-on-surface">₹3,52,000.00</span>
+</div>
+<div class="flex justify-between text-outline">
+<span>Inter-state IGST (18%):</span>
+<span class="font-semibold text-on-surface">₹63,360.00</span>
+</div>
+<div class="flex justify-between text-outline">
+<span>CGST / SGST:</span>
+<span class="font-semibold text-on-surface">₹0.00</span>
+</div>
+<div class="flex justify-between py-1.5 px-2 bg-surface-container-high rounded text-primary font-bold text-[13px] mt-1">
+<span>Grand Total:</span>
+<span>₹4,15,360.00</span>
+</div>
+</div>
+</div>
+<!-- Total in Words Note -->
+<div class="p-2 bg-surface-container-lowest text-[10px] text-outline font-medium">
+              Amount in words: <strong class="text-on-surface">INR Four Lakh Fifteen Thousand Three Hundred Sixty Only</strong>
+</div>
+<!-- Signatory & Terms Footer -->
+<div class="flex items-end justify-between pt-4 mt-auto">
+<div class="flex flex-col gap-0.5 text-[9px] text-outline max-w-[240px]">
+<span class="font-bold text-on-surface">Terms &amp; Conditions:</span>
+<p>1. Payment due within 15 days of invoice date.</p>
+<p>2. Subject to Mumbai Jurisdiction only.</p>
+<p>3. This is a computer generated legal tax invoice.</p>
+</div>
+<div class="flex flex-col items-center gap-1 text-center">
+<span class="font-label-sm text-[10px] text-outline font-medium">For Bharat Technologies Solutions Pvt Ltd</span>
+<div class="h-10 w-28 bg-surface-container-low rounded flex items-center justify-center text-[10px] text-outline font-serif italic">
+                  Rajesh Varma
+                </div>
+<span class="font-label-sm text-[10px] font-bold text-on-surface uppercase">Authorized Signatory</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main></div></body></html>
