@@ -57,12 +57,14 @@ const getInitialSellerProfile = (fallback: any) => {
       const stored = localStorage.getItem('billwebz_default_seller');
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed.state === 'Delhi') parsed.state = '';
-        return { ...fallback, ...parsed };
+        if (parsed && typeof parsed === 'object') {
+          if (parsed.state === 'Delhi') parsed.state = '';
+          return { ...(fallback || {}), ...parsed };
+        }
       }
     } catch (e) {}
   }
-  return fallback;
+  return fallback || {};
 };
 
 const emptyQuotation = (defaultSeller: any, defaultTerms: any, defaultDec: any, defaultCurr: any, existingInvoices: Invoice[] = []): Invoice => {
@@ -272,9 +274,35 @@ function QuotationForm() {
     return () => clearTimeout(timer);
   }, [invoiceData, saveInvoice]);
 
+  // Sync default seller details once loaded from store if current draft is blank
+  useEffect(() => {
+    if (invoiceData && !editId && defaultSeller?.name && !invoiceData.sellerDetails?.name) {
+      setInvoiceData({
+        ...invoiceData,
+        sellerDetails: {
+          ...invoiceData.sellerDetails,
+          ...defaultSeller,
+          state: defaultSeller.state === 'Delhi' ? '' : defaultSeller.state,
+        },
+        paymentDetails: {
+          ...invoiceData.paymentDetails,
+          bankName: defaultSeller.bankName || invoiceData.paymentDetails?.bankName || '',
+          accountNumber: defaultSeller.accountNumber || invoiceData.paymentDetails?.accountNumber || '',
+          accountHolderName: defaultSeller.name || invoiceData.paymentDetails?.accountHolderName || '',
+          ifsc: defaultSeller.ifsc || invoiceData.paymentDetails?.ifsc || '',
+          branch: defaultSeller.branch || invoiceData.paymentDetails?.branch || '',
+          upiId: defaultSeller.upiId || invoiceData.paymentDetails?.upiId || '',
+        }
+      });
+    }
+  }, [defaultSeller, editId]);
+
   // Auto-persist business seller profile & settings to localStorage
   useEffect(() => {
     if (!invoiceData?.sellerDetails) return;
+    const sellerName = (invoiceData.sellerDetails.name || '').trim();
+    if (!sellerName) return;
+
     const timer = setTimeout(() => {
       try {
         const sellerProfile = {

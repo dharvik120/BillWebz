@@ -248,19 +248,22 @@ export function useInvoiceStore() {
 
     if (typeof window !== 'undefined' && invoice.sellerDetails) {
       try {
-        const sellerProfile = {
-          ...invoice.sellerDetails,
-          bankName: invoice.paymentDetails?.bankName || invoice.sellerDetails.bankName,
-          accountNumber: invoice.paymentDetails?.accountNumber || invoice.sellerDetails.accountNumber,
-          accountHolderName: invoice.paymentDetails?.accountHolderName || invoice.sellerDetails.accountHolderName,
-          ifsc: invoice.paymentDetails?.ifsc || invoice.sellerDetails.ifsc,
-          branch: invoice.paymentDetails?.branch || invoice.sellerDetails.branch,
-          upiId: invoice.paymentDetails?.upiId || invoice.sellerDetails.upiId,
-        };
-        localStorage.setItem(DEFAULT_SELLER_KEY, JSON.stringify(sellerProfile));
-        if (invoice.termsAndConditions) localStorage.setItem(DEFAULT_TERMS_KEY, invoice.termsAndConditions);
-        if (invoice.declaration) localStorage.setItem(DEFAULT_DECLARATION_KEY, invoice.declaration);
-        if (invoice.currency) localStorage.setItem(DEFAULT_CURRENCY_KEY, JSON.stringify(invoice.currency));
+        const sellerName = (invoice.sellerDetails.name || '').trim();
+        if (sellerName) {
+          const sellerProfile = {
+            ...invoice.sellerDetails,
+            bankName: invoice.paymentDetails?.bankName || invoice.sellerDetails.bankName,
+            accountNumber: invoice.paymentDetails?.accountNumber || invoice.sellerDetails.accountNumber,
+            accountHolderName: invoice.paymentDetails?.accountHolderName || invoice.sellerDetails.accountHolderName,
+            ifsc: invoice.paymentDetails?.ifsc || invoice.sellerDetails.ifsc,
+            branch: invoice.paymentDetails?.branch || invoice.sellerDetails.branch,
+            upiId: invoice.paymentDetails?.upiId || invoice.sellerDetails.upiId,
+          };
+          localStorage.setItem(DEFAULT_SELLER_KEY, JSON.stringify(sellerProfile));
+          if (invoice.termsAndConditions) localStorage.setItem(DEFAULT_TERMS_KEY, invoice.termsAndConditions);
+          if (invoice.declaration) localStorage.setItem(DEFAULT_DECLARATION_KEY, invoice.declaration);
+          if (invoice.currency) localStorage.setItem(DEFAULT_CURRENCY_KEY, JSON.stringify(invoice.currency));
+        }
       } catch (e) {}
     }
 

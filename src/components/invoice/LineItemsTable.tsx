@@ -27,12 +27,14 @@ interface NumberInputProps {
 }
 
 function NumberInput({ value, onChange, placeholder = '0', className, max }: NumberInputProps) {
-  const [displayValue, setDisplayValue] = useState<string>(value === 0 ? '' : String(value));
+  const safeNum = typeof value === 'number' && !isNaN(value) ? value : (Number(value) || 0);
+  const [displayValue, setDisplayValue] = useState<string>(safeNum === 0 ? '' : String(safeNum));
 
   React.useEffect(() => {
     const num = parseFloat(displayValue) || 0;
-    if (num !== value) {
-      setDisplayValue(value === 0 ? '' : String(value));
+    const currentSafe = typeof value === 'number' && !isNaN(value) ? value : (Number(value) || 0);
+    if (num !== currentSafe) {
+      setDisplayValue(currentSafe === 0 ? '' : String(currentSafe));
     }
   }, [value]);
 
@@ -95,14 +97,17 @@ interface LineItemsTableProps {
 
 export function LineItemsTable({ items, onChange, currencySymbol, showTax = true }: LineItemsTableProps) {
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
+  const safeItems = Array.isArray(items) ? items : [];
 
   const handleItemChange = (index: number, field: keyof LineItem, value: any) => {
-    const updated = [...items];
-    updated[index] = {
-      ...updated[index],
-      [field]: value
-    };
-    onChange(updated);
+    const updated = [...safeItems];
+    if (updated[index]) {
+      updated[index] = {
+        ...updated[index],
+        [field]: value
+      };
+      onChange(updated);
+    }
   };
 
   const addItem = () => {
@@ -126,28 +131,29 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
       taxableValue: 0,
       finalAmount: 0
     };
-    onChange([...items, newItem]);
+    onChange([...safeItems, newItem]);
   };
 
   const duplicateItem = (index: number) => {
-    const itemToClone = items[index];
+    if (!safeItems[index]) return;
+    const itemToClone = safeItems[index];
     const clonedItem: LineItem = {
       ...itemToClone,
       id: Math.random().toString(36).substring(2, 9),
     };
-    const updated = [...items];
+    const updated = [...safeItems];
     updated.splice(index + 1, 0, clonedItem);
     onChange(updated);
   };
 
   const deleteItem = (index: number) => {
-    const updated = items.filter((_, i) => i !== index);
+    const updated = safeItems.filter((_, i) => i !== index);
     onChange(updated);
   };
 
   const moveUp = (index: number) => {
-    if (index === 0) return;
-    const updated = [...items];
+    if (index === 0 || !safeItems[index] || !safeItems[index - 1]) return;
+    const updated = [...safeItems];
     const temp = updated[index];
     updated[index] = updated[index - 1];
     updated[index - 1] = temp;
@@ -155,8 +161,8 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
   };
 
   const moveDown = (index: number) => {
-    if (index === items.length - 1) return;
-    const updated = [...items];
+    if (index >= safeItems.length - 1 || !safeItems[index] || !safeItems[index + 1]) return;
+    const updated = [...safeItems];
     const temp = updated[index];
     updated[index] = updated[index + 1];
     updated[index + 1] = temp;
@@ -165,11 +171,11 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
 
   // Helper calculations for visual breakdown
   const getItemBreakdown = (item: LineItem) => {
-    const qty = Number(item.quantity) || 0;
-    const rate = Number(item.rate) || 0;
-    const disc = Number(item.discountPercent) || 0;
-    const gstRate = showTax ? (Number(item.gstPercent) || 0) : 0;
-    const cessRate = showTax ? (Number(item.cessPercent) || 0) : 0;
+    const qty = Number(item?.quantity) || 0;
+    const rate = Number(item?.rate) || 0;
+    const disc = Number(item?.discountPercent) || 0;
+    const gstRate = showTax ? (Number(item?.gstPercent) || 0) : 0;
+    const cessRate = showTax ? (Number(item?.cessPercent) || 0) : 0;
     const totalTaxPercent = gstRate + cessRate;
 
     let baseRate = rate;
@@ -177,7 +183,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
     let taxAmount = 0;
     let finalAmount = 0;
 
-    if (item.isTaxInclusive) {
+    if (item?.isTaxInclusive) {
       baseRate = totalTaxPercent > 0 ? rate / (1 + totalTaxPercent / 100) : rate;
       const discountedBase = baseRate * (1 - disc / 100);
       taxable = discountedBase * qty;
@@ -192,10 +198,10 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
     }
 
     return {
-      baseRate,
-      taxable,
-      taxAmount,
-      finalAmount
+      baseRate: isNaN(baseRate) ? 0 : baseRate,
+      taxable: isNaN(taxable) ? 0 : taxable,
+      taxAmount: isNaN(taxAmount) ? 0 : taxAmount,
+      finalAmount: isNaN(finalAmount) ? 0 : finalAmount
     };
   };
 
@@ -215,25 +221,25 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
 
         <div className="flex items-center gap-2">
           {/* GST Inclusivity Bulk Action */}
-          {showTax && items.length > 0 && (
+          {showTax && safeItems.length > 0 && (
             <button
               type="button"
               onClick={() => {
-                const anyUnchecked = items.some((i) => !i.isTaxInclusive);
-                const updated = items.map((item) => ({
+                const anyUnchecked = safeItems.some((i) => !i.isTaxInclusive);
+                const updated = safeItems.map((item) => ({
                   ...item,
                   isTaxInclusive: anyUnchecked,
                 }));
                 onChange(updated);
               }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition-all cursor-pointer ${
-                items.every((i) => i.isTaxInclusive)
+                safeItems.every((i) => i.isTaxInclusive)
                   ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-300 border-blue-300 dark:border-blue-800 shadow-2xs'
                   : 'bg-secondary hover:bg-secondary/80 text-muted-foreground border-border/70'
               }`}
               title="Toggle all items to include GST in rates"
             >
-              <span>{items.every((i) => i.isTaxInclusive) ? '✓ All Rates With GST' : 'Make All With GST'}</span>
+              <span>{safeItems.every((i) => i.isTaxInclusive) ? '✓ All Rates With GST' : 'Make All With GST'}</span>
             </button>
           )}
 
@@ -280,7 +286,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
       </div>
 
       {/* Empty State */}
-      {items.length === 0 && (
+      {safeItems.length === 0 && (
         <div className="p-8 sm:p-12 border-2 border-dashed border-border/80 rounded-2xl text-center bg-card flex flex-col items-center justify-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200 dark:border-blue-900">
             <Layers className="w-6 h-6" />
@@ -305,9 +311,9 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
       {/* ────────────────────────────────────────────────────────── */}
       {/* MODE 1: SPACIOUS CARD FORM LAYOUT (Identical to Document Info) */}
       {/* ────────────────────────────────────────────────────────── */}
-      {viewMode === 'cards' && items.length > 0 && (
+      {viewMode === 'cards' && safeItems.length > 0 && (
         <div className="space-y-4">
-          {items.map((item, idx) => {
+          {safeItems.map((item, idx) => {
             const { baseRate, taxable, taxAmount, finalAmount } = getItemBreakdown(item);
 
             return (
@@ -340,7 +346,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                     <button
                       type="button"
                       onClick={() => moveDown(idx)}
-                      disabled={idx === items.length - 1}
+                      disabled={idx === safeItems.length - 1}
                       className="p-1.5 rounded-lg bg-secondary hover:bg-secondary/80 disabled:opacity-30 text-foreground transition-colors cursor-pointer"
                       title="Move Down"
                     >
@@ -377,7 +383,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                     <input
                       type="text"
                       placeholder="e.g. Website Development, Consulting, or Product Model"
-                      value={item.name}
+                      value={item.name || ''}
                       onChange={(e) => handleItemChange(idx, 'name', e.target.value)}
                       className="w-full h-11 px-3.5 bg-background border border-border/80 rounded-xl text-sm font-semibold text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs"
                     />
@@ -417,7 +423,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                       Unit
                     </label>
                     <select
-                      value={item.unit}
+                      value={item.unit || 'Pcs'}
                       onChange={(e) => handleItemChange(idx, 'unit', e.target.value)}
                       className="w-full h-11 px-3.5 bg-background border border-border/80 rounded-xl text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs cursor-pointer"
                     >
@@ -472,7 +478,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                         GST Tax Rate %
                       </label>
                       <select
-                        value={item.gstPercent}
+                        value={item.gstPercent ?? 18}
                         onChange={(e) => handleItemChange(idx, 'gstPercent', parseInt(e.target.value, 10) || 0)}
                         className="w-full h-11 px-3.5 bg-background border border-border/80 rounded-xl text-sm font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs cursor-pointer"
                       >
@@ -501,8 +507,8 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                           </span>
                           <p className="text-[11px] text-muted-foreground">
                             {item.isTaxInclusive
-                              ? `Base: ${currencySymbol}${baseRate.toFixed(2)} | GST (${item.gstPercent}%): ${currencySymbol}${(item.rate - baseRate).toFixed(2)}`
-                              : `Base price is ${currencySymbol}${item.rate.toFixed(2)} + ${item.gstPercent}% GST`}
+                              ? `Base: ${currencySymbol}${baseRate.toFixed(2)} | GST (${item.gstPercent || 0}%): ${currencySymbol}${((Number(item?.rate) || 0) - baseRate).toFixed(2)}`
+                              : `Base price is ${currencySymbol}${(Number(item?.rate) || 0).toFixed(2)} + ${item.gstPercent || 0}% GST`}
                           </p>
                         </div>
                       </label>
@@ -565,7 +571,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
               </tr>
             </thead>
             <tbody>
-              {items.map((item, idx) => (
+              {safeItems.map((item, idx) => (
                 <tr
                   key={item.id}
                   className="border-b border-border/30 bg-card hover:bg-secondary/30 transition-colors align-top"
@@ -677,7 +683,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                       <button
                         type="button"
                         onClick={() => moveDown(idx)}
-                        disabled={idx === items.length - 1}
+                        disabled={idx === safeItems.length - 1}
                         className="p-1 rounded bg-secondary hover:bg-secondary/80 disabled:opacity-40 transition-colors"
                         title="Move Down"
                       >

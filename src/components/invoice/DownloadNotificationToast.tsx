@@ -12,9 +12,11 @@ interface ToastData {
 }
 
 export function DownloadNotificationToast() {
+  const [mounted, setMounted] = useState(false);
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
   useEffect(() => {
+    setMounted(true);
     const handleNotification = (e: Event) => {
       const customEvent = e as CustomEvent<{ filename: string; blobUrl?: string; message?: string }>;
       if (!customEvent.detail) return;
@@ -40,10 +42,12 @@ export function DownloadNotificationToast() {
   };
 
   const handleOpenPdf = (blobUrl?: string) => {
-    if (blobUrl) {
+    if (blobUrl && typeof window !== 'undefined') {
       window.open(blobUrl, '_blank');
     }
   };
+
+  if (!mounted) return null;
 
   return (
     <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col gap-3 max-w-[92vw] sm:max-w-md w-full pointer-events-none">
