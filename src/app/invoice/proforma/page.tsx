@@ -214,6 +214,7 @@ function ProformaInvoiceForm() {
   const toggleSection = (id: string) => setCollapsedSections(prev => ({ ...prev, [id]: !prev[id] }));
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isSharingWhatsApp, setIsSharingWhatsApp] = useState(false);
   const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form');
 
   // Trigger PDF Generation
@@ -459,8 +460,6 @@ function ProformaInvoiceForm() {
       console.error(err);
     }
   };
-
-  const [isSharingWhatsApp, setIsSharingWhatsApp] = useState(false);
 
   const handleShareWhatsApp = async () => {
     if (!invoiceData) return;

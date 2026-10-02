@@ -213,6 +213,7 @@ function GstInvoiceForm() {
   const toggleSection = (id: string) => setCollapsedSections(prev => ({ ...prev, [id]: !prev[id] }));
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isSharingWhatsApp, setIsSharingWhatsApp] = useState(false);
   const [previewTab, setPreviewTab] = useState<'edit' | 'preview'>('edit');
   const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form');
 
@@ -458,8 +459,6 @@ function GstInvoiceForm() {
       console.error(err);
     }
   };
-
-  const [isSharingWhatsApp, setIsSharingWhatsApp] = useState(false);
 
   const handleShareWhatsApp = async () => {
     if (!invoiceData) return;
