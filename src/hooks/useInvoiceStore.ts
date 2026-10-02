@@ -262,6 +262,23 @@ export function useInvoiceStore() {
     await loadInvoices();
   }, [loadInvoices]);
 
+  // Bulk Delete Invoices
+  const deleteInvoices = useCallback(async (ids: string[]) => {
+    if (!ids || ids.length === 0) return;
+    for (const id of ids) {
+      await db.invoices.delete(id);
+      if (isFirebaseEnabled && firebaseDb) {
+        try {
+          const docRef = doc(firebaseDb, 'invoices', id);
+          await deleteDoc(docRef);
+        } catch (e) {
+          console.error('Firebase bulk delete error for id ' + id, e);
+        }
+      }
+    }
+    await loadInvoices();
+  }, [loadInvoices]);
+
   // Duplicate Invoice
   const duplicateInvoice = useCallback(async (invoice: Invoice) => {
     const timestamp = Date.now();
@@ -427,6 +444,7 @@ export function useInvoiceStore() {
     saveSettings,
     saveInvoice,
     deleteInvoice,
+    deleteInvoices,
     duplicateInvoice,
     updateInvoiceStatus,
     getMetrics,

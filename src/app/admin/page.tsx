@@ -46,12 +46,17 @@ export default function AdminPortal() {
     adminSettings, 
     saveAdminSettings, 
     deleteInvoice,
+    deleteInvoices,
     updateInvoiceStatus,
     exportBackup,
     restoreBackup,
     loadInvoices,
     getMetrics
   } = useInvoiceStore();
+
+  // Bulk Selection State for Ledger
+  const [selectedLedgerIds, setSelectedLedgerIds] = useState<string[]>([]);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
   // Login State
   const [username, setUsername] = useState('');
@@ -774,10 +779,95 @@ export default function AdminPortal() {
           {/* TAB 4: MASTER INVOICES LEDGER */}
           {activeTab === 'ledger' && (
             <div className="space-y-6">
-              <div>
-                <h2 className="text-xl font-extrabold text-white">Master Invoices Registry Ledger</h2>
-                <p className="text-xs text-slate-400 mt-1">Review, modify statuses, or delete all active drafts and exported sheets across client nodes.</p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-extrabold text-white">Master Invoices Registry Ledger</h2>
+                  <p className="text-xs text-slate-400 mt-1">Review, modify statuses, or delete all active drafts and exported sheets across client nodes.</p>
+                </div>
+                {invoices.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const allIds = invoices.map(i => i.id).filter(Boolean) as string[];
+                        if (selectedLedgerIds.length === allIds.length) {
+                          setSelectedLedgerIds([]);
+                        } else {
+                          setSelectedLedgerIds(allIds);
+                        }
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-colors"
+                    >
+                      {selectedLedgerIds.length === invoices.length ? 'Deselect All' : 'Select All'}
+                    </button>
+                    {selectedLedgerIds.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const count = selectedLedgerIds.length;
+                          if (!confirm(`Are you sure you want to permanently delete ${count} selected ${count === 1 ? 'invoice' : 'invoices'}? This action cannot be undone.`)) return;
+                          setIsBulkDeleting(true);
+                          try {
+                            await deleteInvoices(selectedLedgerIds);
+                            setSelectedLedgerIds([]);
+                          } catch (err) {
+                            console.error('Bulk delete failed', err);
+                            alert('Failed to delete selected records.');
+                          } finally {
+                            setIsBulkDeleting(false);
+                          }
+                        }}
+                        disabled={isBulkDeleting}
+                        className="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span>{isBulkDeleting ? 'Deleting...' : `Delete Selected (${selectedLedgerIds.length})`}</span>
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
+
+              {/* Bulk Action Bar Banner */}
+              {selectedLedgerIds.length > 0 && (
+                <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-red-950/40 border border-red-800/60 rounded-xl text-xs">
+                  <div className="flex items-center gap-2 text-red-200 font-semibold">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+                    <span><strong>{selectedLedgerIds.length}</strong> of {invoices.length} invoices selected for bulk operation</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedLedgerIds([])}
+                      className="px-3 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const count = selectedLedgerIds.length;
+                        if (!confirm(`Are you sure you want to permanently delete ${count} selected ${count === 1 ? 'invoice' : 'invoices'}? This action cannot be undone.`)) return;
+                        setIsBulkDeleting(true);
+                        try {
+                          await deleteInvoices(selectedLedgerIds);
+                          setSelectedLedgerIds([]);
+                        } catch (err) {
+                          console.error('Bulk delete failed', err);
+                          alert('Failed to delete selected records.');
+                        } finally {
+                          setIsBulkDeleting(false);
+                        }
+                      }}
+                      disabled={isBulkDeleting}
+                      className="px-4 py-1 rounded-md bg-red-600 hover:bg-red-700 text-white font-bold transition-colors flex items-center gap-1.5 shadow"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      <span>{isBulkDeleting ? 'Deleting...' : `Delete Selected (${selectedLedgerIds.length})`}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow overflow-hidden">
                 {invoices.length === 0 ? (
@@ -790,6 +880,22 @@ export default function AdminPortal() {
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
                         <tr className="bg-slate-950 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
+                          <th className="px-4 py-4 w-10 text-center">
+                            <input
+                              type="checkbox"
+                              checked={invoices.length > 0 && selectedLedgerIds.length === invoices.length}
+                              onChange={() => {
+                                const allIds = invoices.map(i => i.id).filter(Boolean) as string[];
+                                if (selectedLedgerIds.length === allIds.length) {
+                                  setSelectedLedgerIds([]);
+                                } else {
+                                  setSelectedLedgerIds(allIds);
+                                }
+                              }}
+                              className="w-4 h-4 rounded cursor-pointer accent-blue-600"
+                              title="Select All Invoices"
+                            />
+                          </th>
                           <th className="px-5 py-4">Invoice No</th>
                           <th className="px-5 py-4">Client/Buyer</th>
                           <th className="px-5 py-4">Type</th>
@@ -800,58 +906,77 @@ export default function AdminPortal() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800/40">
-                        {invoices.map((inv) => (
-                          <tr key={inv.id} className="hover:bg-slate-800/25 transition-colors">
-                            <td className="px-5 py-4 font-mono font-bold text-white">
-                              {inv.metadata.invoiceNumber}
-                            </td>
-                            <td className="px-5 py-4 font-medium text-slate-300">
-                              {inv.buyerDetails.name}
-                            </td>
-                            <td className="px-5 py-4">
-                              <span className={`px-2 py-0.5 rounded-[4px] font-black text-[9px] uppercase ${
-                                inv.type === 'gst' ? 'bg-blue-950 text-blue-400 border border-blue-800/30' :
-                                inv.type === 'proforma' ? 'bg-indigo-950 text-indigo-400 border border-indigo-800/30' :
-                                'bg-emerald-950 text-emerald-400 border border-emerald-800/30'
-                              }`}>
-                                {inv.type}
-                              </span>
-                            </td>
-                            <td className="px-5 py-4 font-bold text-white">
-                              {inv.currency.symbol}{inv.totals.grandTotal.toLocaleString('en-IN')}
-                            </td>
-                            <td className="px-5 py-4">
-                              {inv.isExported ? (
-                                <span className="text-green-500 font-semibold">✓ Exported (Live)</span>
-                              ) : (
-                                <span className="text-slate-500 italic">✗ Draft (In-Editor)</span>
-                              )}
-                            </td>
-                            <td className="px-5 py-4">
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
-                                inv.status === 'Paid' ? 'text-green-400 bg-green-500/10' :
-                                inv.status === 'Pending' ? 'text-amber-400 bg-amber-500/10' :
-                                inv.status === 'Draft' ? 'text-blue-400 bg-blue-500/10' :
-                                'text-red-400 bg-red-500/10'
-                              }`}>
-                                {inv.status}
-                              </span>
-                            </td>
-                            <td className="px-5 py-4 text-right">
-                              <button
-                                onClick={() => {
-                                  if (confirm('Are you sure you want to permanently delete this invoice?')) {
-                                    if (inv.id) deleteInvoice(inv.id);
-                                  }
-                                }}
-                                className="p-1.5 hover:bg-red-950/20 text-slate-500 hover:text-red-400 rounded-lg transition-colors"
-                                title="Purge Record"
-                              >
-                                <Trash2 className="h-4.5 w-4.5" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
+                        {invoices.map((inv) => {
+                          const isSelected = Boolean(inv.id && selectedLedgerIds.includes(inv.id));
+                          return (
+                            <tr 
+                              key={inv.id} 
+                              className={`transition-colors ${isSelected ? 'bg-red-950/20 border-l-2 border-red-500' : 'hover:bg-slate-800/25'}`}
+                            >
+                              <td className="px-4 py-4 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={() => {
+                                    if (!inv.id) return;
+                                    setSelectedLedgerIds(prev =>
+                                      prev.includes(inv.id!) ? prev.filter(id => id !== inv.id) : [...prev, inv.id!]
+                                    );
+                                  }}
+                                  className="w-4 h-4 rounded cursor-pointer accent-blue-600"
+                                />
+                              </td>
+                              <td className="px-5 py-4 font-mono font-bold text-white">
+                                {inv.metadata.invoiceNumber}
+                              </td>
+                              <td className="px-5 py-4 font-medium text-slate-300">
+                                {inv.buyerDetails.name}
+                              </td>
+                              <td className="px-5 py-4">
+                                <span className={`px-2 py-0.5 rounded-[4px] font-black text-[9px] uppercase ${
+                                  inv.type === 'gst' ? 'bg-blue-950 text-blue-400 border border-blue-800/30' :
+                                  inv.type === 'proforma' ? 'bg-indigo-950 text-indigo-400 border border-indigo-800/30' :
+                                  'bg-emerald-950 text-emerald-400 border border-emerald-800/30'
+                                }`}>
+                                  {inv.type}
+                                </span>
+                              </td>
+                              <td className="px-5 py-4 font-bold text-white">
+                                {inv.currency.symbol}{inv.totals.grandTotal.toLocaleString('en-IN')}
+                              </td>
+                              <td className="px-5 py-4">
+                                {inv.isExported ? (
+                                  <span className="text-green-500 font-semibold">✓ Exported (Live)</span>
+                                ) : (
+                                  <span className="text-slate-500 italic">✗ Draft (In-Editor)</span>
+                                )}
+                              </td>
+                              <td className="px-5 py-4">
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                                  inv.status === 'Paid' ? 'text-green-400 bg-green-500/10' :
+                                  inv.status === 'Pending' ? 'text-amber-400 bg-amber-500/10' :
+                                  inv.status === 'Draft' ? 'text-blue-400 bg-blue-500/10' :
+                                  'text-red-400 bg-red-500/10'
+                                }`}>
+                                  {inv.status}
+                                </span>
+                              </td>
+                              <td className="px-5 py-4 text-right">
+                                <button
+                                  onClick={() => {
+                                    if (confirm('Are you sure you want to permanently delete this invoice?')) {
+                                      if (inv.id) deleteInvoice(inv.id);
+                                    }
+                                  }}
+                                  className="p-1.5 hover:bg-red-950/20 text-slate-500 hover:text-red-400 rounded-lg transition-colors"
+                                  title="Purge Record"
+                                >
+                                  <Trash2 className="h-4.5 w-4.5" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>

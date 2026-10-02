@@ -298,7 +298,7 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
 
   // Render Full A4/US Letter layout
   return (
-    <div className="overflow-auto bg-slate-100 p-4 border border-slate-200 dark:border-slate-800 rounded-2xl flex justify-center">
+    <div className="w-full flex justify-center">
       <div 
         id={id} 
         className={`${paperSize === 'letter' ? 'letter-sheet' : 'a4-sheet'} flex flex-col justify-between`}
@@ -315,9 +315,9 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
         {/* Content wrapper */}
         <div className="relative z-10 flex-1 flex flex-col justify-between">
           <div>
-            {/* Row 1: Logo & Company Name + Invoice Meta */}
-            <div className="flex flex-col sm:flex-row items-start justify-between gap-4 border-b pdf-border-light pb-6 mb-6">
-              <div className="flex items-start gap-4 flex-1 min-w-0 max-w-full sm:max-w-[62%]">
+            {/* Row 1: Logo & Company Name + Invoice Meta (Fixed 2-column on all viewports) */}
+            <div className="flex flex-row items-start justify-between gap-4 border-b pdf-border-light pb-6 mb-6">
+              <div className="flex items-start gap-4 flex-1 min-w-0 max-w-[62%]">
                 {sellerDetails.logoUrl ? (
                   <img 
                     src={sellerDetails.logoUrl} 
@@ -371,7 +371,7 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                 </div>
               </div>
 
-              <div className="text-left sm:text-right flex-shrink-0 min-w-[200px] max-w-full">
+              <div className="text-right flex-shrink-0 min-w-[200px]">
                 <span className={`inline-block px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded ${activeColor.primary} text-white mb-2 whitespace-nowrap shadow-sm`}>
                   {type === 'gst' ? (showTax ? 'GST TAX INVOICE' : 'INVOICE') : type === 'proforma' ? 'PROFORMA INVOICE' : 'QUOTATION'}
                 </span>
@@ -389,8 +389,8 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
               </div>
             </div>
 
-            {/* Row 2: Billed To (Buyer Info) & Payment Information (Replaces Shipping Details) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-xs leading-relaxed pdf-text-medium">
+            {/* Row 2: Billed To (Buyer Info) & Payment Information (Fixed 2-column grid) */}
+            <div className="grid grid-cols-2 gap-6 mb-8 text-xs leading-relaxed pdf-text-medium">
               <div className={`${activeColor.accent} pl-3.5 border-l-2 ${activeColor.border}`}>
                 <h4 className="font-bold pdf-text-dark uppercase tracking-wider mb-2">Billed To</h4>
                 <div className="space-y-1">
@@ -560,8 +560,8 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
               </table>
             </div>
 
-            {/* Row 4: Totals Summary & Words (Duplicate Remittance Bank Details Panel Removed) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 text-xs">
+            {/* Row 4: Totals Summary & Words (Fixed 2-column grid) */}
+            <div className="grid grid-cols-2 gap-8 mb-8 text-xs">
               <div className="flex flex-col justify-between">
                 <div>
                   <span className="pdf-text-muted font-semibold block uppercase text-[10px] tracking-wider mb-1">Amount in Words</span>
@@ -638,7 +638,7 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
 
           {/* Row 5: Notes, Signatures, UPI QR & Footer Bar */}
           <div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end border-t pdf-border-light pt-6 mt-auto text-xs">
+            <div className="grid grid-cols-3 gap-6 items-end border-t pdf-border-light pt-6 mt-auto text-xs">
               <div className="space-y-3 col-span-2">
                 {termsAndConditions && (
                   <div>
@@ -666,7 +666,7 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                 )}
               </div>
 
-              <div className="flex flex-col items-center md:items-end justify-end space-y-4">
+              <div className="flex flex-col items-end justify-end space-y-4">
                 {/* QR Code and Barcode */}
                 <div className="flex items-center gap-4">
                   {upiQrUrl && (
@@ -680,8 +680,8 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
 
                 {/* Signature Block - Only renders if NOT computer generated */}
                 {!isComputerGenerated ? (
-                  <div className="flex flex-col items-center md:items-end w-full">
-                    <p className="text-[10px] pdf-text-muted mb-1 font-medium text-center md:text-right w-36">Authorized Signatory</p>
+                  <div className="flex flex-col items-end w-full">
+                    <p className="text-[10px] pdf-text-muted mb-1 font-medium text-right w-36">Authorized Signatory</p>
                     
                     {sellerDetails.signatureUrl ? (
                       <img 

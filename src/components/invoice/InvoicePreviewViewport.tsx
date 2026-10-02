@@ -24,6 +24,7 @@ export function InvoicePreviewViewport({
   themeColor = 'blue'
 }: InvoicePreviewViewportProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const docInnerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState<number>(1);
   const [isFitMode, setIsFitMode] = useState<boolean>(true);
   const [containerWidth, setContainerWidth] = useState<number>(0);
@@ -32,16 +33,31 @@ export function InvoicePreviewViewport({
   const DOCUMENT_WIDTH = 800;
   // Approximate standard A4 document target height in pixels
   const DOCUMENT_HEIGHT = 1130;
+  const [actualDocHeight, setActualDocHeight] = useState<number>(DOCUMENT_HEIGHT);
 
   // Calculate dynamic scale to fit container width
   const calculateFitScale = useCallback((width: number) => {
-    if (!width || width <= 0) return 0.5;
-    // Leave horizontal margin/padding
-    const availableWidth = Math.max(width - 24, 260);
+    if (!width || width <= 0) return 0.45;
+    // Leave horizontal margin/padding (12px on mobile, 24px on desktop)
+    const padding = width < 500 ? 12 : 24;
+    const availableWidth = Math.max(width - padding, 200);
     const fitScale = availableWidth / DOCUMENT_WIDTH;
-    // Bound scale between 0.30 (small phone) and 1.0 (desktop)
-    return Math.min(1.0, Math.max(0.30, Math.round(fitScale * 100) / 100));
+    // Bound scale between 0.25 (small phone) and 1.0 (desktop)
+    return Math.min(1.0, Math.max(0.25, Math.round(fitScale * 100) / 100));
   }, [DOCUMENT_WIDTH]);
+
+  // Measure actual document height
+  useEffect(() => {
+    const measureHeight = () => {
+      if (docInnerRef.current) {
+        const h = docInnerRef.current.offsetHeight;
+        if (h > 0) setActualDocHeight(h);
+      }
+    };
+    measureHeight();
+    const timer = setTimeout(measureHeight, 250);
+    return () => clearTimeout(timer);
+  }, [invoice, scale]);
 
   // Handle ResizeObserver on container
   useEffect(() => {
@@ -73,10 +89,16 @@ export function InvoicePreviewViewport({
 
   // Auto-enable Fit mode on smaller viewports upon initial mount
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-      setIsFitMode(true);
+    if (typeof window !== 'undefined') {
+      const w = window.innerWidth;
+      if (w < 1024) {
+        setIsFitMode(true);
+        if (containerRef.current) {
+          setScale(calculateFitScale(containerRef.current.clientWidth));
+        }
+      }
     }
-  }, []);
+  }, [calculateFitScale]);
 
   const handleZoomIn = () => {
     setIsFitMode(false);
@@ -85,7 +107,7 @@ export function InvoicePreviewViewport({
 
   const handleZoomOut = () => {
     setIsFitMode(false);
-    setScale(prev => Math.max(0.3, Math.round((prev - 0.1) * 10) / 10));
+    setScale(prev => Math.max(0.25, Math.round((prev - 0.1) * 10) / 10));
   };
 
   const handleToggleFit = () => {
@@ -93,6 +115,8 @@ export function InvoicePreviewViewport({
       setIsFitMode(true);
       if (containerRef.current) {
         setScale(calculateFitScale(containerRef.current.clientWidth));
+      } else {
+        setScale(0.45);
       }
     } else {
       setIsFitMode(false);
@@ -106,7 +130,7 @@ export function InvoicePreviewViewport({
   };
 
   const scaledWidth = Math.round(DOCUMENT_WIDTH * scale);
-  const scaledHeight = Math.round(DOCUMENT_HEIGHT * scale);
+  const scaledHeight = Math.round(actualDocHeight * scale);
 
   return (
     <div className="flex flex-col gap-3 w-full">
@@ -202,6 +226,7 @@ export function InvoicePreviewViewport({
         >
           {/* Unscaled 800px document scaled smoothly via CSS transform */}
           <div
+            ref={docInnerRef}
             style={{
               width: `${DOCUMENT_WIDTH}px`,
               transform: `scale(${scale})`,

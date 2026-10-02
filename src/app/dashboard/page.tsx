@@ -42,6 +42,7 @@ export default function Dashboard() {
     invoices, 
     loading, 
     deleteInvoice, 
+    deleteInvoices,
     duplicateInvoice, 
     updateInvoiceStatus, 
     getMetrics, 
@@ -51,6 +52,10 @@ export default function Dashboard() {
   
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
+
+  // Bulk Selection State
+  const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>([]);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
   // Authentication check
   useEffect(() => {
@@ -504,6 +509,47 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Bulk Selection Bar */}
+          {selectedInvoiceIds.length > 0 && (
+            <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-red-500/10 border-b border-red-500/20 text-xs">
+              <div className="flex items-center gap-2 text-red-600 dark:text-red-400 font-bold">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+                <span><strong>{selectedInvoiceIds.length}</strong> of {filteredInvoices.length} invoices selected</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedInvoiceIds([])}
+                  className="px-3 py-1.5 rounded-lg bg-secondary hover:bg-secondary/80 text-foreground font-bold transition-colors"
+                >
+                  Clear Selection
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const count = selectedInvoiceIds.length;
+                    if (!confirm(`Are you sure you want to permanently delete ${count} selected ${count === 1 ? 'document' : 'documents'}? This cannot be undone.`)) return;
+                    setIsBulkDeleting(true);
+                    try {
+                      await deleteInvoices(selectedInvoiceIds);
+                      setSelectedInvoiceIds([]);
+                    } catch (err) {
+                      console.error('Bulk delete failed', err);
+                      alert('Failed to delete selected invoices.');
+                    } finally {
+                      setIsBulkDeleting(false);
+                    }
+                  }}
+                  disabled={isBulkDeleting}
+                  className="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold transition-colors flex items-center gap-1.5 shadow-sm"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span>{isBulkDeleting ? 'Deleting...' : `Delete Selected (${selectedInvoiceIds.length})`}</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Table Container */}
           <div className="overflow-x-auto">
             {loading ? (
@@ -545,6 +591,22 @@ export default function Dashboard() {
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
                   <tr className="bg-secondary/40 border-b border-border/60 text-muted-foreground font-bold text-xs uppercase tracking-wider">
+                    <th className="px-4 py-4 w-10 text-center">
+                      <input
+                        type="checkbox"
+                        checked={filteredInvoices.length > 0 && selectedInvoiceIds.length === filteredInvoices.length}
+                        onChange={() => {
+                          const allFilteredIds = filteredInvoices.map(i => i.id).filter(Boolean) as string[];
+                          if (selectedInvoiceIds.length === allFilteredIds.length) {
+                            setSelectedInvoiceIds([]);
+                          } else {
+                            setSelectedInvoiceIds(allFilteredIds);
+                          }
+                        }}
+                        className="w-4 h-4 rounded cursor-pointer accent-primary"
+                        title="Select All Invoices"
+                      />
+                    </th>
                     <th className="px-6 py-4">Document No</th>
                     <th className="px-6 py-4">Billed To / Client</th>
                     <th className="px-6 py-4">Type</th>
@@ -556,6 +618,7 @@ export default function Dashboard() {
                 </thead>
                 <tbody className="divide-y divide-border/40">
                   {filteredInvoices.map((inv) => {
+                    const isSelected = Boolean(inv.id && selectedInvoiceIds.includes(inv.id));
                     const statusColors = {
                       Paid: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30',
                       Pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30',
@@ -570,7 +633,23 @@ export default function Dashboard() {
                       : `/invoice/quotation?id=${inv.id}`;
 
                     return (
-                      <tr key={inv.id} className="hover:bg-secondary/20 transition-colors">
+                      <tr 
+                        key={inv.id} 
+                        className={`transition-colors ${isSelected ? 'bg-red-500/10' : 'hover:bg-secondary/20'}`}
+                      >
+                        <td className="px-4 py-4 text-center">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => {
+                              if (!inv.id) return;
+                              setSelectedInvoiceIds(prev =>
+                                prev.includes(inv.id!) ? prev.filter(id => id !== inv.id) : [...prev, inv.id!]
+                              );
+                            }}
+                            className="w-4 h-4 rounded cursor-pointer accent-primary"
+                          />
+                        </td>
                         <td className="px-6 py-4 font-mono font-bold text-foreground">
                           {inv.metadata.invoiceNumber}
                         </td>
