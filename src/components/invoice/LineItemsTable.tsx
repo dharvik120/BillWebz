@@ -201,27 +201,27 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
         </div>
       </div>
 
-      <div className="overflow-x-auto border border-border/60 rounded-xl">
-        <table className="w-full text-left text-xs border-collapse min-w-[1140px]">
+      <div className="overflow-x-auto border border-border/60 rounded-2xl shadow-xs">
+        <table className="w-full text-left text-xs border-collapse min-w-[1180px]">
           <thead>
-            <tr className="bg-secondary/40 border-b border-border/50 text-muted-foreground font-semibold uppercase text-[10px] tracking-wider">
-              <th className="px-2 py-3 w-[36px]"></th>
-              <th className="px-2 py-3 w-[50px] text-center">No.</th>
-              <th className="px-3 py-3 min-w-[280px]">Item Name</th>
-              {showTax && <th className="px-3 py-3 w-[150px] min-w-[150px]">HSN/SAC</th>}
-              <th className="px-3 py-3 w-[95px] min-w-[95px]">Qty</th>
-              <th className="px-3 py-3 w-[130px] min-w-[130px]">Unit</th>
-              <th className="px-3 py-3 w-[180px] min-w-[180px]">Rate ({currencySymbol})</th>
-              <th className="px-3 py-3 w-[105px] min-w-[105px]">Discount %</th>
-              {showTax && <th className="px-3 py-3 w-[135px] min-w-[135px]">GST %</th>}
-              <th className="px-3 py-3 w-[140px] min-w-[140px] text-right">Actions</th>
+            <tr className="bg-secondary/50 border-b border-border/60 text-muted-foreground font-bold uppercase text-[11px] tracking-wider">
+              <th className="px-2 py-3.5 w-[40px]"></th>
+              <th className="px-2 py-3.5 w-[50px] text-center">No.</th>
+              <th className="px-3.5 py-3.5 min-w-[280px]">Item Name</th>
+              {showTax && <th className="px-3.5 py-3.5 w-[160px] min-w-[160px]">HSN/SAC</th>}
+              <th className="px-3.5 py-3.5 w-[100px] min-w-[100px]">Qty</th>
+              <th className="px-3.5 py-3.5 w-[145px] min-w-[145px]">Unit</th>
+              <th className="px-3.5 py-3.5 w-[180px] min-w-[180px]">Rate ({currencySymbol})</th>
+              <th className="px-3.5 py-3.5 w-[110px] min-w-[110px]">Discount %</th>
+              {showTax && <th className="px-3.5 py-3.5 w-[150px] min-w-[150px]">GST %</th>}
+              <th className="px-3.5 py-3.5 w-[140px] min-w-[140px] text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {items.length === 0 ? (
               <tr>
-                <td colSpan={showTax ? 10 : 8} className="py-10 text-center text-muted-foreground font-medium bg-card">
-                  No items added. Click &quot;Add Product Item&quot; to begin.
+                <td colSpan={showTax ? 10 : 8} className="py-12 text-center text-muted-foreground font-medium bg-card">
+                  No items added yet. Click &quot;+ Add Product Item&quot; to begin creating your invoice.
                 </td>
               </tr>
             ) : (
@@ -232,26 +232,26 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                   onDragStart={(e) => handleDragStart(e, idx)}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => handleDrop(e, idx)}
-                  className="border-b border-border/30 bg-card hover:bg-muted/5 transition-colors align-top"
+                  className="border-b border-border/30 bg-card hover:bg-secondary/30 transition-colors align-top"
                 >
                   {/* Drag Handle */}
                   <td className="px-2 py-3 text-center cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600">
-                    <GripVertical className="h-4 w-4 mx-auto mt-2" />
+                    <GripVertical className="h-4 w-4 mx-auto mt-2.5" />
                   </td>
 
                   {/* Serial Number */}
-                  <td className="px-2 py-3 text-center text-muted-foreground font-bold text-[12px] pt-4">
+                  <td className="px-2 py-3 text-center text-muted-foreground font-bold text-xs pt-4">
                     {idx + 1}
                   </td>
 
-                  {/* Item Name (Secondary description removed per Requirement 4) */}
+                  {/* Item Name */}
                   <td className="px-3 py-3">
                     <input
                       type="text"
                       placeholder="Item Name (Required)"
                       value={item.name}
                       onChange={(e) => handleItemChange(idx, 'name', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-md text-[13px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500 font-semibold"
+                      className="w-full h-10 px-3.5 py-2 border border-border/80 rounded-xl text-xs sm:text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold shadow-xs"
                     />
                   </td>
 
@@ -272,7 +272,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                       value={item.quantity}
                       onChange={(val) => handleItemChange(idx, 'quantity', val)}
                       placeholder="1"
-                      className="w-full px-3 py-2 border border-border/80 rounded-md text-[13px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
+                      className="w-full h-10 px-3 py-2 border border-border/80 rounded-xl text-xs sm:text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-bold shadow-xs text-center"
                     />
                   </td>
 
@@ -281,16 +281,16 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                     <select
                       value={item.unit}
                       onChange={(e) => handleItemChange(idx, 'unit', e.target.value)}
-                      className="w-full px-2.5 py-2 border border-border/80 rounded-lg text-xs bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold cursor-pointer"
+                      className="w-full h-10 px-3 py-2 border border-border/80 rounded-xl text-xs sm:text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold cursor-pointer shadow-xs"
                     >
-                      <option value="Pcs">Pcs</option>
-                      <option value="Nos">Nos</option>
-                      <option value="Kgs">Kgs</option>
-                      <option value="Box">Box</option>
-                      <option value="Hrs">Hrs</option>
+                      <option value="Pcs">Pcs (Pieces)</option>
+                      <option value="Nos">Nos (Numbers)</option>
+                      <option value="Kgs">Kgs (Kilograms)</option>
+                      <option value="Box">Box (Boxes)</option>
+                      <option value="Hrs">Hrs (Hours)</option>
                       <option value="Days">Days</option>
-                      <option value="Ltr">Ltr</option>
-                      <option value="Mtr">Mtr</option>
+                      <option value="Ltr">Ltr (Litres)</option>
+                      <option value="Mtr">Mtr (Metres)</option>
                       <option value="Service">Service</option>
                     </select>
                   </td>
@@ -301,7 +301,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                       value={item.rate}
                       onChange={(val) => handleItemChange(idx, 'rate', val)}
                       placeholder="0"
-                      className="w-full px-3 py-2 border border-border/80 rounded-md text-[13px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500 font-bold"
+                      className="w-full h-10 px-3 py-2 border border-border/80 rounded-xl text-xs sm:text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-bold shadow-xs"
                     />
                     {showTax && (
                       <div className="mt-1.5 space-y-1">
@@ -317,9 +317,9 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                           </span>
                         </label>
                         {item.isTaxInclusive && item.rate > 0 && item.gstPercent > 0 && (
-                          <div className="text-[10px] text-muted-foreground font-mono bg-blue-50/60 dark:bg-blue-950/40 p-1 rounded border border-blue-200/50 dark:border-blue-800/50">
+                          <div className="text-[10px] text-muted-foreground font-mono bg-blue-50/60 dark:bg-blue-950/40 p-1.5 rounded-lg border border-blue-200/50 dark:border-blue-800/50">
                             <div>Base: {currencySymbol}{(item.rate / (1 + (item.gstPercent + (item.cessPercent || 0)) / 100)).toFixed(2)}</div>
-                            <div className="text-blue-600 dark:text-blue-400">GST: {currencySymbol}{(item.rate - (item.rate / (1 + (item.gstPercent + (item.cessPercent || 0)) / 100))).toFixed(2)}</div>
+                            <div className="text-blue-600 dark:text-blue-400 font-bold">GST: {currencySymbol}{(item.rate - (item.rate / (1 + (item.gstPercent + (item.cessPercent || 0)) / 100))).toFixed(2)}</div>
                           </div>
                         )}
                       </div>
@@ -333,7 +333,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                       onChange={(val) => handleItemChange(idx, 'discountPercent', val)}
                       placeholder="0"
                       max={100}
-                      className="w-full px-3 py-2 border border-border/80 rounded-md text-[13px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full h-10 px-3 py-2 border border-border/80 rounded-xl text-xs sm:text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold shadow-xs text-center"
                     />
                   </td>
 
@@ -343,9 +343,9 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                       <select
                         value={item.gstPercent}
                         onChange={(e) => handleItemChange(idx, 'gstPercent', parseInt(e.target.value, 10) || 0)}
-                        className="w-full px-2.5 py-2 border border-border/80 rounded-lg text-xs bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold cursor-pointer"
+                        className="w-full h-10 px-3 py-2 border border-border/80 rounded-xl text-xs sm:text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-bold cursor-pointer shadow-xs"
                       >
-                        <option value="0">0% GST</option>
+                        <option value="0">0% (Nil)</option>
                         <option value="5">5% GST</option>
                         <option value="12">12% GST</option>
                         <option value="18">18% GST</option>

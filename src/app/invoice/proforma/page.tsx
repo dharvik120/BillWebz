@@ -26,7 +26,10 @@ import {
   ToggleRight,
   Eye,
   FileSpreadsheet,
-  ChevronDown
+  ChevronDown,
+  ChevronUp,
+  Layers,
+  ShieldCheck
 } from 'lucide-react';
 import { useInvoiceStore } from '@/hooks/useInvoiceStore';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
@@ -36,6 +39,13 @@ import { downloadInvoicePdf } from '@/utils/pdfGenerator';
 import { InvoicePreview } from '@/components/invoice/InvoicePreview';
 import { InvoicePreviewViewport } from '@/components/invoice/InvoicePreviewViewport';
 import { LineItemsTable } from '@/components/invoice/LineItemsTable';
+import { BentoNav } from '@/components/invoice/BentoNav';
+import { BentoCard } from '@/components/invoice/BentoCard';
+import { SellerSection } from '@/components/invoice/sections/SellerSection';
+import { BuyerSection } from '@/components/invoice/sections/BuyerSection';
+import { PaymentSection } from '@/components/invoice/sections/PaymentSection';
+import { TermsSection } from '@/components/invoice/sections/TermsSection';
+import { ProformaMetadataSection } from '@/components/invoice/sections/ProformaMetadataSection';
 import { Invoice, LineItem, InvoiceStatus, InvoiceTheme, PaperSize } from '@/types/invoice';
 import { countriesList, statesByCountry } from '@/utils/locationData';
 import { getNextDocumentNumber } from '@/utils/documentNumbering';
@@ -179,7 +189,9 @@ function ProformaInvoiceForm() {
     }
   }, [initialData, invoiceData, resetUndoRedo]);
 
-  const [activeAccordion, setActiveAccordion] = useState<string>('seller');
+  const [activeSection, setActiveSection] = useState<string>('all');
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+  const toggleSection = (id: string) => setCollapsedSections(prev => ({ ...prev, [id]: !prev[id] }));
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form');
@@ -419,7 +431,7 @@ function ProformaInvoiceForm() {
           <select
             value={invoiceData.theme}
             onChange={(e) => updateField('theme' as any, '', e.target.value as InvoiceTheme)}
-            className="px-2.5 py-2 border border-border rounded-lg text-xs font-semibold bg-background"
+            className="h-10 px-3 border border-border/80 rounded-xl text-xs sm:text-sm font-semibold bg-background text-foreground shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           >
             <option value="blue">Blue Corporate</option>
             <option value="navy">Classic Navy</option>
@@ -435,7 +447,7 @@ function ProformaInvoiceForm() {
           <select
             value={invoiceData.paperSize}
             onChange={(e) => updateField('paperSize' as any, '', e.target.value as PaperSize)}
-            className="px-2.5 py-2 border border-border rounded-lg text-xs font-semibold bg-background"
+            className="h-10 px-3 border border-border/80 rounded-xl text-xs sm:text-sm font-semibold bg-background text-foreground shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           >
             <option value="a4">Standard A4</option>
             <option value="letter">US Letter</option>
@@ -466,7 +478,7 @@ function ProformaInvoiceForm() {
                 return next;
               });
             }}
-            className="px-2.5 py-2 border border-border rounded-lg text-xs font-semibold bg-background"
+            className="h-10 px-3 border border-border/80 rounded-xl text-xs sm:text-sm font-semibold bg-background text-foreground shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           >
             <option value="INR">Rupees (₹)</option>
             <option value="USD">Dollars ($)</option>
@@ -477,7 +489,7 @@ function ProformaInvoiceForm() {
           {/* Save Status triggers */}
           <button
             onClick={() => handleSaveDraft(true)}
-            className="px-3.5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center gap-1.5 shadow-sm transition-colors"
+            className="h-10 px-4 text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
           >
             {saveSuccess ? <Check className="h-4.5 w-4.5" /> : <Save className="h-4.5 w-4.5" />}
             {saveSuccess ? 'Saved!' : 'Save Draft'}
@@ -486,7 +498,7 @@ function ProformaInvoiceForm() {
           <button
             onClick={handleDownloadPdf}
             disabled={isExporting}
-            className="px-3.5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center gap-1.5 shadow-sm transition-colors disabled:opacity-50"
+            className="h-10 px-4 text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl flex items-center gap-1.5 shadow-sm transition-colors disabled:opacity-50 cursor-pointer"
           >
             {isExporting ? <RefreshCw className="h-4.5 w-4.5 animate-spin" /> : <Download className="h-4.5 w-4.5" />}
             {isExporting ? 'Generating...' : 'Export PDF'}
@@ -494,7 +506,7 @@ function ProformaInvoiceForm() {
 
           <button
             onClick={handleShareWhatsApp}
-            className="px-3.5 py-2 text-xs font-bold bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center gap-1.5 shadow-sm transition-colors"
+            className="h-10 px-4 text-xs sm:text-sm font-bold bg-green-600 hover:bg-green-700 text-white rounded-xl flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
           >
             <Share2 className="h-4.5 w-4.5" /> WhatsApp
           </button>
@@ -535,772 +547,244 @@ function ProformaInvoiceForm() {
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 p-4 sm:p-6 lg:p-8 max-w-8xl w-full mx-auto align-stretch">
         
         {/* Left Side inputs form */}
-        <div className={`space-y-6 flex flex-col justify-start no-print ${mobileTab === 'preview' ? 'hidden lg:flex' : 'flex'}`}>
-          <div className="border border-border/70 rounded-2xl overflow-hidden bg-card shadow-sm">
-            
-            {/* Section 1: Seller Details */}
-            <div>
-              <button
-                type="button"
-                onClick={() => setActiveAccordion(activeAccordion === 'seller' ? '' : 'seller')}
-                className={`w-full flex items-center justify-between p-4 sm:p-4.5 border-b border-border/40 text-left transition-all ${
-                  activeAccordion === 'seller'
-                    ? 'bg-indigo-50/50 dark:bg-indigo-950/25'
-                    : 'hover:bg-secondary/40'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-colors ${
-                    activeAccordion === 'seller'
+        <div className={`space-y-6 flex flex-col justify-start no-print ${mobileTab === 'form' ? 'block' : 'hidden lg:block'}`}>
+          {/* Quick Section Navigation Bar */}
+          <BentoNav
+            activeSection={activeSection}
+            onSelectSection={setActiveSection}
+            accentColor="indigo"
+            tabs={[
+              { id: 'all', label: 'All Sections', icon: Layers },
+              { id: 'seller', label: 'Business', icon: Building },
+              { id: 'buyer', label: 'Client', icon: User },
+              { id: 'metadata', label: 'Proforma Info', icon: Calendar },
+              { id: 'items', label: 'Items & Rates', icon: ListPlus },
+              { id: 'payment', label: 'Bank & Pay', icon: CreditCard },
+              { id: 'terms', label: 'Terms & Notes', icon: FileText },
+            ]}
+          />
+
+          {/* Tax / Proforma Billing Mode Card */}
+          <div className="border border-border/80 rounded-2xl p-5 bg-card shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="font-extrabold text-sm text-foreground flex items-center gap-2">
+                  <ShieldCheck className="h-4.5 w-4.5 text-indigo-600" />
+                  Tax & Proforma Mode
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Choose between GST compliant proforma invoice or flat non-tax proforma
+                </p>
+              </div>
+              <div className="flex items-center p-1 bg-secondary/80 rounded-xl border border-border/60 self-start sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInvoiceData((prev: Invoice | null) => {
+                      if (!prev) return prev;
+                      const nextItems = prev.items.map(item => ({
+                        ...item,
+                        gstPercent: 18,
+                        cgst: 0,
+                        sgst: 0,
+                        igst: 0,
+                        cessPercent: 0,
+                        cessAmount: 0
+                      }));
+                      const calcs = calculateInvoiceTotals(
+                        nextItems,
+                        prev.sellerDetails.state || '',
+                        prev.buyerDetails.placeOfSupply || '',
+                        prev.currency.code,
+                        true
+                      );
+                      return {
+                        ...prev,
+                        showTax: true,
+                        items: calcs.items,
+                        totals: calcs.totals
+                      };
+                    });
+                  }}
+                  className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    invoiceData.showTax
                       ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
-                  }`}>
-                    <Building className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-xs sm:text-sm tracking-tight text-foreground">
-                      Seller Business Details
-                    </h4>
-                    <p className="text-[11px] text-muted-foreground font-normal">
-                      Your business identity, GSTIN, address & branding
-                    </p>
-                  </div>
-                </div>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-secondary/80 text-muted-foreground transition-transform duration-300 ${
-                  activeAccordion === 'seller' ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''
-                }`}>
-                  <ChevronDown className="h-4 w-4" />
-                </div>
-              </button>
-              
-              {activeAccordion === 'seller' && (
-                <div className="p-5 border-b border-border/40 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div className="sm:col-span-2">
-                    <label className="block text-slate-500 font-semibold mb-1">Business Name</label>
-                    <input
-                      type="text"
-                      value={invoiceData.sellerDetails.name}
-                      onChange={(e) => updateField('sellerDetails', 'name', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">GSTIN (Optional)</label>
-                    <input
-                      type="text"
-                      placeholder="07AAAAA1111A1Z1"
-                      value={invoiceData.sellerDetails.gstin || ''}
-                      onChange={(e) => updateField('sellerDetails', 'gstin', e.target.value.toUpperCase())}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Phone</label>
-                    <input
-                      type="text"
-                      value={invoiceData.sellerDetails.phone}
-                      onChange={(e) => updateField('sellerDetails', 'phone', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Email</label>
-                    <input
-                      type="email"
-                      value={invoiceData.sellerDetails.email}
-                      onChange={(e) => updateField('sellerDetails', 'email', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Website</label>
-                    <input
-                      type="text"
-                      value={invoiceData.sellerDetails.website}
-                      onChange={(e) => updateField('sellerDetails', 'website', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-slate-500 font-semibold mb-1">Address</label>
-                    <textarea
-                      value={invoiceData.sellerDetails.address}
-                      onChange={(e) => updateField('sellerDetails', 'address', e.target.value)}
-                      rows={2}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Country</label>
-                    <input
-                      type="text"
-                      list="countries-list"
-                      placeholder="e.g. India"
-                      value={invoiceData.sellerDetails.country || ''}
-                      onChange={(e) => updateField('sellerDetails', 'country', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">State</label>
-                    <input
-                      type="text"
-                      list="states-list"
-                      placeholder="e.g. Delhi"
-                      value={invoiceData.sellerDetails.state || ''}
-                      onChange={(e) => updateField('sellerDetails', 'state', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Pincode</label>
-                    <input
-                      type="text"
-                      value={invoiceData.sellerDetails.pincode}
-                      onChange={(e) => updateField('sellerDetails', 'pincode', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Upload Logo</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(e, 'logoUrl')}
-                      className="w-full file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Upload Signature</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(e, 'signatureUrl')}
-                      className="w-full file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Section 2: Buyer Details */}
-            <div>
-              <button
-                type="button"
-                onClick={() => setActiveAccordion(activeAccordion === 'buyer' ? '' : 'buyer')}
-                className={`w-full flex items-center justify-between p-4 sm:p-4.5 border-b border-border/40 text-left transition-all ${
-                  activeAccordion === 'buyer'
-                    ? 'bg-indigo-50/50 dark:bg-indigo-950/25'
-                    : 'hover:bg-secondary/40'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-colors ${
-                    activeAccordion === 'buyer'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  GST Proforma
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInvoiceData((prev: Invoice | null) => {
+                      if (!prev) return prev;
+                      const nextItems = prev.items.map(item => ({
+                        ...item,
+                        gstPercent: 0,
+                        cgst: 0,
+                        sgst: 0,
+                        igst: 0,
+                        cessPercent: 0,
+                        cessAmount: 0
+                      }));
+                      const calcs = calculateInvoiceTotals(
+                        nextItems,
+                        prev.sellerDetails.state || '',
+                        prev.buyerDetails.placeOfSupply || '',
+                        prev.currency.code,
+                        false
+                      );
+                      return {
+                        ...prev,
+                        showTax: false,
+                        items: calcs.items,
+                        totals: calcs.totals
+                      };
+                    });
+                  }}
+                  className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    !invoiceData.showTax
                       ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
-                  }`}>
-                    <User className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-xs sm:text-sm tracking-tight text-foreground">
-                      Client / Buyer Details
-                    </h4>
-                    <p className="text-[11px] text-muted-foreground font-normal">
-                      Bill-to and ship-to party info, GSTIN & state
-                    </p>
-                  </div>
-                </div>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-secondary/80 text-muted-foreground transition-transform duration-300 ${
-                  activeAccordion === 'buyer' ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''
-                }`}>
-                  <ChevronDown className="h-4 w-4" />
-                </div>
-              </button>
-              
-              {activeAccordion === 'buyer' && (
-                <div className="p-5 border-b border-border/40 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Customer / Client Name</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Rahul Sharma"
-                      value={invoiceData.buyerDetails.name}
-                      onChange={(e) => updateField('buyerDetails', 'name', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Company Name</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Acme Enterprises Ltd."
-                      value={invoiceData.buyerDetails.companyName}
-                      onChange={(e) => updateField('buyerDetails', 'companyName', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Contact Person (Attn)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Procurement Lead"
-                      value={invoiceData.buyerDetails.contactPerson || ''}
-                      onChange={(e) => updateField('buyerDetails', 'contactPerson', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">GSTIN (Optional)</label>
-                    <input
-                      type="text"
-                      placeholder="Client GSTIN"
-                      value={invoiceData.buyerDetails.gstin || ''}
-                      onChange={(e) => updateField('buyerDetails', 'gstin', e.target.value.toUpperCase())}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Phone Number</label>
-                    <input
-                      type="text"
-                      placeholder="+91 98765 43210"
-                      value={invoiceData.buyerDetails.phone}
-                      onChange={(e) => updateField('buyerDetails', 'phone', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Email Address</label>
-                    <input
-                      type="email"
-                      placeholder="client@company.com"
-                      value={invoiceData.buyerDetails.email || ''}
-                      onChange={(e) => updateField('buyerDetails', 'email', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Website URL</label>
-                    <input
-                      type="text"
-                      placeholder="www.company.com"
-                      value={invoiceData.buyerDetails.website || ''}
-                      onChange={(e) => updateField('buyerDetails', 'website', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Country</label>
-                    <input
-                      type="text"
-                      list="countries-list"
-                      placeholder="e.g. India"
-                      value={invoiceData.buyerDetails.country || ''}
-                      onChange={(e) => updateField('buyerDetails', 'country', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-slate-500 font-semibold mb-1">Billing Address</label>
-                    <textarea
-                      placeholder="Complete street address..."
-                      value={invoiceData.buyerDetails.billingAddress}
-                      onChange={(e) => updateField('buyerDetails', 'billingAddress', e.target.value)}
-                      rows={2}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Billing State</label>
-                    <input
-                      type="text"
-                      list="states-list"
-                      placeholder="e.g. Delhi"
-                      value={invoiceData.buyerDetails.state || ''}
-                      onChange={(e) => updateField('buyerDetails', 'state', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">State Code (GST)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 07"
-                      value={invoiceData.buyerDetails.stateCode || ''}
-                      onChange={(e) => updateField('buyerDetails', 'stateCode', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Pincode / ZIP</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 110001"
-                      value={invoiceData.buyerDetails.pincode || ''}
-                      onChange={(e) => updateField('buyerDetails', 'pincode', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Place of Supply</label>
-                    <input
-                      type="text"
-                      list="states-list"
-                      placeholder="e.g. Delhi"
-                      value={invoiceData.buyerDetails.placeOfSupply || ''}
-                      onChange={(e) => updateField('buyerDetails', 'placeOfSupply', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-                </div>
-              )}
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Non-GST Proforma
+                </button>
+              </div>
             </div>
-
-            {/* Section 3: Proforma Metadata */}
-            <div>
-              <button
-                type="button"
-                onClick={() => setActiveAccordion(activeAccordion === 'metadata' ? '' : 'metadata')}
-                className={`w-full flex items-center justify-between p-4 sm:p-4.5 border-b border-border/40 text-left transition-all ${
-                  activeAccordion === 'metadata'
-                    ? 'bg-indigo-50/50 dark:bg-indigo-950/25'
-                    : 'hover:bg-secondary/40'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-colors ${
-                    activeAccordion === 'metadata'
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
-                  }`}>
-                    <Calendar className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-xs sm:text-sm tracking-tight text-foreground">
-                      Proforma Dates & Validity
-                    </h4>
-                    <p className="text-[11px] text-muted-foreground font-normal">
-                      Document number, dates, validity period & terms
-                    </p>
-                  </div>
-                </div>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-secondary/80 text-muted-foreground transition-transform duration-300 ${
-                  activeAccordion === 'metadata' ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''
-                }`}>
-                  <ChevronDown className="h-4 w-4" />
-                </div>
-              </button>
-              
-              {activeAccordion === 'metadata' && (
-                <div className="p-5 border-b border-border/40 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Quotation Number</label>
-                    <input
-                      type="text"
-                      value={invoiceData.metadata.invoiceNumber}
-                      onChange={(e) => updateField('metadata', 'invoiceNumber', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background font-mono font-bold"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Quotation Date</label>
-                    <input
-                      type="date"
-                      value={invoiceData.metadata.invoiceDate}
-                      onChange={(e) => updateField('metadata', 'invoiceDate', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Validity Days</label>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="0"
-                      value={invoiceData.metadata.validityDays === 0 ? '' : (invoiceData.metadata.validityDays || '')}
-                      onFocus={(e) => e.target.select()}
-                      onChange={(e) => {
-                        let raw = e.target.value;
-                        if (!/^\d*$/.test(raw)) return;
-                        if (/^0\d+/.test(raw)) raw = raw.replace(/^0+/, '');
-                        const days = raw === '' ? 0 : parseInt(raw, 10) || 0;
-                        const date = new Date(invoiceData.metadata.invoiceDate || Date.now());
-                        date.setDate(date.getDate() + days);
-                        
-                        setInvoiceData((prev: Invoice | null) => {
-                          if (!prev) return prev;
-                          return {
-                            ...prev,
-                            metadata: {
-                              ...prev.metadata,
-                              validityDays: days,
-                              validUntilDate: date.toISOString().split('T')[0]
-                            }
-                          };
-                        });
-                      }}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Quotation Valid Until Date</label>
-                    <input
-                      type="date"
-                      value={invoiceData.metadata.validUntilDate || ''}
-                      onChange={(e) => updateField('metadata', 'validUntilDate', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Expected Delivery Date</label>
-                    <input
-                      type="date"
-                      value={invoiceData.metadata.expectedDeliveryDate || ''}
-                      onChange={(e) => updateField('metadata', 'expectedDeliveryDate', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Payment Terms</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 50% Advance, 50% Net 30"
-                      value={invoiceData.metadata.paymentTerms || ''}
-                      onChange={(e) => updateField('metadata', 'paymentTerms', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Delivery Note</label>
-                    <input
-                      type="text"
-                      value={invoiceData.metadata.deliveryNote || ''}
-                      onChange={(e) => updateField('metadata', 'deliveryNote', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Vehicle / Transport Mode</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Courier / Hand Delivered"
-                      value={invoiceData.metadata.transportMode || ''}
-                      onChange={(e) => updateField('metadata', 'transportMode', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  {/* Tax Toggler */}
-                  <div className="flex items-center gap-2 pt-4">
-                    <button
-                      type="button"
-                      onClick={() => updateField('showTax' as any, '', !invoiceData.showTax)}
-                      className="text-indigo-600 focus:outline-none"
-                    >
-                      {invoiceData.showTax ? (
-                        <ToggleRight className="h-8 w-8 text-indigo-600" />
-                      ) : (
-                        <ToggleLeft className="h-8 w-8 text-slate-400" />
-                      )}
-                    </button>
-                    <span className="font-semibold text-slate-600">Apply GST Calculations</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Section 4: Payment Information */}
-            <div>
-              <button
-                type="button"
-                onClick={() => setActiveAccordion(activeAccordion === 'payment' ? '' : 'payment')}
-                className={`w-full flex items-center justify-between p-4 sm:p-4.5 border-b border-border/40 text-left transition-all ${
-                  activeAccordion === 'payment'
-                    ? 'bg-indigo-50/50 dark:bg-indigo-950/25'
-                    : 'hover:bg-secondary/40'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-colors ${
-                    activeAccordion === 'payment'
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
-                  }`}>
-                    <CreditCard className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-xs sm:text-sm tracking-tight text-foreground">
-                      Bank & Payment Credentials
-                    </h4>
-                    <p className="text-[11px] text-muted-foreground font-normal">
-                      Bank account, IFSC, UPI ID & pay instructions
-                    </p>
-                  </div>
-                </div>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-secondary/80 text-muted-foreground transition-transform duration-300 ${
-                  activeAccordion === 'payment' ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''
-                }`}>
-                  <ChevronDown className="h-4 w-4" />
-                </div>
-              </button>
-              
-              {activeAccordion === 'payment' && (
-                <div className="p-5 border-b border-border/40 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Bank Name</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. HDFC Bank Ltd."
-                      value={invoiceData.paymentDetails?.bankName || invoiceData.sellerDetails.bankName || ''}
-                      onChange={(e) => updatePaymentField('bankName', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Account Number</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 50200012345678"
-                      value={invoiceData.paymentDetails?.accountNumber || invoiceData.sellerDetails.accountNumber || ''}
-                      onChange={(e) => updatePaymentField('accountNumber', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Account Holder Name</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Acme Technologies LLP"
-                      value={invoiceData.paymentDetails?.accountHolderName || invoiceData.sellerDetails.name || ''}
-                      onChange={(e) => updatePaymentField('accountHolderName', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">IFSC Code</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. HDFC0001234"
-                      value={invoiceData.paymentDetails?.ifsc || invoiceData.sellerDetails.ifsc || ''}
-                      onChange={(e) => updatePaymentField('ifsc', e.target.value.toUpperCase())}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Account Type</label>
-                    <select
-                      value={invoiceData.paymentDetails?.accountType || 'Current'}
-                      onChange={(e) => updatePaymentField('accountType', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      <option value="Current">Current Account</option>
-                      <option value="Savings">Savings Account</option>
-                      <option value="Overdraft">Overdraft (OD)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Branch Name</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Connaught Place, New Delhi"
-                      value={invoiceData.paymentDetails?.branch || invoiceData.sellerDetails.branch || ''}
-                      onChange={(e) => updatePaymentField('branch', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">UPI ID / VPA (for Payment QR)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. merchant@upi"
-                      value={invoiceData.paymentDetails?.upiId || invoiceData.sellerDetails.upiId || ''}
-                      onChange={(e) => updatePaymentField('upiId', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Payment Instructions / Notes</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Please mention proforma invoice number in remarks."
-                      value={invoiceData.paymentDetails?.paymentInstructions || ''}
-                      onChange={(e) => updatePaymentField('paymentInstructions', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Section 5: Proforma Statements */}
-            <div>
-              <button
-                type="button"
-                onClick={() => setActiveAccordion(activeAccordion === 'additional' ? '' : 'additional')}
-                className={`w-full flex items-center justify-between p-4 sm:p-4.5 border-b border-border/40 text-left transition-all ${
-                  activeAccordion === 'additional'
-                    ? 'bg-indigo-50/50 dark:bg-indigo-950/25'
-                    : 'hover:bg-secondary/40'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-colors ${
-                    activeAccordion === 'additional'
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
-                  }`}>
-                    <FileText className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-xs sm:text-sm tracking-tight text-foreground">
-                      Terms, Declaration & Notes
-                    </h4>
-                    <p className="text-[11px] text-muted-foreground font-normal">
-                      Proforma terms, declaration & watermark controls
-                    </p>
-                  </div>
-                </div>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-secondary/80 text-muted-foreground transition-transform duration-300 ${
-                  activeAccordion === 'additional' ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''
-                }`}>
-                  <ChevronDown className="h-4 w-4" />
-                </div>
-              </button>
-              
-              {activeAccordion === 'additional' && (
-                <div className="p-5 border-b border-border/40 grid grid-cols-1 gap-4 text-xs">
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Quotation Notes</label>
-                    <textarea
-                      value={invoiceData.quotationNotes || ''}
-                      onChange={(e) => updateField('quotationNotes' as any, '', e.target.value)}
-                      rows={2}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Terms & Conditions</label>
-                    <textarea
-                      value={invoiceData.termsAndConditions || ''}
-                      onChange={(e) => updateField('termsAndConditions' as any, '', e.target.value)}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Notes</label>
-                    <textarea
-                      value={invoiceData.notes || ''}
-                      onChange={(e) => updateField('notes' as any, '', e.target.value)}
-                      rows={2}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Declaration</label>
-                    <textarea
-                      value={invoiceData.declaration || ''}
-                      onChange={(e) => updateField('declaration' as any, '', e.target.value)}
-                      rows={2}
-                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-slate-500 font-semibold mb-1">Authorized Signatory Name</label>
-                      <input
-                        type="text"
-                        value={invoiceData.authorizedSignatoryName || ''}
-                        onChange={(e) => updateField('authorizedSignatoryName' as any, '', e.target.value)}
-                        className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-2 pt-5">
-                      <button
-                        type="button"
-                        onClick={() => updateField('isComputerGenerated' as any, '', !invoiceData.isComputerGenerated)}
-                        className="text-indigo-600 focus:outline-none"
-                      >
-                        {invoiceData.isComputerGenerated ? (
-                          <ToggleRight className="h-8 w-8 text-indigo-600" />
-                        ) : (
-                          <ToggleLeft className="h-8 w-8 text-slate-400" />
-                        )}
-                      </button>
-                      <span className="font-semibold text-slate-600">Show &quot;Computer Generated&quot; Footer</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 border-t border-slate-100 pt-4">
-                    <button
-                      type="button"
-                      onClick={() => updateField('watermark' as any, '', !invoiceData.watermark)}
-                      className="text-indigo-600 focus:outline-none"
-                    >
-                      {invoiceData.watermark ? (
-                        <ToggleRight className="h-8 w-8 text-indigo-600" />
-                      ) : (
-                        <ToggleLeft className="h-8 w-8 text-slate-400" />
-                      )}
-                    </button>
-                    <span className="font-semibold text-slate-600">Show Diagonal Watermark</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
+            <p className="text-[11px] text-muted-foreground mt-3 pt-3 border-t border-border/40">
+              {invoiceData.showTax
+                ? "Standard GST tax proforma breakdown. Shows HSN/SAC, GST, CGST, and SGST/IGST tax rates."
+                : "Simple proforma estimate. The document displays pure line item rates without tax breakdowns."}
+            </p>
           </div>
 
-          {/* Line items section */}
-          <div className="bg-card border border-border/70 rounded-2xl p-5 shadow-sm">
-            <LineItemsTable
-              items={invoiceData.items}
-              onChange={handleItemsChange}
-              currencySymbol={invoiceData.currency.symbol}
+          {/* Section 1: Business Details (Seller) */}
+          {(activeSection === 'all' || activeSection === 'seller') && (
+            <SellerSection
+              sellerDetails={invoiceData.sellerDetails}
+              onUpdateField={(f, v) => updateField('sellerDetails', f, v)}
+              onImageUpload={handleImageUpload}
+              isCollapsed={collapsedSections['seller']}
+              onToggleCollapse={() => toggleSection('seller')}
+              accentColor="indigo"
             />
-          </div>
+          )}
+
+          {/* Section 2: Client / Buyer Details */}
+          {(activeSection === 'all' || activeSection === 'buyer') && (
+            <BuyerSection
+              buyerDetails={invoiceData.buyerDetails}
+              onUpdateField={(f, v) => updateField('buyerDetails', f, v)}
+              isCollapsed={collapsedSections['buyer']}
+              onToggleCollapse={() => toggleSection('buyer')}
+              accentColor="indigo"
+            />
+          )}
+
+          {/* Section 3: Proforma Metadata & Dates */}
+          {(activeSection === 'all' || activeSection === 'metadata') && (
+            <ProformaMetadataSection
+              metadata={invoiceData.metadata}
+              showTax={invoiceData.showTax}
+              onUpdateField={(f, v) => updateField('metadata', f, v)}
+              onUpdateValidityDays={(val) => {
+                const date = new Date(invoiceData.metadata.invoiceDate || Date.now());
+                date.setDate(date.getDate() + val);
+                setInvoiceData((prev: Invoice | null) => {
+                  if (!prev) return prev;
+                  return {
+                    ...prev,
+                    metadata: {
+                      ...prev.metadata,
+                      validityDays: val,
+                      validUntilDate: date.toISOString().split('T')[0]
+                    }
+                  };
+                });
+              }}
+              onToggleTax={() => {
+                const nextTax = !invoiceData.showTax;
+                setInvoiceData((prev: Invoice | null) => {
+                  if (!prev) return prev;
+                  const nextItems = prev.items.map(item => ({
+                    ...item,
+                    gstPercent: nextTax ? 18 : 0,
+                    cgst: 0,
+                    sgst: 0,
+                    igst: 0,
+                    cessPercent: 0,
+                    cessAmount: 0
+                  }));
+                  const calcs = calculateInvoiceTotals(
+                    nextItems,
+                    prev.sellerDetails.state || '',
+                    prev.buyerDetails.placeOfSupply || '',
+                    prev.currency.code,
+                    nextTax
+                  );
+                  return {
+                    ...prev,
+                    showTax: nextTax,
+                    items: calcs.items,
+                    totals: calcs.totals
+                  };
+                });
+              }}
+              isCollapsed={collapsedSections['metadata']}
+              onToggleCollapse={() => toggleSection('metadata')}
+              accentColor="indigo"
+            />
+          )}
+
+          {/* Section 4: Line Items & Pricing */}
+          {(activeSection === 'all' || activeSection === 'items') && (
+            <BentoCard
+              id="items"
+              title="Proforma Line Items & Rates"
+              subtitle="Add products or services, quantities, rates & taxes"
+              icon={ListPlus}
+              badgeColor="indigo"
+              isCollapsed={collapsedSections['items']}
+              onToggleCollapse={() => toggleSection('items')}
+            >
+              <LineItemsTable
+                items={invoiceData.items}
+                onChange={handleItemsChange}
+                currencySymbol={invoiceData.currency.symbol}
+                showTax={invoiceData.showTax}
+              />
+            </BentoCard>
+          )}
+
+          {/* Section 5: Bank & Payment Credentials */}
+          {(activeSection === 'all' || activeSection === 'payment') && (
+            <PaymentSection
+              paymentDetails={invoiceData.paymentDetails || {}}
+              sellerDetails={invoiceData.sellerDetails}
+              onUpdatePaymentField={updatePaymentField}
+              isCollapsed={collapsedSections['payment']}
+              onToggleCollapse={() => toggleSection('payment')}
+              accentColor="indigo"
+            />
+          )}
+
+          {/* Section 6: Terms, Declaration & Legal Notes */}
+          {(activeSection === 'all' || activeSection === 'terms') && (
+            <TermsSection
+              termsAndConditions={invoiceData.termsAndConditions || ''}
+              notes={invoiceData.notes || ''}
+              declaration={invoiceData.declaration || ''}
+              authorizedSignatoryName={invoiceData.authorizedSignatoryName || ''}
+              isComputerGenerated={invoiceData.isComputerGenerated}
+              watermark={invoiceData.watermark}
+              onUpdateField={(f, v) => updateField(f as any, '', v)}
+              isCollapsed={collapsedSections['terms']}
+              onToggleCollapse={() => toggleSection('terms')}
+              accentColor="indigo"
+            />
+          )}
         </div>
 
         {/* Right Side live print-size preview container */}
