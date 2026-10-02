@@ -202,19 +202,19 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
       </div>
 
       <div className="overflow-x-auto border border-border/60 rounded-xl">
-        <table className="w-full text-left text-xs border-collapse min-w-[1080px]">
+        <table className="w-full text-left text-xs border-collapse min-w-[1140px]">
           <thead>
             <tr className="bg-secondary/40 border-b border-border/50 text-muted-foreground font-semibold uppercase text-[10px] tracking-wider">
               <th className="px-2 py-3 w-[36px]"></th>
-              <th className="px-2 py-3 w-[45px] text-center">No.</th>
-              <th className="px-3 py-3 w-[320px]">Item Name</th>
-              {showTax && <th className="px-3 py-3 w-[150px]">HSN/SAC</th>}
-              <th className="px-3 py-3 w-[90px]">Qty</th>
-              <th className="px-3 py-3 w-[100px]">Unit</th>
-              <th className="px-3 py-3 w-[170px]">Rate ({currencySymbol})</th>
-              <th className="px-3 py-3 w-[90px]">Discount %</th>
-              {showTax && <th className="px-3 py-3 w-[110px]">GST %</th>}
-              <th className="px-3 py-3 w-[130px] text-right">Actions</th>
+              <th className="px-2 py-3 w-[50px] text-center">No.</th>
+              <th className="px-3 py-3 min-w-[280px]">Item Name</th>
+              {showTax && <th className="px-3 py-3 w-[150px] min-w-[150px]">HSN/SAC</th>}
+              <th className="px-3 py-3 w-[95px] min-w-[95px]">Qty</th>
+              <th className="px-3 py-3 w-[130px] min-w-[130px]">Unit</th>
+              <th className="px-3 py-3 w-[180px] min-w-[180px]">Rate ({currencySymbol})</th>
+              <th className="px-3 py-3 w-[105px] min-w-[105px]">Discount %</th>
+              {showTax && <th className="px-3 py-3 w-[135px] min-w-[135px]">GST %</th>}
+              <th className="px-3 py-3 w-[140px] min-w-[140px] text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -281,7 +281,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                     <select
                       value={item.unit}
                       onChange={(e) => handleItemChange(idx, 'unit', e.target.value)}
-                      className="w-full px-3 py-2 border border-border/80 rounded-md text-[13px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-2.5 py-2 border border-border/80 rounded-lg text-xs bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold cursor-pointer"
                     >
                       <option value="Pcs">Pcs</option>
                       <option value="Nos">Nos</option>
@@ -343,7 +343,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                       <select
                         value={item.gstPercent}
                         onChange={(e) => handleItemChange(idx, 'gstPercent', parseInt(e.target.value, 10) || 0)}
-                        className="w-full px-3 py-2 border border-border/80 rounded-md text-[13px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500 font-semibold"
+                        className="w-full px-2.5 py-2 border border-border/80 rounded-lg text-xs bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold cursor-pointer"
                       >
                         <option value="0">0% GST</option>
                         <option value="5">5% GST</option>

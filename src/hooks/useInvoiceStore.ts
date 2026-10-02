@@ -85,8 +85,8 @@ const defaultSellerInitial: SellerDetails = {
   email: '',
   website: '',
   address: '',
-  state: 'Delhi',
-  country: 'IN',
+  state: '',
+  country: '',
   pincode: '',
   bankName: '',
   accountNumber: '',
@@ -115,7 +115,11 @@ export function useInvoiceStore() {
     if (typeof window !== 'undefined') {
       try {
         const storedSeller = localStorage.getItem(DEFAULT_SELLER_KEY);
-        if (storedSeller) setDefaultSeller(JSON.parse(storedSeller));
+        if (storedSeller) {
+          const parsed = JSON.parse(storedSeller);
+          if (parsed.state === 'Delhi') parsed.state = '';
+          setDefaultSeller(parsed);
+        }
 
         const storedTerms = localStorage.getItem(DEFAULT_TERMS_KEY);
         if (storedTerms) setDefaultTerms(storedTerms);

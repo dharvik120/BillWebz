@@ -25,7 +25,8 @@ import {
   ToggleLeft,
   ToggleRight,
   Eye,
-  FileCheck
+  FileCheck,
+  ChevronDown
 } from 'lucide-react';
 import { useInvoiceStore } from '@/hooks/useInvoiceStore';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
@@ -33,6 +34,7 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { calculateInvoiceTotals } from '@/utils/gstCalculator';
 import { downloadInvoicePdf } from '@/utils/pdfGenerator';
 import { InvoicePreview } from '@/components/invoice/InvoicePreview';
+import { InvoicePreviewViewport } from '@/components/invoice/InvoicePreviewViewport';
 import { LineItemsTable } from '@/components/invoice/LineItemsTable';
 import { Invoice, LineItem, InvoiceStatus, InvoiceTheme, PaperSize } from '@/types/invoice';
 import { countriesList, statesByCountry } from '@/utils/locationData';
@@ -46,7 +48,11 @@ const emptyInvoice = (defaultSeller: any, defaultTerms: any, defaultDec: any, de
   paperSize: 'a4',
   currency: { symbol: defaultCurr?.symbol || '₹', code: defaultCurr?.code || 'INR' },
   watermark: true,
-  sellerDetails: { ...defaultSeller },
+  sellerDetails: { 
+    ...defaultSeller,
+    state: (defaultSeller?.state === 'Delhi' ? '' : defaultSeller?.state) || '',
+    country: (defaultSeller?.country === 'IN' ? '' : defaultSeller?.country) || '',
+  },
   paymentDetails: {
     bankName: defaultSeller?.bankName || '',
     accountNumber: defaultSeller?.accountNumber || '',
@@ -66,11 +72,11 @@ const emptyInvoice = (defaultSeller: any, defaultTerms: any, defaultDec: any, de
     email: '',
     website: '',
     billingAddress: '',
-    state: defaultSeller?.state || 'Delhi',
+    state: '',
     stateCode: '',
-    country: 'IN',
+    country: '',
     pincode: '',
-    placeOfSupply: defaultSeller?.state || 'Delhi',
+    placeOfSupply: '',
   },
   metadata: {
     invoiceNumber: getNextDocumentNumber('gst', existingInvoices),
@@ -496,29 +502,33 @@ function GstInvoiceForm() {
       </header>
 
       {/* Sticky Mobile Tabs Switcher per Requirement 7 */}
-      <div className="lg:hidden sticky top-16 z-30 bg-background/95 backdrop-blur-sm border-b border-border/80 px-4 py-2.5 flex items-center justify-center gap-3 no-print">
-        <button
-          type="button"
-          onClick={() => setMobileTab('form')}
-          className={`flex-1 max-w-[200px] py-2 px-3 rounded-xl text-xs font-bold transition-all ${
-            mobileTab === 'form'
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'bg-secondary text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          Edit Form
-        </button>
-        <button
-          type="button"
-          onClick={() => setMobileTab('preview')}
-          className={`flex-1 max-w-[200px] py-2 px-3 rounded-xl text-xs font-bold transition-all ${
-            mobileTab === 'preview'
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'bg-secondary text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          Preview Document
-        </button>
+      <div className="lg:hidden sticky top-16 z-30 bg-background/90 backdrop-blur-md border-b border-border/70 px-4 py-2 flex items-center justify-center no-print">
+        <div className="w-full max-w-sm flex items-center p-1 rounded-2xl bg-secondary/80 border border-border/50 shadow-xs">
+          <button
+            type="button"
+            onClick={() => setMobileTab('form')}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+              mobileTab === 'form'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <FileText className="h-3.5 w-3.5" />
+            <span>Edit Form</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab('preview')}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+              mobileTab === 'preview'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Eye className="h-3.5 w-3.5" />
+            <span>Preview Document</span>
+          </button>
+        </div>
       </div>
 
       {/* Editor Screen Container */}
@@ -581,12 +591,34 @@ function GstInvoiceForm() {
               <button
                 type="button"
                 onClick={() => setActiveAccordion(activeAccordion === 'seller' ? '' : 'seller')}
-                className="w-full flex items-center justify-between p-5 border-b border-border/40 font-bold hover:bg-muted/10 text-left text-sm text-foreground/90 uppercase tracking-wider"
+                className={`w-full flex items-center justify-between p-4 sm:p-4.5 border-b border-border/40 text-left transition-all ${
+                  activeAccordion === 'seller'
+                    ? 'bg-blue-50/50 dark:bg-blue-950/25'
+                    : 'hover:bg-secondary/40'
+                }`}
               >
-                <span className="flex items-center gap-2">
-                  <Building className="h-4.5 w-4.5 text-blue-600" /> Seller Business Details
-                </span>
-                <span>{activeAccordion === 'seller' ? '−' : '+'}</span>
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-colors ${
+                    activeAccordion === 'seller'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                  }`}>
+                    <Building className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-xs sm:text-sm tracking-tight text-foreground">
+                      Seller Business Details
+                    </h4>
+                    <p className="text-[11px] text-muted-foreground font-normal">
+                      Your business identity, GSTIN, address & logos
+                    </p>
+                  </div>
+                </div>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-secondary/80 text-muted-foreground transition-transform duration-300 ${
+                  activeAccordion === 'seller' ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''
+                }`}>
+                  <ChevronDown className="h-4 w-4" />
+                </div>
               </button>
               
               {activeAccordion === 'seller' && (
@@ -715,12 +747,34 @@ function GstInvoiceForm() {
               <button
                 type="button"
                 onClick={() => setActiveAccordion(activeAccordion === 'buyer' ? '' : 'buyer')}
-                className="w-full flex items-center justify-between p-5 border-b border-border/40 font-bold hover:bg-muted/10 text-left text-sm text-foreground/90 uppercase tracking-wider"
+                className={`w-full flex items-center justify-between p-4 sm:p-4.5 border-b border-border/40 text-left transition-all ${
+                  activeAccordion === 'buyer'
+                    ? 'bg-blue-50/50 dark:bg-blue-950/25'
+                    : 'hover:bg-secondary/40'
+                }`}
               >
-                <span className="flex items-center gap-2">
-                  <User className="h-4.5 w-4.5 text-blue-600" /> Buyer Customer Details
-                </span>
-                <span>{activeAccordion === 'buyer' ? '−' : '+'}</span>
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-colors ${
+                    activeAccordion === 'buyer'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                  }`}>
+                    <User className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-xs sm:text-sm tracking-tight text-foreground">
+                      Client / Buyer Details
+                    </h4>
+                    <p className="text-[11px] text-muted-foreground font-normal">
+                      Bill-to and ship-to client identity, GSTIN & state
+                    </p>
+                  </div>
+                </div>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-secondary/80 text-muted-foreground transition-transform duration-300 ${
+                  activeAccordion === 'buyer' ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''
+                }`}>
+                  <ChevronDown className="h-4 w-4" />
+                </div>
               </button>
               
               {activeAccordion === 'buyer' && (
@@ -879,12 +933,34 @@ function GstInvoiceForm() {
               <button
                 type="button"
                 onClick={() => setActiveAccordion(activeAccordion === 'metadata' ? '' : 'metadata')}
-                className="w-full flex items-center justify-between p-5 border-b border-border/40 font-bold hover:bg-muted/10 text-left text-sm text-foreground/90 uppercase tracking-wider"
+                className={`w-full flex items-center justify-between p-4 sm:p-4.5 border-b border-border/40 text-left transition-all ${
+                  activeAccordion === 'metadata'
+                    ? 'bg-blue-50/50 dark:bg-blue-950/25'
+                    : 'hover:bg-secondary/40'
+                }`}
               >
-                <span className="flex items-center gap-2">
-                  <Calendar className="h-4.5 w-4.5 text-blue-600" /> Invoice Dates & Logistics
-                </span>
-                <span>{activeAccordion === 'metadata' ? '−' : '+'}</span>
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-colors ${
+                    activeAccordion === 'metadata'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                  }`}>
+                    <Calendar className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-xs sm:text-sm tracking-tight text-foreground">
+                      Invoice Dates & Document Info
+                    </h4>
+                    <p className="text-[11px] text-muted-foreground font-normal">
+                      Invoice number, issue date, due date & dispatch
+                    </p>
+                  </div>
+                </div>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-secondary/80 text-muted-foreground transition-transform duration-300 ${
+                  activeAccordion === 'metadata' ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''
+                }`}>
+                  <ChevronDown className="h-4 w-4" />
+                </div>
               </button>
               
               {activeAccordion === 'metadata' && (
@@ -999,17 +1075,39 @@ function GstInvoiceForm() {
               )}
             </div>
 
-            {/* Section 4: Payment Information (Replaces Shipping Details per Requirement 3) */}
+            {/* Section 4: Payment Information */}
             <div>
               <button
                 type="button"
                 onClick={() => setActiveAccordion(activeAccordion === 'payment' ? '' : 'payment')}
-                className="w-full flex items-center justify-between p-5 border-b border-border/40 font-bold hover:bg-muted/10 text-left text-sm text-foreground/90 uppercase tracking-wider"
+                className={`w-full flex items-center justify-between p-4 sm:p-4.5 border-b border-border/40 text-left transition-all ${
+                  activeAccordion === 'payment'
+                    ? 'bg-blue-50/50 dark:bg-blue-950/25'
+                    : 'hover:bg-secondary/40'
+                }`}
               >
-                <span className="flex items-center gap-2">
-                  <CreditCard className="h-4.5 w-4.5 text-blue-600" /> Payment Information
-                </span>
-                <span>{activeAccordion === 'payment' ? '−' : '+'}</span>
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-colors ${
+                    activeAccordion === 'payment'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                  }`}>
+                    <CreditCard className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-xs sm:text-sm tracking-tight text-foreground">
+                      Bank & Payment Credentials
+                    </h4>
+                    <p className="text-[11px] text-muted-foreground font-normal">
+                      Bank account, IFSC, UPI ID & pay instructions
+                    </p>
+                  </div>
+                </div>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-secondary/80 text-muted-foreground transition-transform duration-300 ${
+                  activeAccordion === 'payment' ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''
+                }`}>
+                  <ChevronDown className="h-4 w-4" />
+                </div>
               </button>
               
               {activeAccordion === 'payment' && (
@@ -1112,12 +1210,34 @@ function GstInvoiceForm() {
               <button
                 type="button"
                 onClick={() => setActiveAccordion(activeAccordion === 'additional' ? '' : 'additional')}
-                className="w-full flex items-center justify-between p-5 border-b border-border/40 font-bold hover:bg-muted/10 text-left text-sm text-foreground/90 uppercase tracking-wider"
+                className={`w-full flex items-center justify-between p-4 sm:p-4.5 border-b border-border/40 text-left transition-all ${
+                  activeAccordion === 'additional'
+                    ? 'bg-blue-50/50 dark:bg-blue-950/25'
+                    : 'hover:bg-secondary/40'
+                }`}
               >
-                <span className="flex items-center gap-2">
-                  <FileText className="h-4.5 w-4.5 text-blue-600" /> Additional Notes & Declarations
-                </span>
-                <span>{activeAccordion === 'additional' ? '−' : '+'}</span>
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-colors ${
+                    activeAccordion === 'additional'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                  }`}>
+                    <FileText className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-xs sm:text-sm tracking-tight text-foreground">
+                      Terms, Declaration & Notes
+                    </h4>
+                    <p className="text-[11px] text-muted-foreground font-normal">
+                      Legal disclaimer, terms & watermark controls
+                    </p>
+                  </div>
+                </div>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center bg-secondary/80 text-muted-foreground transition-transform duration-300 ${
+                  activeAccordion === 'additional' ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''
+                }`}>
+                  <ChevronDown className="h-4 w-4" />
+                </div>
               </button>
               
               {activeAccordion === 'additional' && (
@@ -1210,22 +1330,8 @@ function GstInvoiceForm() {
         </div>
 
         {/* Right Side live print-size preview container */}
-        <div className={`flex flex-col gap-4 ${mobileTab === 'preview' ? 'flex' : 'hidden lg:flex'}`}>
-          <div className="flex items-center justify-between no-print">
-            <h3 className="font-extrabold text-sm text-foreground/80 uppercase tracking-wider flex items-center gap-2">
-              <Eye className="h-4 w-4 text-blue-600" /> Live Print Preview
-            </h3>
-            <span className="text-xs text-muted-foreground bg-secondary px-2.5 py-1 rounded-full font-mono uppercase">
-              Scale to Fit View
-            </span>
-          </div>
-
-          {/* Scaled viewport wrapping preview */}
-          <div className="flex-1 min-h-[500px] border border-border/50 rounded-2xl bg-secondary/30 p-2 overflow-auto max-h-[85vh] preview-container-parent">
-            <div className="scale-75 origin-top sm:scale-[0.8] md:scale-[0.85] lg:scale-95 xl:scale-100 transition-all duration-300 preview-scale-wrapper">
-              <InvoicePreview invoice={invoiceData} id="invoice-render-sheet" />
-            </div>
-          </div>
+        <div className={`flex flex-col gap-4 w-full ${mobileTab === 'preview' ? 'flex' : 'hidden lg:flex'}`}>
+          <InvoicePreviewViewport invoice={invoiceData} id="invoice-render-sheet" />
         </div>
 
       </div>
