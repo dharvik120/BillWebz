@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
@@ -15,15 +15,29 @@ import {
   LogOut, 
   Check, 
   Eye, 
+  EyeOff,
   Database,
   ShieldAlert,
+  ShieldCheck,
   Globe,
   Sparkles,
   KeyRound,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Hash,
+  Upload,
+  Download,
+  AlertCircle,
+  TrendingUp,
+  Receipt,
+  FileCheck
 } from 'lucide-react';
 import { useInvoiceStore } from '@/hooks/useInvoiceStore';
-import { AdminSettings, PricingPlan, Invoice } from '@/types/invoice';
+import { AdminSettings, PricingPlan, Invoice, NumberingSettings, InvoiceType } from '@/types/invoice';
+import { 
+  getStoredNumberingSettings, 
+  saveStoredNumberingSettings, 
+  getNextDocumentNumber 
+} from '@/utils/documentNumbering';
 
 export default function AdminPortal() {
   const router = useRouter();
@@ -34,17 +48,26 @@ export default function AdminPortal() {
     deleteInvoice,
     updateInvoiceStatus,
     exportBackup,
-    loadInvoices
+    restoreBackup,
+    loadInvoices,
+    getMetrics
   } = useInvoiceStore();
 
   // Login State
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginError, setLoginError] = useState('');
 
+  // Password Reset / Recovery State
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [recoveryInput, setRecoveryInput] = useState('');
+  const [newResetPassword, setNewResetPassword] = useState('');
+  const [recoveryMessage, setRecoveryMessage] = useState<{ text: string; isError: boolean } | null>(null);
+
   // Active workspace tab
-  const [activeTab, setActiveTab] = useState<'customizer' | 'faqs' | 'pricing' | 'ledger' | 'security'>('customizer');
+  const [activeTab, setActiveTab] = useState<'customizer' | 'faqs' | 'pricing' | 'ledger' | 'numbering' | 'security'>('customizer');
 
   // Form states matching adminSettings
   const [heroTitle, setHeroTitle] = useState('');
@@ -55,10 +78,19 @@ export default function AdminPortal() {
   const [faqList, setFaqList] = useState<{ q: string; a: string }[]>([]);
   const [adminPassword, setAdminPassword] = useState('');
 
+  // Document Numbering State
+  const [numberingSettings, setNumberingSettings] = useState<NumberingSettings>(getStoredNumberingSettings());
+  const [numberingSaveSuccess, setNumberingSaveSuccess] = useState(false);
+
   // Editing state for new entries
   const [newFaqQ, setNewFaqQ] = useState('');
   const [newFaqA, setNewFaqA] = useState('');
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Metrics from real database data
+  const metrics = getMetrics();
 
   // Load state check on session
   useEffect(() => {
@@ -81,16 +113,67 @@ export default function AdminPortal() {
     }
   }, [adminSettings]);
 
+  useEffect(() => {
+    setNumberingSettings(getStoredNumberingSettings());
+  }, []);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const correctPassword = adminSettings?.adminPassword || 'admin123';
-    if (username === 'admin' && password === correctPassword) {
+    const validUsernames = [
+      'admin', 
+      'administrator', 
+      (adminSettings?.contactEmail || 'support@billwebz.com').toLowerCase(), 
+      'support@billwebz.com'
+    ];
+    
+    if (validUsernames.includes(username.trim().toLowerCase()) && password === correctPassword) {
       sessionStorage.setItem('billwebz_admin_logged_in', 'true');
       setIsLoggedIn(true);
       setLoginError('');
       loadInvoices();
     } else {
-      setLoginError('Invalid Administrator Username or Password.');
+      setLoginError('Invalid Administrator Username/Email or Password.');
+    }
+  };
+
+  const handleResetPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    const validEmail = (adminSettings?.contactEmail || 'support@billwebz.com').toLowerCase();
+    const masterKey = 'billwebz-master-2026';
+    
+    if (
+      recoveryInput.trim().toLowerCase() === validEmail || 
+      recoveryInput.trim() === masterKey || 
+      recoveryInput.trim().toLowerCase() === 'admin'
+    ) {
+      if (!newResetPassword || newResetPassword.length < 6) {
+        setRecoveryMessage({ text: 'New password must be at least 6 characters long.', isError: true });
+        return;
+      }
+      const updated = {
+        ...(adminSettings || {
+          heroTitle: '',
+          heroSubtitle: '',
+          contactEmail: validEmail,
+          isSubscriptionLocked: false,
+          pricingPlans: [],
+          faqList: []
+        }),
+        adminPassword: newResetPassword
+      };
+      saveAdminSettings(updated);
+      setAdminPassword(newResetPassword);
+      setRecoveryMessage({ text: 'Password reset successfully! You can now log in.', isError: false });
+      setTimeout(() => {
+        setShowForgotModal(false);
+        setPassword(newResetPassword);
+        setRecoveryInput('');
+        setNewResetPassword('');
+        setRecoveryMessage(null);
+      }, 1600);
+    } else {
+      setRecoveryMessage({ text: 'Invalid recovery key or email. Please check and try again.', isError: true });
     }
   };
 
@@ -115,6 +198,12 @@ export default function AdminPortal() {
     saveAdminSettings(updatedSettings);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 2000);
+  };
+
+  const handleSaveNumberingSettings = () => {
+    saveStoredNumberingSettings(numberingSettings);
+    setNumberingSaveSuccess(true);
+    setTimeout(() => setNumberingSaveSuccess(false), 2000);
   };
 
   // FAQ Manager helpers
@@ -156,6 +245,27 @@ export default function AdminPortal() {
     linkElement.click();
   };
 
+  const handleRestoreFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const content = event.target?.result as string;
+      if (content) {
+        const success = await restoreBackup(content);
+        if (success) {
+          alert('Database restored successfully from backup!');
+          loadInvoices();
+          window.location.reload();
+        } else {
+          alert('Failed to restore backup. Invalid JSON file format.');
+        }
+      }
+    };
+    reader.readAsText(file);
+  };
+
   // Render Login Panel
   if (!isLoggedIn) {
     return (
@@ -176,11 +286,13 @@ export default function AdminPortal() {
           <div className="bg-slate-900 border border-slate-800 py-8 px-6 shadow-xl rounded-2xl sm:px-10">
             <form className="space-y-6" onSubmit={handleLogin}>
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Username</label>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Username or Email
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="admin"
+                  placeholder="admin or email@domain.com"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="w-full px-3 py-2 border border-slate-700 bg-slate-950 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -188,15 +300,36 @@ export default function AdminPortal() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Password</label>
-                <input
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-700 bg-slate-950 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    Password
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotModal(true)}
+                    className="text-xs text-blue-400 hover:text-blue-300 font-semibold transition-colors"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-3 pr-10 py-2 border border-slate-700 bg-slate-950 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
 
               {loginError && (
@@ -215,6 +348,81 @@ export default function AdminPortal() {
             </form>
           </div>
         </div>
+
+        {/* Forgot Password Modal */}
+        {showForgotModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+              <div className="flex items-center gap-2.5 mb-2 text-blue-500">
+                <KeyRound className="h-5 w-5" />
+                <h3 className="text-lg font-extrabold text-white">Reset Admin Password</h3>
+              </div>
+              <p className="text-xs text-slate-400 mb-4 leading-relaxed">
+                Enter your registered admin email, master key (<code className="text-blue-400 font-mono">billwebz-master-2026</code>), or username to set a new password.
+              </p>
+
+              <form onSubmit={handleResetPassword} className="space-y-4 text-xs">
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1 uppercase tracking-wider text-[11px]">
+                    Recovery Key or Admin Email
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="support@billwebz.com or master key"
+                    value={recoveryInput}
+                    onChange={(e) => setRecoveryInput(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-700 bg-slate-950 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1 uppercase tracking-wider text-[11px]">
+                    New Admin Password
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Enter at least 6 characters"
+                    value={newResetPassword}
+                    onChange={(e) => setNewResetPassword(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-700 bg-slate-950 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                {recoveryMessage && (
+                  <div className={`p-2.5 rounded-lg border text-xs flex items-center gap-2 ${
+                    recoveryMessage.isError 
+                      ? 'bg-red-500/10 border-red-500/30 text-red-400' 
+                      : 'bg-green-500/10 border-green-500/30 text-green-400'
+                  }`}>
+                    {recoveryMessage.isError ? <AlertCircle className="h-4 w-4 flex-shrink-0" /> : <ShieldCheck className="h-4 w-4 flex-shrink-0" />}
+                    <span>{recoveryMessage.text}</span>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForgotModal(false);
+                      setRecoveryMessage(null);
+                    }}
+                    className="px-4 py-2 border border-slate-700 hover:bg-slate-800 text-slate-300 rounded-lg font-semibold transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-colors shadow"
+                  >
+                    Reset & Update Password
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -262,6 +470,55 @@ export default function AdminPortal() {
         </div>
       </header>
 
+      {/* Live Metrics Summary Bar (Real Data Counters per Requirement 6) */}
+      <section className="bg-slate-900/60 border-b border-slate-800/80 px-6 py-4 no-print">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-xl flex flex-col">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <FileSpreadsheet className="h-3 w-3 text-emerald-400" /> Quotations
+            </span>
+            <span className="text-xl font-extrabold text-emerald-400 mt-1">{metrics.quotationCount}</span>
+          </div>
+
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-xl flex flex-col">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <Receipt className="h-3 w-3 text-blue-400" /> GST Invoices
+            </span>
+            <span className="text-xl font-extrabold text-blue-400 mt-1">{metrics.gstCount}</span>
+          </div>
+
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-xl flex flex-col">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <FileText className="h-3 w-3 text-indigo-400" /> Proforma
+            </span>
+            <span className="text-xl font-extrabold text-indigo-400 mt-1">{metrics.proformaCount}</span>
+          </div>
+
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-xl flex flex-col">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <FileCheck className="h-3 w-3 text-amber-400" /> Non-GST
+            </span>
+            <span className="text-xl font-extrabold text-amber-400 mt-1">{metrics.nongstCount}</span>
+          </div>
+
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-xl flex flex-col">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <Database className="h-3 w-3 text-slate-400" /> Total Docs
+            </span>
+            <span className="text-xl font-extrabold text-white mt-1">{metrics.totalCount}</span>
+          </div>
+
+          <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-xl flex flex-col">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <TrendingUp className="h-3 w-3 text-green-400" /> Total Turnover
+            </span>
+            <span className="text-base font-extrabold text-green-400 mt-1 truncate">
+              ₹{metrics.totalRevenue.toLocaleString('en-IN')}
+            </span>
+          </div>
+        </div>
+      </section>
+
       {/* Main Admin Columns */}
       <div className="flex-1 flex flex-col md:flex-row">
         
@@ -273,6 +530,7 @@ export default function AdminPortal() {
               { id: 'faqs', label: 'FAQ Registry', icon: <HelpCircle className="h-4 w-4" /> },
               { id: 'pricing', label: 'Pricing & Plans', icon: <CreditCard className="h-4 w-4" /> },
               { id: 'ledger', label: 'Master Invoices Ledger', icon: <FileText className="h-4 w-4" /> },
+              { id: 'numbering', label: 'Document Numbering', icon: <Hash className="h-4 w-4" /> },
               { id: 'security', label: 'Security & Backup', icon: <Settings className="h-4 w-4" /> },
             ].map((tab) => (
               <button
@@ -602,7 +860,137 @@ export default function AdminPortal() {
             </div>
           )}
 
-          {/* TAB 5: SECURITY & BACKUPS */}
+          {/* TAB 5: DOCUMENT NUMBERING CONFIGURATION (Requirement 5) */}
+          {activeTab === 'numbering' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-extrabold text-white">Document Numbering Sequences</h2>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Manage sequential prefix, starting index, and digit padding across Quotations, GST Invoices, Non-GST and Proforma.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSaveNumberingSettings}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow"
+                >
+                  {numberingSaveSuccess ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+                  {numberingSaveSuccess ? 'Sequences Saved!' : 'Save Numbering Rules'}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {(['quotation', 'gst', 'proforma', 'nongst'] as InvoiceType[]).map((type) => {
+                  const conf = numberingSettings[type];
+                  const labelMap: Record<InvoiceType, string> = {
+                    quotation: 'Quotation Sequence',
+                    gst: 'GST Tax Invoice Sequence',
+                    proforma: 'Proforma Invoice Sequence',
+                    nongst: 'Non-GST Invoice Sequence'
+                  };
+                  const nextPreview = getNextDocumentNumber(type, invoices, numberingSettings);
+
+                  return (
+                    <div key={type} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 text-xs">
+                      <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <span className="text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                          <Hash className="h-4 w-4 text-blue-500" /> {labelMap[type]}
+                        </span>
+                        <div className="text-[10px] bg-slate-950 border border-slate-800 px-2.5 py-1 rounded font-mono font-bold text-blue-400">
+                          Next: {nextPreview}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-slate-400 font-medium mb-1">Prefix</label>
+                          <input
+                            type="text"
+                            value={conf.prefix}
+                            onChange={(e) => {
+                              setNumberingSettings({
+                                ...numberingSettings,
+                                [type]: { ...conf, prefix: e.target.value.toUpperCase() }
+                              });
+                            }}
+                            className="w-full px-3 py-2 border border-slate-700 bg-slate-950 text-white rounded-lg focus:outline-none font-mono"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-400 font-medium mb-1">Starting Number</label>
+                          <input
+                            type="number"
+                            value={conf.startNumber}
+                            onChange={(e) => {
+                              setNumberingSettings({
+                                ...numberingSettings,
+                                [type]: { ...conf, startNumber: parseInt(e.target.value, 10) || 1 }
+                              });
+                            }}
+                            className="w-full px-3 py-2 border border-slate-700 bg-slate-950 text-white rounded-lg focus:outline-none font-mono"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-400 font-medium mb-1">Digit Padding (e.g. 4 for 0001)</label>
+                          <input
+                            type="number"
+                            min={1}
+                            max={8}
+                            value={conf.padLength}
+                            onChange={(e) => {
+                              setNumberingSettings({
+                                ...numberingSettings,
+                                [type]: { ...conf, padLength: parseInt(e.target.value, 10) || 4 }
+                              });
+                            }}
+                            className="w-full px-3 py-2 border border-slate-700 bg-slate-950 text-white rounded-lg focus:outline-none font-mono"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-400 font-medium mb-1">Separator</label>
+                          <input
+                            type="text"
+                            value={conf.separator}
+                            onChange={(e) => {
+                              setNumberingSettings({
+                                ...numberingSettings,
+                                [type]: { ...conf, separator: e.target.value }
+                              });
+                            }}
+                            className="w-full px-3 py-2 border border-slate-700 bg-slate-950 text-white rounded-lg focus:outline-none font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2 border-t border-slate-800/80">
+                        <input
+                          type="checkbox"
+                          id={`year-${type}`}
+                          checked={conf.includeYear}
+                          onChange={(e) => {
+                            setNumberingSettings({
+                              ...numberingSettings,
+                              [type]: { ...conf, includeYear: e.target.checked }
+                            });
+                          }}
+                          className="rounded border-slate-700 bg-slate-950 text-blue-600 focus:ring-0"
+                        />
+                        <label htmlFor={`year-${type}`} className="text-slate-400 font-medium">
+                          Include Current Year in Number (e.g. {conf.prefix}-2026-...)
+                        </label>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 6: SECURITY & BACKUPS */}
           {activeTab === 'security' && (
             <div className="space-y-6">
               <div>
@@ -625,19 +1013,36 @@ export default function AdminPortal() {
                 </div>
               </div>
 
-              {/* Backup triggers */}
+              {/* Backup & Restore triggers */}
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-                <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-200">Master JSON Backup utility</h3>
+                <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-200">Master JSON Backup & Restore</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Download a full backup of all configurations, pricing models, settings, and invoices inside the system.
+                  Download a full backup of all configurations, pricing models, settings, and invoices, or restore from an existing JSON file.
                 </p>
-                <button
-                  type="button"
-                  onClick={handleDownloadBackup}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5"
-                >
-                  <Database className="h-4.5 w-4.5" /> Export Master Database
-                </button>
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleDownloadBackup}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow"
+                  >
+                    <Download className="h-4.5 w-4.5" /> Export Master Database
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 border border-slate-700"
+                  >
+                    <Upload className="h-4.5 w-4.5 text-blue-400" /> Restore from JSON Backup
+                  </button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleRestoreFile}
+                    accept=".json"
+                    className="hidden"
+                  />
+                </div>
               </div>
             </div>
           )}

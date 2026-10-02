@@ -35,30 +35,44 @@ import { InvoicePreview } from '@/components/invoice/InvoicePreview';
 import { LineItemsTable } from '@/components/invoice/LineItemsTable';
 import { Invoice, LineItem, InvoiceStatus, InvoiceTheme, PaperSize } from '@/types/invoice';
 import { countriesList, statesByCountry } from '@/utils/locationData';
+import { getNextDocumentNumber } from '@/utils/documentNumbering';
 import confetti from 'canvas-confetti';
 
-const emptyQuotation = (defaultSeller: any, defaultTerms: any, defaultDec: any, defaultCurr: any): Invoice => ({
+const emptyQuotation = (defaultSeller: any, defaultTerms: any, defaultDec: any, defaultCurr: any, existingInvoices: Invoice[] = []): Invoice => ({
   type: 'quotation',
   status: 'Draft',
   theme: 'emerald', // Quotation defaults to emerald theme
   paperSize: 'a4',
-  currency: { symbol: defaultCurr.symbol || '₹', code: defaultCurr.code || 'INR' },
+  currency: { symbol: defaultCurr?.symbol || '₹', code: defaultCurr?.code || 'INR' },
   watermark: true,
   sellerDetails: { ...defaultSeller },
+  paymentDetails: {
+    bankName: defaultSeller?.bankName || '',
+    accountNumber: defaultSeller?.accountNumber || '',
+    accountHolderName: defaultSeller?.name || '',
+    ifsc: defaultSeller?.ifsc || '',
+    branch: defaultSeller?.branch || '',
+    accountType: 'Current',
+    upiId: defaultSeller?.upiId || '',
+    paymentInstructions: ''
+  },
   buyerDetails: {
     name: '',
     companyName: '',
+    contactPerson: '',
     gstin: '',
     phone: '',
     email: '',
+    website: '',
     billingAddress: '',
-    shippingAddress: '',
-    state: defaultSeller.state || 'Delhi',
+    state: defaultSeller?.state || 'Delhi',
+    stateCode: '',
     country: 'IN',
-    placeOfSupply: defaultSeller.state || 'Delhi',
+    pincode: '',
+    placeOfSupply: defaultSeller?.state || 'Delhi',
   },
   metadata: {
-    invoiceNumber: `QUO-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+    invoiceNumber: getNextDocumentNumber('quotation', existingInvoices),
     invoiceDate: new Date().toISOString().split('T')[0],
     validityDays: 30,
     validUntilDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -137,7 +151,7 @@ function QuotationForm() {
         setInitialData(match);
       }
     } else {
-      setInitialData(emptyQuotation(defaultSeller, defaultTerms, defaultDeclaration, defaultCurrency));
+      setInitialData(emptyQuotation(defaultSeller, defaultTerms, defaultDeclaration, defaultCurrency, invoices));
     }
   }, [editId, invoices, defaultSeller, defaultTerms, defaultDeclaration, defaultCurrency]);
 
@@ -161,6 +175,7 @@ function QuotationForm() {
   const [activeAccordion, setActiveAccordion] = useState<string>('seller');
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form');
 
   // Trigger PDF Generation
   const handleDownloadPdf = async () => {
@@ -301,6 +316,35 @@ function QuotationForm() {
     reader.readAsDataURL(file);
   };
 
+  const updatePaymentField = (field: string, value: any) => {
+    setInvoiceData((prev: Invoice | null) => {
+      if (!prev) return prev;
+      const currentPd = prev.paymentDetails || {
+        bankName: prev.sellerDetails.bankName || '',
+        accountNumber: prev.sellerDetails.accountNumber || '',
+        accountHolderName: prev.sellerDetails.name || '',
+        ifsc: prev.sellerDetails.ifsc || '',
+        branch: prev.sellerDetails.branch || '',
+        accountType: 'Current',
+        upiId: prev.sellerDetails.upiId || '',
+        paymentInstructions: ''
+      };
+      const updatedPd = { ...currentPd, [field]: value };
+      const updatedSeller = { ...prev.sellerDetails };
+      if (field === 'bankName') updatedSeller.bankName = value;
+      if (field === 'accountNumber') updatedSeller.accountNumber = value;
+      if (field === 'ifsc') updatedSeller.ifsc = value;
+      if (field === 'branch') updatedSeller.branch = value;
+      if (field === 'upiId') updatedSeller.upiId = value;
+
+      return {
+        ...prev,
+        paymentDetails: updatedPd,
+        sellerDetails: updatedSeller
+      };
+    });
+  };
+
   const handleSaveDraft = async (manual: boolean = false) => {
     try {
       await saveInvoice(invoiceData);
@@ -373,11 +417,14 @@ function QuotationForm() {
             className="px-2.5 py-2 border border-border rounded-lg text-xs font-semibold bg-background"
             title="Invoice Accent Color Theme"
           >
-            <option value="emerald">Emerald Theme</option>
-            <option value="blue">Blue Theme</option>
-            <option value="slate">Slate Theme</option>
-            <option value="charcoal">Charcoal Theme</option>
-            <option value="gold">Gold Theme</option>
+            <option value="emerald">Emerald Forest</option>
+            <option value="blue">Blue Classic</option>
+            <option value="navy">Navy Executive</option>
+            <option value="burgundy">Burgundy Regal</option>
+            <option value="slate">Slate Modern</option>
+            <option value="charcoal">Charcoal Dark</option>
+            <option value="monochrome">Monochrome Minimal</option>
+            <option value="gold">Amber Gold</option>
           </select>
 
           {/* Paper Size selector */}
@@ -448,11 +495,37 @@ function QuotationForm() {
         </div>
       </header>
 
+      {/* Sticky Mobile Tabs Switcher per Requirement 7 */}
+      <div className="lg:hidden sticky top-16 z-30 bg-background/95 backdrop-blur-sm border-b border-border/80 px-4 py-2.5 flex items-center justify-center gap-3 no-print">
+        <button
+          type="button"
+          onClick={() => setMobileTab('form')}
+          className={`flex-1 max-w-[200px] py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+            mobileTab === 'form'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'bg-secondary text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Edit Form
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab('preview')}
+          className={`flex-1 max-w-[200px] py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+            mobileTab === 'preview'
+              ? 'bg-blue-600 text-white shadow-sm'
+              : 'bg-secondary text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Preview Document
+        </button>
+      </div>
+
       {/* Editor Screen Container */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 p-4 sm:p-6 lg:p-8 max-w-8xl w-full mx-auto align-stretch">
         
         {/* Left Side inputs form */}
-        <div className="space-y-6 flex flex-col justify-start no-print">
+        <div className={`space-y-6 flex flex-col justify-start no-print ${mobileTab === 'form' ? 'block' : 'hidden lg:block'}`}>
           
           {/* Tax Configurations card */}
           <div className="border border-border/70 rounded-2xl p-5 bg-card shadow-sm text-xs space-y-3">
@@ -656,7 +729,7 @@ function QuotationForm() {
                     <label className="block text-slate-500 font-semibold mb-1">Client Name</label>
                     <input
                       type="text"
-                      placeholder="Individual Name"
+                      placeholder="e.g. Rahul Sharma"
                       value={invoiceData.buyerDetails.name}
                       onChange={(e) => updateField('buyerDetails', 'name', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -667,9 +740,20 @@ function QuotationForm() {
                     <label className="block text-slate-500 font-semibold mb-1">Company Name</label>
                     <input
                       type="text"
-                      placeholder="Business Name"
+                      placeholder="e.g. Acme Enterprises Ltd."
                       value={invoiceData.buyerDetails.companyName || ''}
                       onChange={(e) => updateField('buyerDetails', 'companyName', e.target.value)}
+                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Contact Person (Attn)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Procurement Lead"
+                      value={invoiceData.buyerDetails.contactPerson || ''}
+                      onChange={(e) => updateField('buyerDetails', 'contactPerson', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -686,31 +770,34 @@ function QuotationForm() {
                   </div>
 
                   <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Phone</label>
+                    <label className="block text-slate-500 font-semibold mb-1">Phone Number</label>
                     <input
                       type="text"
+                      placeholder="+91 98765 43210"
                       value={invoiceData.buyerDetails.phone || ''}
                       onChange={(e) => updateField('buyerDetails', 'phone', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
-                  <div className="sm:col-span-2">
-                    <label className="block text-slate-500 font-semibold mb-1">Billing Address</label>
-                    <textarea
-                      value={invoiceData.buyerDetails.billingAddress || ''}
-                      onChange={(e) => updateField('buyerDetails', 'billingAddress', e.target.value)}
-                      rows={2}
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Email Address</label>
+                    <input
+                      type="email"
+                      placeholder="client@company.com"
+                      value={invoiceData.buyerDetails.email || ''}
+                      onChange={(e) => updateField('buyerDetails', 'email', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
-                  <div className="sm:col-span-2">
-                    <label className="block text-slate-500 font-semibold mb-1">Shipping Address (Leave empty if same)</label>
-                    <textarea
-                      value={invoiceData.buyerDetails.shippingAddress || ''}
-                      onChange={(e) => updateField('buyerDetails', 'shippingAddress', e.target.value)}
-                      rows={2}
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Website URL</label>
+                    <input
+                      type="text"
+                      placeholder="www.company.com"
+                      value={invoiceData.buyerDetails.website || ''}
+                      onChange={(e) => updateField('buyerDetails', 'website', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -727,6 +814,17 @@ function QuotationForm() {
                     />
                   </div>
 
+                  <div className="sm:col-span-2">
+                    <label className="block text-slate-500 font-semibold mb-1">Billing Address</label>
+                    <textarea
+                      placeholder="Complete street address..."
+                      value={invoiceData.buyerDetails.billingAddress || ''}
+                      onChange={(e) => updateField('buyerDetails', 'billingAddress', e.target.value)}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
                   <div>
                     <label className="block text-slate-500 font-semibold mb-1">Billing State</label>
                     <input
@@ -735,6 +833,28 @@ function QuotationForm() {
                       placeholder="e.g. Delhi"
                       value={invoiceData.buyerDetails.state || ''}
                       onChange={(e) => updateField('buyerDetails', 'state', e.target.value)}
+                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">State Code (GST)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 07"
+                      value={invoiceData.buyerDetails.stateCode || ''}
+                      onChange={(e) => updateField('buyerDetails', 'stateCode', e.target.value)}
+                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Pincode / ZIP</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 110001"
+                      value={invoiceData.buyerDetails.pincode || ''}
+                      onChange={(e) => updateField('buyerDetails', 'pincode', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -864,27 +984,28 @@ function QuotationForm() {
               )}
             </div>
 
-            {/* Section 4: Bank Details */}
+            {/* Section 4: Payment Information (Replaces Shipping Details per Requirement 3) */}
             <div>
               <button
                 type="button"
-                onClick={() => setActiveAccordion(activeAccordion === 'bank' ? '' : 'bank')}
+                onClick={() => setActiveAccordion(activeAccordion === 'payment' ? '' : 'payment')}
                 className="w-full flex items-center justify-between p-5 border-b border-border/40 font-bold hover:bg-muted/10 text-left text-sm text-foreground/90 uppercase tracking-wider"
               >
                 <span className="flex items-center gap-2">
-                  <CreditCard className="h-4.5 w-4.5 text-blue-600" /> Remittance & Bank Details
+                  <CreditCard className="h-4.5 w-4.5 text-blue-600" /> Payment Information
                 </span>
-                <span>{activeAccordion === 'bank' ? '−' : '+'}</span>
+                <span>{activeAccordion === 'payment' ? '−' : '+'}</span>
               </button>
               
-              {activeAccordion === 'bank' && (
+              {activeAccordion === 'payment' && (
                 <div className="p-5 border-b border-border/40 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div>
                     <label className="block text-slate-500 font-semibold mb-1">Bank Name</label>
                     <input
                       type="text"
-                      value={invoiceData.sellerDetails.bankName || ''}
-                      onChange={(e) => updateField('sellerDetails', 'bankName', e.target.value)}
+                      placeholder="e.g. HDFC Bank Ltd."
+                      value={invoiceData.paymentDetails?.bankName || invoiceData.sellerDetails.bankName || ''}
+                      onChange={(e) => updatePaymentField('bankName', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -893,9 +1014,21 @@ function QuotationForm() {
                     <label className="block text-slate-500 font-semibold mb-1">Account Number</label>
                     <input
                       type="text"
-                      value={invoiceData.sellerDetails.accountNumber || ''}
-                      onChange={(e) => updateField('sellerDetails', 'accountNumber', e.target.value)}
+                      placeholder="e.g. 50200012345678"
+                      value={invoiceData.paymentDetails?.accountNumber || invoiceData.sellerDetails.accountNumber || ''}
+                      onChange={(e) => updatePaymentField('accountNumber', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Account Holder Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Acme Technologies LLP"
+                      value={invoiceData.paymentDetails?.accountHolderName || invoiceData.sellerDetails.name || ''}
+                      onChange={(e) => updatePaymentField('accountHolderName', e.target.value)}
+                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
@@ -903,30 +1036,56 @@ function QuotationForm() {
                     <label className="block text-slate-500 font-semibold mb-1">IFSC Code</label>
                     <input
                       type="text"
-                      value={invoiceData.sellerDetails.ifsc || ''}
-                      onChange={(e) => updateField('sellerDetails', 'ifsc', e.target.value.toUpperCase())}
+                      placeholder="e.g. HDFC0001234"
+                      value={invoiceData.paymentDetails?.ifsc || invoiceData.sellerDetails.ifsc || ''}
+                      onChange={(e) => updatePaymentField('ifsc', e.target.value.toUpperCase())}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Branch</label>
+                    <label className="block text-slate-500 font-semibold mb-1">Account Type</label>
+                    <select
+                      value={invoiceData.paymentDetails?.accountType || 'Current'}
+                      onChange={(e) => updatePaymentField('accountType', e.target.value)}
+                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="Current">Current Account</option>
+                      <option value="Savings">Savings Account</option>
+                      <option value="Overdraft">Overdraft (OD)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Branch Name</label>
                     <input
                       type="text"
-                      value={invoiceData.sellerDetails.branch || ''}
-                      onChange={(e) => updateField('sellerDetails', 'branch', e.target.value)}
+                      placeholder="e.g. Connaught Place, New Delhi"
+                      value={invoiceData.paymentDetails?.branch || invoiceData.sellerDetails.branch || ''}
+                      onChange={(e) => updatePaymentField('branch', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-500 font-semibold mb-1">Merchant UPI ID (for Payment QR)</label>
+                    <label className="block text-slate-500 font-semibold mb-1">UPI ID / VPA (for Payment QR)</label>
                     <input
                       type="text"
-                      placeholder="merchant@upi"
-                      value={invoiceData.sellerDetails.upiId || ''}
-                      onChange={(e) => updateField('sellerDetails', 'upiId', e.target.value)}
+                      placeholder="e.g. merchant@upi"
+                      value={invoiceData.paymentDetails?.upiId || invoiceData.sellerDetails.upiId || ''}
+                      onChange={(e) => updatePaymentField('upiId', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-500 font-semibold mb-1">Payment Instructions / Notes</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Please mention quotation number in remarks."
+                      value={invoiceData.paymentDetails?.paymentInstructions || ''}
+                      onChange={(e) => updatePaymentField('paymentInstructions', e.target.value)}
+                      className="w-full px-3 py-2 border border-border/80 rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -1046,7 +1205,7 @@ function QuotationForm() {
         </div>
 
         {/* Right Side live print-size preview container */}
-        <div className="flex flex-col gap-4">
+        <div className={`flex flex-col gap-4 ${mobileTab === 'preview' ? 'flex' : 'hidden lg:flex'}`}>
           <div className="flex items-center justify-between no-print">
             <h3 className="font-extrabold text-sm text-foreground/80 uppercase tracking-wider flex items-center gap-2">
               <Eye className="h-4 w-4 text-emerald-600" /> Live Print Preview

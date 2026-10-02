@@ -56,15 +56,40 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
     showTax
   } = invoice;
 
+  const rawPaymentDetails = (invoice as any).paymentDetails;
+  const paymentDetails = rawPaymentDetails || {
+    bankName: sellerDetails.bankName,
+    accountNumber: sellerDetails.accountNumber,
+    accountHolderName: sellerDetails.name,
+    ifsc: sellerDetails.ifsc,
+    branch: sellerDetails.branch,
+    accountType: 'Current',
+    upiId: sellerDetails.upiId,
+    paymentInstructions: ''
+  };
+
+  const hasPaymentInfo = Boolean(
+    paymentDetails.bankName ||
+    paymentDetails.accountNumber ||
+    paymentDetails.ifsc ||
+    paymentDetails.upiId ||
+    sellerDetails.bankName ||
+    sellerDetails.accountNumber ||
+    sellerDetails.ifsc ||
+    sellerDetails.upiId
+  );
+
   const [upiQrUrl, setUpiQrUrl] = useState<string>('');
 
   // Generate UPI QR Code dynamically when total or upi ID changes
   useEffect(() => {
     async function updateQr() {
-      if (sellerDetails.upiId) {
+      const effectiveUpiId = paymentDetails.upiId || sellerDetails.upiId;
+      const effectiveName = paymentDetails.accountHolderName || sellerDetails.name;
+      if (effectiveUpiId) {
         const url = await generateUpiQrCode(
-          sellerDetails.upiId,
-          sellerDetails.name,
+          effectiveUpiId,
+          effectiveName,
           totals.grandTotal,
           currency.code
         );
@@ -74,10 +99,10 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
       }
     }
     updateQr();
-  }, [sellerDetails.upiId, sellerDetails.name, totals.grandTotal, currency.code]);
+  }, [paymentDetails.upiId, paymentDetails.accountHolderName, sellerDetails.upiId, sellerDetails.name, totals.grandTotal, currency.code]);
 
   // Color scheme selectors using Hex-safe PDF variables
-  const themeColors = {
+  const themeColors: Record<string, { primary: string; text: string; border: string; bgLight: string; accent: string; tableHeader: string }> = {
     blue: {
       primary: 'pdf-theme-blue-primary',
       text: 'pdf-theme-blue-text',
@@ -85,6 +110,14 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
       bgLight: 'pdf-theme-blue-bg-light',
       accent: 'pdf-theme-blue-accent',
       tableHeader: 'pdf-theme-blue-primary'
+    },
+    navy: {
+      primary: 'pdf-theme-navy-primary',
+      text: 'pdf-theme-navy-text',
+      border: 'pdf-theme-navy-border',
+      bgLight: 'pdf-theme-navy-bg-light',
+      accent: 'pdf-theme-navy-accent',
+      tableHeader: 'pdf-theme-navy-primary'
     },
     slate: {
       primary: 'pdf-theme-slate-primary',
@@ -102,6 +135,14 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
       accent: 'pdf-theme-emerald-accent',
       tableHeader: 'pdf-theme-emerald-primary'
     },
+    burgundy: {
+      primary: 'pdf-theme-burgundy-primary',
+      text: 'pdf-theme-burgundy-text',
+      border: 'pdf-theme-burgundy-border',
+      bgLight: 'pdf-theme-burgundy-bg-light',
+      accent: 'pdf-theme-burgundy-accent',
+      tableHeader: 'pdf-theme-burgundy-primary'
+    },
     charcoal: {
       primary: 'pdf-theme-charcoal-primary',
       text: 'pdf-theme-charcoal-text',
@@ -109,6 +150,14 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
       bgLight: 'pdf-theme-charcoal-bg-light',
       accent: 'pdf-theme-charcoal-accent',
       tableHeader: 'pdf-theme-charcoal-primary'
+    },
+    monochrome: {
+      primary: 'pdf-theme-monochrome-primary',
+      text: 'pdf-theme-monochrome-text',
+      border: 'pdf-theme-monochrome-border',
+      bgLight: 'pdf-theme-monochrome-bg-light',
+      accent: 'pdf-theme-monochrome-accent',
+      tableHeader: 'pdf-theme-monochrome-primary'
     },
     gold: {
       primary: 'pdf-theme-gold-primary',
@@ -266,28 +315,30 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
         {/* Content wrapper */}
         <div className="relative z-10 flex-1 flex flex-col justify-between">
           <div>
-            {/* Row 1: Logo & Company Name */}
-            <div className="flex items-start justify-between border-b pdf-border-light pb-6 mb-6">
-              <div className="flex items-center gap-4">
+            {/* Row 1: Logo & Company Name + Invoice Meta */}
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-4 border-b pdf-border-light pb-6 mb-6">
+              <div className="flex items-start gap-4 flex-1 min-w-0 max-w-full sm:max-w-[62%]">
                 {sellerDetails.logoUrl ? (
                   <img 
                     src={sellerDetails.logoUrl} 
                     alt="Logo" 
-                    className="max-h-16 max-w-28 object-contain rounded" 
+                    className="max-h-16 max-w-28 object-contain rounded flex-shrink-0" 
                   />
                 ) : (
-                  <div className={`h-12 w-12 rounded-xl ${activeColor.primary} flex items-center justify-center text-white font-extrabold text-xl`}>
+                  <div className={`h-12 w-12 rounded-xl ${activeColor.primary} flex items-center justify-center text-white font-extrabold text-xl flex-shrink-0`}>
                     {sellerDetails.name.substring(0, 1).toUpperCase() || 'B'}
                   </div>
                 )}
-                <div>
-                  <h1 className="text-xl font-bold pdf-text-dark leading-snug">{sellerDetails.name}</h1>
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-xl font-bold pdf-text-dark leading-snug break-words">{sellerDetails.name}</h1>
                   {sellerDetails.gstin && (
-                    <p className="text-xs pdf-text-muted font-mono mt-0.5">GSTIN: {sellerDetails.gstin}</p>
+                    <p className="text-xs pdf-text-muted font-mono mt-0.5 break-all">GSTIN: {sellerDetails.gstin}</p>
                   )}
-                  <p className="text-xs pdf-text-muted max-w-sm mt-1">{sellerDetails.address}</p>
+                  {sellerDetails.address && (
+                    <p className="text-xs pdf-text-muted mt-1 break-words">{sellerDetails.address}</p>
+                  )}
                   {(sellerDetails.state || sellerDetails.country) && (
-                    <p className="text-xs pdf-text-muted mt-0.5">
+                    <p className="text-xs pdf-text-muted mt-0.5 break-words">
                       {[
                         sellerDetails.state && sellerDetails.state !== 'NONE' && sellerDetails.state !== 'OTHER' ? `State: ${sellerDetails.state}` : '',
                         sellerDetails.country && sellerDetails.country !== 'OTHER' && sellerDetails.country !== 'NONE' ? `Country: ${sellerDetails.country}` : ''
@@ -296,21 +347,21 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                     </p>
                   )}
                   {(sellerDetails.phone || sellerDetails.email || sellerDetails.website) && (
-                    <div className="mt-2.5 pt-2 border-t border-slate-200/60 max-w-sm text-[11px] pdf-text-muted space-y-0.5">
+                    <div className="mt-2.5 pt-2 border-t border-slate-200/60 text-[11px] pdf-text-muted space-y-0.5">
                       {sellerDetails.phone && (
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="text-slate-400 font-medium">Phone:</span>
                           <span className="pdf-text-dark font-medium">{sellerDetails.phone}</span>
                         </div>
                       )}
                       {sellerDetails.email && (
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="text-slate-400 font-medium">Email:</span>
                           <span className="pdf-text-dark font-medium break-all">{sellerDetails.email}</span>
                         </div>
                       )}
                       {sellerDetails.website && (
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="text-slate-400 font-medium">Website:</span>
                           <span className="pdf-text-dark font-medium break-all">{sellerDetails.website}</span>
                         </div>
@@ -320,14 +371,14 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                 </div>
               </div>
 
-              <div className="text-right">
-                <span className={`inline-block px-3 py-1 text-xs font-black uppercase tracking-wider rounded ${activeColor.primary} text-white mb-2`}>
+              <div className="text-left sm:text-right flex-shrink-0 min-w-[200px] max-w-full">
+                <span className={`inline-block px-3 py-1.5 text-xs font-black uppercase tracking-wider rounded ${activeColor.primary} text-white mb-2 whitespace-nowrap shadow-sm`}>
                   {type === 'gst' ? (showTax ? 'GST TAX INVOICE' : 'INVOICE') : type === 'proforma' ? 'PROFORMA INVOICE' : 'QUOTATION'}
                 </span>
-                <p className="text-sm font-semibold pdf-text-dark font-mono">No: {metadata.invoiceNumber}</p>
+                <p className="text-sm font-semibold pdf-text-dark font-mono break-all">No: {metadata.invoiceNumber}</p>
                 <p className="text-xs pdf-text-muted">Date: {metadata.invoiceDate}</p>
                 {type === 'gst' ? (
-                  <p className="text-xs pdf-text-muted">Due Date: {metadata.dueDate}</p>
+                  metadata.dueDate && <p className="text-xs pdf-text-muted">Due Date: {metadata.dueDate}</p>
                 ) : (
                   metadata.validUntilDate && <p className="text-xs pdf-text-muted">Valid Until: {metadata.validUntilDate}</p>
                 )}
@@ -338,21 +389,33 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
               </div>
             </div>
 
-            {/* Row 2: Client Details (Clean 2-Column Grid) */}
+            {/* Row 2: Billed To (Buyer Info) & Payment Information (Replaces Shipping Details) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-xs leading-relaxed pdf-text-medium">
-              <div className={`${activeColor.accent} pl-3`}>
+              <div className={`${activeColor.accent} pl-3.5 border-l-2 ${activeColor.border}`}>
                 <h4 className="font-bold pdf-text-dark uppercase tracking-wider mb-2">Billed To</h4>
-                <div className="space-y-0.5">
-                  <p className="font-bold pdf-text-dark">{buyerDetails.name}</p>
-                  {buyerDetails.companyName && <p>{buyerDetails.companyName}</p>}
-                  {buyerDetails.gstin && <p className="font-mono">GSTIN: {buyerDetails.gstin}</p>}
-                  <p>{buyerDetails.billingAddress}</p>
-                  {buyerDetails.state && buyerDetails.state !== 'NONE' && buyerDetails.state !== 'OTHER' && <p>State: {buyerDetails.state}</p>}
-                  {buyerDetails.country && buyerDetails.country !== 'OTHER' && buyerDetails.country !== 'NONE' && (
-                    <p>Country: {buyerDetails.country}</p>
+                <div className="space-y-1">
+                  <p className="font-bold pdf-text-dark text-sm">{buyerDetails.name}</p>
+                  {buyerDetails.companyName && <p className="font-medium pdf-text-dark">{buyerDetails.companyName}</p>}
+                  {buyerDetails.contactPerson && (
+                    <p className="text-[11px] pdf-text-muted">
+                      <span className="text-slate-400 font-medium">Attn: </span>
+                      <span className="font-medium pdf-text-dark">{buyerDetails.contactPerson}</span>
+                    </p>
                   )}
-                  {(buyerDetails.phone || buyerDetails.email) && (
-                    <div className="mt-2 pt-1.5 border-t border-slate-200/50 max-w-sm text-[11px] pdf-text-muted space-y-0.5">
+                  {buyerDetails.gstin && <p className="font-mono text-[11px]">GSTIN: {buyerDetails.gstin}</p>}
+                  {buyerDetails.billingAddress && <p className="break-words">{buyerDetails.billingAddress}</p>}
+                  {(buyerDetails.state || buyerDetails.stateCode || buyerDetails.pincode || buyerDetails.country) && (
+                    <p className="text-[11px]">
+                      {[
+                        buyerDetails.state && buyerDetails.state !== 'NONE' && buyerDetails.state !== 'OTHER' ? buyerDetails.state : '',
+                        buyerDetails.stateCode ? `(Code: ${buyerDetails.stateCode})` : '',
+                        buyerDetails.pincode ? `- ${buyerDetails.pincode}` : '',
+                        buyerDetails.country && buyerDetails.country !== 'OTHER' && buyerDetails.country !== 'NONE' ? buyerDetails.country : ''
+                      ].filter(Boolean).join(' ')}
+                    </p>
+                  )}
+                  {(buyerDetails.phone || buyerDetails.email || buyerDetails.website) && (
+                    <div className="mt-2 pt-1.5 border-t border-slate-200/60 text-[11px] pdf-text-muted space-y-0.5">
                       {buyerDetails.phone && (
                         <div className="flex items-center gap-1.5">
                           <span className="text-slate-400 font-medium">Phone:</span>
@@ -365,31 +428,87 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                           <span className="pdf-text-dark font-medium break-all">{buyerDetails.email}</span>
                         </div>
                       )}
+                      {buyerDetails.website && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-400 font-medium">Website:</span>
+                          <span className="pdf-text-dark font-medium break-all">{buyerDetails.website}</span>
+                        </div>
+                      )}
                     </div>
+                  )}
+                  {buyerDetails.placeOfSupply && (
+                    <p className="text-[11px] pt-1 text-slate-500">
+                      <span className="font-medium text-slate-400">Place of Supply: </span>
+                      {buyerDetails.placeOfSupply}
+                    </p>
                   )}
                 </div>
               </div>
 
-              <div>
-                <h4 className="font-bold pdf-text-dark uppercase tracking-wider mb-2">Shipping Details</h4>
-                <div className="space-y-0.5">
-                  {buyerDetails.shippingAddress ? (
-                    <p>{buyerDetails.shippingAddress}</p>
-                  ) : (
-                    <p className="italic pdf-text-muted">Same as billing address</p>
+              {/* Payment Information (Replaces Shipping Details per Requirement 3) */}
+              <div className="pdf-bg-light rounded-xl p-3.5 border pdf-border-light">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold pdf-text-dark uppercase tracking-wider text-xs">Payment Information</h4>
+                  {paymentDetails.accountType && (
+                    <span className="text-[10px] font-medium normal-case px-2 py-0.5 rounded bg-white/80 border border-slate-200 text-slate-600">
+                      {paymentDetails.accountType} A/c
+                    </span>
                   )}
-                  <p className="mt-2 font-semibold pdf-text-dark">Place of Supply:</p>
-                  <p>{buyerDetails.placeOfSupply}</p>
                 </div>
+                {hasPaymentInfo ? (
+                  <div className="space-y-1 text-[11px]">
+                    {(paymentDetails.bankName || sellerDetails.bankName) && (
+                      <div className="flex justify-between py-0.5 border-b border-slate-200/50">
+                        <span className="text-slate-400">Bank Name:</span>
+                        <span className="font-semibold pdf-text-dark">{paymentDetails.bankName || sellerDetails.bankName}</span>
+                      </div>
+                    )}
+                    {(paymentDetails.accountNumber || sellerDetails.accountNumber) && (
+                      <div className="flex justify-between py-0.5 border-b border-slate-200/50">
+                        <span className="text-slate-400">Account Number:</span>
+                        <span className="font-mono font-bold pdf-text-dark">{paymentDetails.accountNumber || sellerDetails.accountNumber}</span>
+                      </div>
+                    )}
+                    {(paymentDetails.accountHolderName || sellerDetails.name) && (
+                      <div className="flex justify-between py-0.5 border-b border-slate-200/50">
+                        <span className="text-slate-400">Account Holder:</span>
+                        <span className="font-medium pdf-text-dark">{paymentDetails.accountHolderName || sellerDetails.name}</span>
+                      </div>
+                    )}
+                    {(paymentDetails.ifsc || sellerDetails.ifsc) && (
+                      <div className="flex justify-between py-0.5 border-b border-slate-200/50">
+                        <span className="text-slate-400">IFSC Code:</span>
+                        <span className="font-mono font-bold pdf-text-dark">{paymentDetails.ifsc || sellerDetails.ifsc}</span>
+                      </div>
+                    )}
+                    {(paymentDetails.branch || sellerDetails.branch) && (
+                      <div className="flex justify-between py-0.5 border-b border-slate-200/50">
+                        <span className="text-slate-400">Branch:</span>
+                        <span className="pdf-text-dark">{paymentDetails.branch || sellerDetails.branch}</span>
+                      </div>
+                    )}
+                    {(paymentDetails.upiId || sellerDetails.upiId) && (
+                      <div className="flex justify-between py-0.5 border-b border-slate-200/50">
+                        <span className="text-slate-400">UPI / VPA:</span>
+                        <span className="font-mono font-semibold text-emerald-700">{paymentDetails.upiId || sellerDetails.upiId}</span>
+                      </div>
+                    )}
+                    {paymentDetails.paymentInstructions && (
+                      <p className="text-[10px] text-slate-500 italic pt-1">{paymentDetails.paymentInstructions}</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-slate-400 italic text-[11px] py-2">Bank or UPI payment details will appear here once configured.</p>
+                )}
               </div>
             </div>
 
-            {/* Row 3: Product Line Items Table */}
+            {/* Row 3: Product Line Items Table (Header "No." & Single Line Item Name without Secondary Description) */}
             <div className="overflow-hidden border pdf-border-light rounded-xl mb-8">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className={`${activeColor.tableHeader} font-bold`}>
-                    <th className="px-3 py-3 w-8">#</th>
+                  <tr className={`${activeColor.tableHeader} font-bold text-white`}>
+                    <th className="px-3 py-3 w-12 text-center">No.</th>
                     <th className="px-3 py-3">Product Description</th>
                     {showTax && <th className="px-3 py-3 text-right">HSN/SAC</th>}
                     <th className="px-3 py-3 text-right">Qty</th>
@@ -406,11 +525,10 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                 </thead>
                 <tbody className="pdf-divide-light">
                   {items.map((item, idx) => (
-                    <tr key={idx} className="hover:pdf-bg-light">
-                      <td className="px-3 py-3 pdf-text-light">{idx + 1}</td>
+                    <tr key={idx} className="hover:pdf-bg-light border-b pdf-border-light">
+                      <td className="px-3 py-3 text-center pdf-text-light font-medium">{idx + 1}</td>
                       <td className="px-3 py-3">
                         <strong className="pdf-text-dark font-bold block">{item.name}</strong>
-                        {item.description && <span className="text-[10px] pdf-text-light block mt-0.5">{item.description}</span>}
                       </td>
                       {showTax && <td className="px-3 py-3 text-right font-mono pdf-text-muted">{item.hsnSac || '-'}</td>}
                       <td className="px-3 py-3 text-right font-semibold pdf-text-dark">
@@ -442,39 +560,9 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
               </table>
             </div>
 
-            {/* Row 4: Totals Summary, Words, Bank */}
+            {/* Row 4: Totals Summary & Words (Duplicate Remittance Bank Details Panel Removed) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 text-xs">
-              <div>
-                {/* Bank Details section */}
-                {sellerDetails.bankName && (
-                  <div className="pdf-bg-light rounded-xl p-4 border pdf-border-light mb-4">
-                    <h5 className="font-bold pdf-text-dark uppercase tracking-wider mb-2">Remittance Bank Details</h5>
-                    <table className="w-full text-left leading-relaxed pdf-text-medium">
-                      <tbody>
-                        <tr>
-                          <td className="pdf-text-muted w-24">Bank Name:</td>
-                          <td className="font-semibold pdf-text-dark">{sellerDetails.bankName}</td>
-                        </tr>
-                        <tr>
-                          <td className="pdf-text-muted">Account No:</td>
-                          <td className="font-semibold font-mono pdf-text-dark">{sellerDetails.accountNumber}</td>
-                        </tr>
-                        <tr>
-                          <td className="pdf-text-muted">IFSC Code:</td>
-                          <td className="font-mono pdf-text-dark">{sellerDetails.ifsc}</td>
-                        </tr>
-                        {sellerDetails.branch && (
-                          <tr>
-                            <td className="pdf-text-muted">Branch:</td>
-                            <td className="pdf-text-dark">{sellerDetails.branch}</td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-
-                {/* Amount in words */}
+              <div className="flex flex-col justify-between">
                 <div>
                   <span className="pdf-text-muted font-semibold block uppercase text-[10px] tracking-wider mb-1">Amount in Words</span>
                   <strong className="pdf-text-dark text-[11px] leading-relaxed block italic">{totals.amountInWords}</strong>

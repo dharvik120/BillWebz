@@ -372,4 +372,26 @@ body {
 .pdf-theme-gold-border { border-color: rgba(180, 83, 9, 0.2) !important; }
 .pdf-theme-gold-accent { border-left: 4px solid #b45309 !important; }
 
+/* Navy (Midnight Navy) PDF Classes */
+.pdf-theme-navy-primary { background-color: #0f172a !important; color: #ffffff !important; }
+.pdf-theme-navy-text { color: #0f172a !important; }
+.pdf-theme-navy-bg-light { background-color: #f1f5f9 !important; }
+.pdf-theme-navy-border { border-color: rgba(15, 23, 42, 0.2) !important; }
+.pdf-theme-navy-accent { border-left: 4px solid #0f172a !important; }
+
+/* Burgundy PDF Classes */
+.pdf-theme-burgundy-primary { background-color: #881337 !important; color: #ffffff !important; }
+.pdf-theme-burgundy-text { color: #881337 !important; }
+.pdf-theme-burgundy-bg-light { background-color: #fff1f2 !important; }
+.pdf-theme-burgundy-border { border-color: rgba(136, 19, 55, 0.2) !important; }
+.pdf-theme-burgundy-accent { border-left: 4px solid #881337 !important; }
+
+/* Monochrome (Classic Black & White) PDF Classes */
+.pdf-theme-monochrome-primary { background-color: #111827 !important; color: #ffffff !important; }
+.pdf-theme-monochrome-text { color: #111827 !important; }
+.pdf-theme-monochrome-bg-light { background-color: #f3f4f6 !important; }
+.pdf-theme-monochrome-border { border-color: rgba(17, 24, 39, 0.25) !important; }
+.pdf-theme-monochrome-accent { border-left: 4px solid #111827 !important; }
+
+
 

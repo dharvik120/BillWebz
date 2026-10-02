@@ -14,10 +14,46 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BillWebz | Free Professional GST & Proforma Invoice Generator",
-  description: "Generate professional GST and Proforma invoices instantly. 100% Free, Offline First, Secure, and No Login Required. Ideal for Indian businesses, startups, and freelancers.",
-  keywords: ["GST Invoice Generator", "Proforma Invoice Maker", "Free Billing Software", "Offline Billing Web App", "Indian GST Billing"],
+  metadataBase: new URL('https://bill-webz.vercel.app'),
+  title: {
+    default: "BillWebz | Free Professional GST, Quotation & Proforma Generator",
+    template: "%s | BillWebz"
+  },
+  description: "Create professional GST invoices, Quotations, and Proforma documents instantly. Offline-first privacy, automatic sequential numbering, HSN/SAC catalogue, and beautiful PDF exports.",
+  keywords: [
+    "GST Invoice Generator",
+    "Quotation Maker",
+    "Proforma Invoice",
+    "Free Billing Software",
+    "Offline Billing App",
+    "Indian GST Billing",
+    "Invoice PDF Export",
+    "BillWebz"
+  ],
   authors: [{ name: "Webz Technologies" }],
+  creator: "Webz Technologies",
+  publisher: "BillWebz",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://bill-webz.vercel.app",
+    title: "BillWebz | Free Professional GST, Quotation & Proforma Generator",
+    description: "Generate professional GST and Proforma invoices instantly. Offline First, Secure, and No Login Required.",
+    siteName: "BillWebz",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BillWebz | Free Professional GST & Quotation Generator",
+    description: "Generate professional GST and Proforma invoices instantly with zero configuration.",
+  },
 };
 
 export default function RootLayout({

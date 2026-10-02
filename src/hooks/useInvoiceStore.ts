@@ -295,13 +295,13 @@ export function useInvoiceStore() {
 
   // Metrics Calculation
   const getMetrics = useCallback(() => {
-    const totalCount = invoices.filter((i) => i.isExported === true).length;
-    const gstCount = invoices.filter((i) => i.type === 'gst' && i.isExported === true).length;
-    const proformaCount = invoices.filter((i) => i.type === 'proforma' && i.isExported === true).length;
-    const quotationCount = invoices.filter((i) => i.type === 'quotation' && i.isExported === true).length;
+    const totalCount = invoices.length;
+    const gstCount = invoices.filter((i) => i.type === 'gst' && i.showTax !== false).length;
+    const nongstCount = invoices.filter((i) => i.type === 'nongst' || (i.type === 'gst' && i.showTax === false)).length;
+    const proformaCount = invoices.filter((i) => i.type === 'proforma').length;
+    const quotationCount = invoices.filter((i) => i.type === 'quotation').length;
 
-    // Monthly revenue calculation (only counting 'Paid' and 'Pending' invoices)
-    // Grouped by Month-Year of invoiceDate
+    // Monthly revenue calculation
     const monthlyRevenueMap: { [key: string]: number } = {};
     const statusCounts = {
       Paid: 0,
@@ -311,16 +311,16 @@ export function useInvoiceStore() {
     };
 
     invoices.forEach((inv) => {
-      if (!inv.isExported) return;
       // Aggregate status
-      statusCounts[inv.status] = (statusCounts[inv.status] || 0) + 1;
+      const st = inv.status || 'Draft';
+      statusCounts[st] = (statusCounts[st] || 0) + 1;
 
-      // Only sum revenue if not Cancelled or Draft
+      // Sum monthly revenue
       if (inv.status === 'Paid' || inv.status === 'Pending') {
         const date = new Date(inv.metadata.invoiceDate || inv.createdAt);
         if (!isNaN(date.getTime())) {
           const monthYear = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-          monthlyRevenueMap[monthYear] = (monthlyRevenueMap[monthYear] || 0) + inv.totals.grandTotal;
+          monthlyRevenueMap[monthYear] = (monthlyRevenueMap[monthYear] || 0) + (inv.totals?.grandTotal || 0);
         }
       }
     });
@@ -331,19 +331,24 @@ export function useInvoiceStore() {
     })).slice(-6); // Limit to last 6 months
 
     const totalRevenue = invoices
+      .reduce((sum, i) => sum + (i.totals?.grandTotal || 0), 0);
+
+    const paidRevenue = invoices
       .filter((i) => i.status === 'Paid')
-      .reduce((sum, i) => sum + i.totals.grandTotal, 0);
+      .reduce((sum, i) => sum + (i.totals?.grandTotal || 0), 0);
 
     const pendingRevenue = invoices
       .filter((i) => i.status === 'Pending')
-      .reduce((sum, i) => sum + i.totals.grandTotal, 0);
+      .reduce((sum, i) => sum + (i.totals?.grandTotal || 0), 0);
 
     return {
       totalCount,
       gstCount,
+      nongstCount,
       proformaCount,
       quotationCount,
       totalRevenue,
+      paidRevenue,
       pendingRevenue,
       statusCounts,
       monthlyRevenue,

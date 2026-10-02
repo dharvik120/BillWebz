@@ -3,6 +3,7 @@
 import React from 'react';
 import { Trash2, Copy, Plus, ArrowUp, ArrowDown, GripVertical } from 'lucide-react';
 import { LineItem } from '../../types/invoice';
+import { HsnSacSelector } from './HsnSacSelector';
 
 interface NumberInputProps {
   value: number;
@@ -204,9 +205,10 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
         <table className="w-full text-left text-xs border-collapse min-w-[1080px]">
           <thead>
             <tr className="bg-secondary/40 border-b border-border/50 text-muted-foreground font-semibold uppercase text-[10px] tracking-wider">
-              <th className="px-2 py-3 w-[40px]"></th>
-              <th className="px-3 py-3 w-[340px]">Item Details</th>
-              {showTax && <th className="px-3 py-3 w-[120px]">HSN/SAC</th>}
+              <th className="px-2 py-3 w-[36px]"></th>
+              <th className="px-2 py-3 w-[45px] text-center">No.</th>
+              <th className="px-3 py-3 w-[320px]">Item Name</th>
+              {showTax && <th className="px-3 py-3 w-[150px]">HSN/SAC</th>}
               <th className="px-3 py-3 w-[90px]">Qty</th>
               <th className="px-3 py-3 w-[100px]">Unit</th>
               <th className="px-3 py-3 w-[170px]">Rate ({currencySymbol})</th>
@@ -218,7 +220,7 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
           <tbody>
             {items.length === 0 ? (
               <tr>
-                <td colSpan={showTax ? 9 : 7} className="py-10 text-center text-muted-foreground font-medium bg-card">
+                <td colSpan={showTax ? 10 : 8} className="py-10 text-center text-muted-foreground font-medium bg-card">
                   No items added. Click &quot;Add Product Item&quot; to begin.
                 </td>
               </tr>
@@ -233,12 +235,17 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                   className="border-b border-border/30 bg-card hover:bg-muted/5 transition-colors align-top"
                 >
                   {/* Drag Handle */}
-                  <td className="px-2 py-4 text-center cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600">
-                    <GripVertical className="h-4 w-4 mx-auto" />
+                  <td className="px-2 py-3 text-center cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600">
+                    <GripVertical className="h-4 w-4 mx-auto mt-2" />
                   </td>
 
-                  {/* Item name and description */}
-                  <td className="px-3 py-3 space-y-1.5">
+                  {/* Serial Number */}
+                  <td className="px-2 py-3 text-center text-muted-foreground font-bold text-[12px] pt-4">
+                    {idx + 1}
+                  </td>
+
+                  {/* Item Name (Secondary description removed per Requirement 4) */}
+                  <td className="px-3 py-3">
                     <input
                       type="text"
                       placeholder="Item Name (Required)"
@@ -246,24 +253,15 @@ export function LineItemsTable({ items, onChange, currencySymbol, showTax = true
                       onChange={(e) => handleItemChange(idx, 'name', e.target.value)}
                       className="w-full px-3 py-2 border border-border/80 rounded-md text-[13px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500 font-semibold"
                     />
-                    <textarea
-                      placeholder="Item Description (Optional)"
-                      value={item.description}
-                      onChange={(e) => handleItemChange(idx, 'description', e.target.value)}
-                      rows={2}
-                      className="w-full px-3 py-2 border border-border/80 rounded-md text-[13px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500 resize-y"
-                    />
                   </td>
 
-                  {/* HSN/SAC */}
+                  {/* HSN/SAC with Catalogue Selector */}
                   {showTax && (
                     <td className="px-3 py-3">
-                      <input
-                        type="text"
-                        placeholder="HSN/SAC"
-                        value={item.hsnSac}
-                        onChange={(e) => handleItemChange(idx, 'hsnSac', e.target.value)}
-                        className="w-full px-3 py-2 border border-border/80 rounded-md text-[13px] bg-background focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono"
+                      <HsnSacSelector
+                        value={item.hsnSac || ''}
+                        onChange={(code) => handleItemChange(idx, 'hsnSac', code)}
+                        currentGstPercent={item.gstPercent}
                       />
                     </td>
                   )}

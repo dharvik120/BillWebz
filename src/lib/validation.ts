@@ -3,6 +3,19 @@ import { z } from 'zod';
 export const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 export const PHONE_REGEX = /^[0-9]{10,12}$/;
 
+export const paymentSchema = z.object({
+  paymentMethod: z.string().optional(),
+  bankName: z.string().optional(),
+  accountHolderName: z.string().optional(),
+  accountNumber: z.string().optional(),
+  ifsc: z.string().optional(),
+  branch: z.string().optional(),
+  upiId: z.string().optional(),
+  upiQrUrl: z.string().optional(),
+  transactionReference: z.string().optional(),
+  paymentInstructions: z.string().optional(),
+}).optional();
+
 export const sellerSchema = z.object({
   name: z.string().min(1, 'Business name is required'),
   gstin: z.string().refine((val) => !val || GSTIN_REGEX.test(val), {
@@ -12,18 +25,22 @@ export const sellerSchema = z.object({
     message: 'Invalid phone number (must be 10-12 digits)',
   }).optional().or(z.literal('')),
   email: z.string().email('Invalid email address').optional().or(z.literal('')),
-  website: z.string().url('Invalid website URL').optional().or(z.literal('')),
+  website: z.string().optional().or(z.literal('')),
   address: z.string().min(1, 'Address is required'),
-  state: z.string().min(1, 'State is required'),
-  pincode: z.string().min(6, 'Pincode must be at least 6 digits').optional().or(z.literal('')),
+  state: z.string().optional().or(z.literal('')),
+  country: z.string().optional().or(z.literal('')),
+  pincode: z.string().optional().or(z.literal('')),
   logoUrl: z.string().optional(),
   signatureUrl: z.string().optional(),
+  paymentMethod: z.string().optional(),
   bankName: z.string().optional(),
+  accountHolderName: z.string().optional(),
   accountNumber: z.string().optional(),
   ifsc: z.string().optional(),
   branch: z.string().optional(),
   upiQrUrl: z.string().optional(),
   upiId: z.string().optional(),
+  paymentInstructions: z.string().optional(),
 });
 
 export const buyerSchema = z.object({
@@ -32,14 +49,17 @@ export const buyerSchema = z.object({
   gstin: z.string().refine((val) => !val || GSTIN_REGEX.test(val), {
     message: 'Invalid GSTIN format',
   }).optional().or(z.literal('')),
-  phone: z.string().refine((val) => !val || PHONE_REGEX.test(val), {
-    message: 'Invalid phone number',
-  }).optional().or(z.literal('')),
+  contactPerson: z.string().optional(),
+  phone: z.string().optional().or(z.literal('')),
   email: z.string().email('Invalid email address').optional().or(z.literal('')),
-  billingAddress: z.string().min(1, 'Billing address is required'),
+  website: z.string().optional().or(z.literal('')),
+  billingAddress: z.string().optional().or(z.literal('')),
   shippingAddress: z.string().optional(),
-  state: z.string().min(1, 'State is required'),
-  placeOfSupply: z.string().min(1, 'Place of supply is required'),
+  state: z.string().optional().or(z.literal('')),
+  stateCode: z.string().optional().or(z.literal('')),
+  country: z.string().optional().or(z.literal('')),
+  pincode: z.string().optional().or(z.literal('')),
+  placeOfSupply: z.string().optional().or(z.literal('')),
 });
 
 export const lineItemSchema = z.object({

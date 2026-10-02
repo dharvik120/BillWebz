@@ -1,3 +1,17 @@
+export interface PaymentDetails {
+  paymentMethod?: string;
+  bankName?: string;
+  accountHolderName?: string;
+  accountNumber?: string;
+  accountType?: string;
+  ifsc?: string;
+  branch?: string;
+  upiId?: string;
+  upiQrUrl?: string;
+  transactionReference?: string;
+  paymentInstructions?: string;
+}
+
 export interface SellerDetails {
   name: string;
   gstin?: string;
@@ -10,24 +24,31 @@ export interface SellerDetails {
   pincode?: string;
   logoUrl?: string;
   signatureUrl?: string;
+  paymentMethod?: string;
   bankName?: string;
+  accountHolderName?: string;
   accountNumber?: string;
   ifsc?: string;
   branch?: string;
   upiQrUrl?: string;
   upiId?: string;
+  paymentInstructions?: string;
 }
 
 export interface BuyerDetails {
   name: string;
   companyName?: string;
   gstin?: string;
+  contactPerson?: string;
   phone?: string;
   email?: string;
+  website?: string;
   billingAddress?: string;
   shippingAddress?: string;
   state?: string;
+  stateCode?: string;
   country?: string;
+  pincode?: string;
   placeOfSupply?: string;
 }
 
@@ -66,8 +87,8 @@ export interface InvoiceTotals {
 }
 
 export type InvoiceStatus = 'Paid' | 'Pending' | 'Cancelled' | 'Draft';
-export type InvoiceType = 'gst' | 'proforma' | 'quotation';
-export type InvoiceTheme = 'blue' | 'slate' | 'emerald' | 'charcoal' | 'gold';
+export type InvoiceType = 'gst' | 'proforma' | 'quotation' | 'nongst';
+export type InvoiceTheme = 'blue' | 'navy' | 'emerald' | 'burgundy' | 'slate' | 'charcoal' | 'monochrome' | 'gold';
 export type PaperSize = 'a4' | 'letter' | 'thermal80';
 
 export interface InvoiceMetadata {
@@ -104,6 +125,7 @@ export interface Invoice {
   
   sellerDetails: SellerDetails;
   buyerDetails: BuyerDetails;
+  paymentDetails?: PaymentDetails;
   metadata: InvoiceMetadata;
   items: LineItem[];
   totals: InvoiceTotals;
@@ -117,7 +139,7 @@ export interface Invoice {
   
   // Proforma exclusive
   quotationNotes?: string;
-  showTax: boolean; // Proforma option to hide tax details
+  showTax: boolean; // Proforma / Non-GST option to hide tax details
   isExported?: boolean; // Marks if PDF has been downloaded
   createdAt: number;
   updatedAt: number;
@@ -133,14 +155,33 @@ export interface PricingPlan {
   isPopular?: boolean;
 }
 
+export interface NumberingSequenceConfig {
+  prefix: string;
+  yearFormat?: 'YYYY' | 'YY' | 'NONE';
+  startingNumber?: number;
+  startNumber?: number;
+  padLength: number;
+  includeYear?: boolean;
+  separator?: string;
+}
+
+export interface NumberingSettings {
+  gst: NumberingSequenceConfig;
+  nongst: NumberingSequenceConfig;
+  quotation: NumberingSequenceConfig;
+  proforma: NumberingSequenceConfig;
+}
+
 export interface AdminSettings {
   adminPassword?: string;
+  adminEmail?: string;
   heroTitle?: string;
   heroSubtitle?: string;
   faqList?: { q: string; a: string }[];
   pricingPlans?: PricingPlan[];
   isSubscriptionLocked?: boolean;
   contactEmail?: string;
+  numbering?: NumberingSettings;
 }
 
 
