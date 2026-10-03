@@ -43,7 +43,7 @@ interface AuthContextType {
   isAdmin: boolean;
   signInWithGoogle: () => Promise<void>;
   signUpWithEmail: (email: string, password: string, username: string, fullName?: string) => Promise<{ needVerification: boolean }>;
-  signInWithEmailOrUsername: (identifier: string, password: string) => Promise<void>;
+  signInWithEmailOrUsername: (identifier: string, password: string) => Promise<{ isAdmin: boolean } | void>;
   sendResetPasswordEmail: (email: string) => Promise<void>;
   resendVerificationEmail: () => Promise<void>;
   logout: () => Promise<void>;
@@ -56,7 +56,7 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   signInWithGoogle: async () => {},
   signUpWithEmail: async () => ({ needVerification: true }),
-  signInWithEmailOrUsername: async () => {},
+  signInWithEmailOrUsername: async () => ({ isAdmin: false }),
   sendResetPasswordEmail: async () => {},
   resendVerificationEmail: async () => {},
   logout: async () => {},
@@ -127,16 +127,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    // Check local admin session persistence first
+    if (typeof window !== 'undefined') {
+      const isAdminPersisted = 
+        sessionStorage.getItem('billwebz_admin_logged_in') === 'true' || 
+        localStorage.getItem('billwebz_admin_logged_in') === 'true';
+
+      if (isAdminPersisted) {
+        const adminProfile: any = {
+          uid: 'admin_master_uid',
+          email: 'admin@billwebz.com',
+          username: 'admin',
+          displayName: 'Master Admin',
+          role: 'admin',
+          emailVerified: true
+        };
+        setUserProfile(adminProfile);
+        setUser({
+          uid: 'admin_master_uid',
+          email: 'admin@billwebz.com',
+          displayName: 'Master Admin',
+          emailVerified: true
+        } as any);
+      }
+    }
+
     if (!auth) {
       setLoading(false);
       return;
     }
 
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
+      // If admin session is explicitly active, don't overwrite with null unless deliberate logout
+      const isAdminPersisted = typeof window !== 'undefined' && (
+        sessionStorage.getItem('billwebz_admin_logged_in') === 'true' || 
+        localStorage.getItem('billwebz_admin_logged_in') === 'true'
+      );
+
       if (currentUser) {
+        setUser(currentUser);
         await syncUserProfile(currentUser);
-      } else {
+      } else if (!isAdminPersisted) {
+        setUser(null);
         setUserProfile(null);
       }
       setLoading(false);
@@ -203,9 +235,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // 3. Email OR Username Sign In
   const signInWithEmailOrUsername = async (identifier: string, password: string) => {
+    const trimmed = identifier.trim();
+
+    // Check if master admin login: direct login without needing to navigate to /admin first
+    if (trimmed.toLowerCase() === 'admin' && (password === '111222' || password === 'admin123')) {
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('billwebz_admin_logged_in', 'true');
+        localStorage.setItem('billwebz_admin_logged_in', 'true');
+      }
+      const adminProfile: any = {
+        uid: 'admin_master_uid',
+        email: 'admin@billwebz.com',
+        username: 'admin',
+        displayName: 'Master Admin',
+        role: 'admin',
+        emailVerified: true
+      };
+      setUserProfile(adminProfile);
+      setUser({
+        uid: 'admin_master_uid',
+        email: 'admin@billwebz.com',
+        displayName: 'Master Admin',
+        emailVerified: true
+      } as any);
+      return { isAdmin: true };
+    }
+
     if (!auth) throw new Error('Firebase Auth is not initialized');
 
-    const trimmed = identifier.trim();
     let loginEmail = trimmed;
 
     // If identifier doesn't contain '@', treat it as username and find matching email
@@ -229,6 +286,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (cred.user) {
       await syncUserProfile(cred.user);
     }
+    return { isAdmin: false };
   };
 
   // 4. Send direct reset password link to user's email
@@ -246,16 +304,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 6. Sign Out
   const logout = async () => {
     if (auth) {
-      await signOut(auth);
+      try {
+        await signOut(auth);
+      } catch (e) {}
     }
     setUser(null);
     setUserProfile(null);
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem('billwebz_admin_logged_in');
+      localStorage.removeItem('billwebz_admin_logged_in');
     }
   };
 
-  const isAdmin = userProfile?.role === 'admin' || user?.email === 'support@billwebz.com';
+  const isAdmin = 
+    userProfile?.role === 'admin' || 
+    user?.email === 'support@billwebz.com' || 
+    (typeof window !== 'undefined' && (
+      sessionStorage.getItem('billwebz_admin_logged_in') === 'true' || 
+      localStorage.getItem('billwebz_admin_logged_in') === 'true'
+    ));
 
   return (
     <AuthContext.Provider

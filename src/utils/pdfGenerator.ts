@@ -12,18 +12,15 @@ export function getDocumentPdfFilename(invoiceData?: any, fallbackName?: string)
   }
 
   const type = invoiceData?.type;
-  const isTax = invoiceData?.showTax !== false;
   const rawNum = (invoiceData?.metadata?.invoiceNumber || invoiceData?.metadata?.referenceNumber || '').trim();
-  const safeNum = rawNum ? `_${rawNum.replace(/[/\\?%*:|"<> ]/g, '-')}` : '';
+  const safeNum = rawNum ? `-${rawNum.replace(/[/\\?%*:|"<> ]/g, '-')}` : '';
 
-  if (type === 'gst') {
-    return isTax ? `GST_Invoice${safeNum}.pdf` : `Invoice${safeNum}.pdf`;
+  if (type === 'gst' || type === 'nongst') {
+    return `Invoice${safeNum}.pdf`;
   } else if (type === 'quotation') {
     return `Quotation${safeNum}.pdf`;
   } else if (type === 'proforma') {
     return `Proforma_Invoice${safeNum}.pdf`;
-  } else if (type === 'nongst') {
-    return `Invoice${safeNum}.pdf`;
   }
 
   return `Invoice${safeNum}.pdf`;

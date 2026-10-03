@@ -29,7 +29,8 @@ import {
   ChevronDown,
   ChevronUp,
   Layers,
-  ShieldCheck
+  ShieldCheck,
+  Plus
 } from 'lucide-react';
 import { useInvoiceStore } from '@/hooks/useInvoiceStore';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
@@ -74,6 +75,7 @@ const getInitialSellerProfile = (fallback: any) => {
 const emptyProforma = (defaultSeller: any, defaultTerms: any, defaultDec: any, defaultCurr: any, existingInvoices: Invoice[] = []): Invoice => {
   const seller = getInitialSellerProfile(defaultSeller);
   return {
+    id: 'inv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
     type: 'proforma',
     status: 'Draft',
     theme: 'blue',
@@ -192,9 +194,11 @@ function ProformaInvoiceForm() {
         setInitialData(match);
       }
     } else {
-      setInitialData(emptyProforma(defaultSeller, defaultTerms, defaultDeclaration, defaultCurrency, invoices));
+      if (!initialData) {
+        setInitialData(emptyProforma(defaultSeller, defaultTerms, defaultDeclaration, defaultCurrency, invoices));
+      }
     }
-  }, [editId, invoices, defaultSeller, defaultTerms, defaultDeclaration, defaultCurrency]);
+  }, [editId, defaultSeller, defaultTerms, defaultDeclaration, defaultCurrency]);
 
   // 2. Setup Undo Redo Hook
   const { 
@@ -213,6 +217,15 @@ function ProformaInvoiceForm() {
     }
   }, [initialData, invoiceData, resetUndoRedo]);
 
+  // Handler to start a fresh next proforma (e.g. 2 -> 3)
+  const handleNewProforma = () => {
+    const nextNum = getNextDocumentNumber('proforma', invoices);
+    const newInv = emptyProforma(defaultSeller, defaultTerms, defaultDeclaration, defaultCurrency, invoices);
+    newInv.metadata.invoiceNumber = nextNum;
+    setInvoiceData(newInv);
+    resetUndoRedo(newInv);
+  };
+
   const [activeSection, setActiveSection] = useState<string>('all');
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
   const toggleSection = (id: string) => setCollapsedSections(prev => ({ ...prev, [id]: !prev[id] }));
@@ -224,11 +237,6 @@ function ProformaInvoiceForm() {
   // Trigger PDF Generation
   const handleDownloadPdf = async () => {
     if (!invoiceData) return;
-
-    if (!user) {
-      setShowAuthModal(true);
-      return;
-    }
 
     setIsExporting(true);
     try {
@@ -452,8 +460,12 @@ function ProformaInvoiceForm() {
   };
 
   const handleSaveDraft = async (manual: boolean = false) => {
+    if (!invoiceData) return;
     try {
-      await saveInvoice(invoiceData);
+      const saved = await saveInvoice(invoiceData);
+      if (saved?.id && saved.id !== invoiceData.id) {
+        setInvoiceData(prev => prev ? { ...prev, id: saved.id } : prev);
+      }
       if (manual) {
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 2000);
@@ -465,10 +477,6 @@ function ProformaInvoiceForm() {
 
   const handleShareWhatsApp = async () => {
     if (!invoiceData) return;
-    if (!user) {
-      setShowAuthModal(true);
-      return;
-    }
     setIsSharingWhatsApp(true);
     try {
       const clientName = invoiceData.buyerDetails?.name || 'Customer';
@@ -633,6 +641,17 @@ function ProformaInvoiceForm() {
             <option value="EUR">Euros (€)</option>
             <option value="AED">Dirhams (AED)</option>
           </select>
+
+          {/* Next / New Proforma Trigger */}
+          <button
+            onClick={handleNewProforma}
+            className="h-8.5 sm:h-10 px-2.5 sm:px-3 text-xs sm:text-sm font-bold text-foreground bg-secondary hover:bg-secondary/80 border border-border/80 rounded-xl flex items-center gap-1 sm:gap-1.5 shadow-xs transition-colors cursor-pointer active:scale-95 shrink-0"
+            title="Start New / Next Proforma Invoice"
+          >
+            <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-indigo-600" />
+            <span className="hidden sm:inline">Next Proforma</span>
+            <span className="sm:hidden">New</span>
+          </button>
 
           {/* Save Status triggers */}
           <button

@@ -31,7 +31,8 @@ import {
   Layers,
   ShieldCheck,
   Truck,
-  Wallet
+  Wallet,
+  Plus
 } from 'lucide-react';
 import { useInvoiceStore } from '@/hooks/useInvoiceStore';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
@@ -76,6 +77,7 @@ const getInitialSellerProfile = (fallback: any) => {
 const emptyInvoice = (defaultSeller: any, defaultTerms: any, defaultDec: any, defaultCurr: any, existingInvoices: Invoice[] = []): Invoice => {
   const seller = getInitialSellerProfile(defaultSeller);
   return {
+    id: 'inv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
     type: 'gst',
     status: 'Draft',
     theme: 'blue',
@@ -192,15 +194,17 @@ function GstInvoiceForm() {
         setInitialData(match);
       }
     } else {
-      const init = emptyInvoice(defaultSeller, defaultTerms, defaultDeclaration, defaultCurrency, invoices);
-      if (isNonGstMode) {
-        init.showTax = false;
-        init.type = 'nongst';
-        init.metadata.invoiceNumber = getNextDocumentNumber('nongst', invoices);
+      if (!initialData) {
+        const init = emptyInvoice(defaultSeller, defaultTerms, defaultDeclaration, defaultCurrency, invoices);
+        if (isNonGstMode) {
+          init.showTax = false;
+          init.type = 'nongst';
+          init.metadata.invoiceNumber = getNextDocumentNumber('nongst', invoices);
+        }
+        setInitialData(init);
       }
-      setInitialData(init);
     }
-  }, [editId, invoices, defaultSeller, defaultTerms, defaultDeclaration, defaultCurrency, isNonGstMode]);
+  }, [editId, defaultSeller, defaultTerms, defaultDeclaration, defaultCurrency, isNonGstMode]);
 
   // 2. Setup Undo Redo Hook once initialData loads
   const { 
@@ -219,6 +223,21 @@ function GstInvoiceForm() {
     }
   }, [initialData, invoiceData, resetUndoRedo]);
 
+  // Handler to start a fresh next invoice (e.g. 2 -> 3)
+  const handleNewInvoice = () => {
+    const nextNum = getNextDocumentNumber(isNonGstMode ? 'nongst' : 'gst', invoices);
+    const newInv = emptyInvoice(defaultSeller, defaultTerms, defaultDeclaration, defaultCurrency, invoices);
+    if (isNonGstMode) {
+      newInv.showTax = false;
+      newInv.type = 'nongst';
+      newInv.metadata.invoiceNumber = nextNum;
+    } else {
+      newInv.metadata.invoiceNumber = nextNum;
+    }
+    setInvoiceData(newInv);
+    resetUndoRedo(newInv);
+  };
+
   const [activeSection, setActiveSection] = useState<string>('all');
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
   const toggleSection = (id: string) => setCollapsedSections(prev => ({ ...prev, [id]: !prev[id] }));
@@ -231,12 +250,6 @@ function GstInvoiceForm() {
   // Trigger PDF Generation
   const handleDownloadPdf = async () => {
     if (!invoiceData) return;
-
-    // Require Auth before generating / downloading invoices
-    if (!user) {
-      setShowAuthModal(true);
-      return;
-    }
 
     setIsExporting(true);
     try {
@@ -459,8 +472,12 @@ function GstInvoiceForm() {
   };
 
   const handleSaveDraft = async (manual: boolean = false) => {
+    if (!invoiceData) return;
     try {
-      await saveInvoice(invoiceData);
+      const saved = await saveInvoice(invoiceData);
+      if (saved?.id && saved.id !== invoiceData.id) {
+        setInvoiceData(prev => prev ? { ...prev, id: saved.id } : prev);
+      }
       if (manual) {
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 2000);
@@ -472,10 +489,6 @@ function GstInvoiceForm() {
 
   const handleShareWhatsApp = async () => {
     if (!invoiceData) return;
-    if (!user) {
-      setShowAuthModal(true);
-      return;
-    }
     setIsSharingWhatsApp(true);
     try {
       const clientName = invoiceData.buyerDetails?.name || 'Customer';
@@ -646,6 +659,17 @@ function GstInvoiceForm() {
             <option value="EUR">Euros (€)</option>
             <option value="AED">Dirhams (AED)</option>
           </select>
+
+          {/* Next / New Invoice Trigger */}
+          <button
+            onClick={handleNewInvoice}
+            className="h-8.5 sm:h-10 px-2.5 sm:px-3 text-xs sm:text-sm font-bold text-foreground bg-secondary hover:bg-secondary/80 border border-border/80 rounded-xl flex items-center gap-1 sm:gap-1.5 shadow-xs transition-colors cursor-pointer active:scale-95 shrink-0"
+            title="Start New / Next Invoice"
+          >
+            <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600" />
+            <span className="hidden sm:inline">Next Invoice</span>
+            <span className="sm:hidden">New</span>
+          </button>
 
           {/* Save Status triggers */}
           <button

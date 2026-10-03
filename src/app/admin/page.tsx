@@ -103,7 +103,9 @@ export default function AdminPortal() {
   // Load state check on session or Firebase Auth
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const logged = sessionStorage.getItem('billwebz_admin_logged_in') === 'true';
+      const logged = 
+        sessionStorage.getItem('billwebz_admin_logged_in') === 'true' ||
+        localStorage.getItem('billwebz_admin_logged_in') === 'true';
       if (logged || isFirebaseAdmin) {
         setIsLoggedIn(true);
       }
@@ -194,10 +196,11 @@ export default function AdminPortal() {
 
   const handleLogout = () => {
     sessionStorage.removeItem('billwebz_admin_logged_in');
+    localStorage.removeItem('billwebz_admin_logged_in');
     setIsLoggedIn(false);
     setUsername('');
     setPassword('');
-    loadInvoices();
+    loadInvoices(true);
   };
 
   const handleSaveSettings = () => {

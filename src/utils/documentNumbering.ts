@@ -103,37 +103,39 @@ export function getNextDocumentNumber(
 
   // Filter invoices for this type or prefix
   const startNum = config.startNumber ?? config.startingNumber ?? 1;
-  let maxNumber: number = startNum > 0 ? startNum : 0;
-  
-  // For quotation, if user had historical 4626, ensure base floor is at least 4626
-  if (type === 'quotation' && maxNumber < 4626) {
-    maxNumber = 4626;
-  }
+  let highestFoundSeq: number | null = null;
 
   existingInvoices.forEach((inv) => {
-    const invNumber = inv.metadata?.invoiceNumber || '';
+    const invNumber = (inv.metadata?.invoiceNumber || '').trim();
     const invType = inv.type;
 
     // Check if this invoice matches our type or starts with our prefix
     const isMatchingType = 
       invType === type ||
-      (type === 'gst' && (invType as string) === 'tax' || invNumber.toUpperCase().startsWith('GST-') || invNumber.toUpperCase().startsWith('INV-')) ||
+      (type === 'gst' && ((invType as string) === 'tax' || invNumber.toUpperCase().startsWith('GST-'))) ||
+      (type === 'nongst' && (invNumber.toUpperCase().startsWith('INV-'))) ||
       (type === 'quotation' && invNumber.toUpperCase().startsWith('QUO-')) ||
       (type === 'proforma' && (invNumber.toUpperCase().startsWith('PRO-') || invNumber.toUpperCase().startsWith('PI-')));
 
     if (isMatchingType && invNumber) {
-      // Check if invoice belongs to current year if configured
-      if (config.includeYear && !invNumber.includes(String(currentYear))) {
-        // Different year, ignore or handle per year
-      }
       const seq = extractSequenceNumber(invNumber, config.prefix);
-      if (seq !== null && seq > maxNumber) {
-        maxNumber = seq;
+      if (seq !== null) {
+        if (highestFoundSeq === null || seq > highestFoundSeq) {
+          highestFoundSeq = seq;
+        }
       }
     }
   });
 
-  const nextSeq = maxNumber + 1;
+  // If no document exists yet, start at startNum (e.g. 1, or 4626 for quotation)
+  // If documents exist, next sequence is strictly highest + 1 (e.g. 2 -> 3 -> 4)
+  let nextSeq: number;
+  if (highestFoundSeq === null) {
+    nextSeq = startNum;
+  } else {
+    nextSeq = Math.max(highestFoundSeq + 1, startNum);
+  }
+
   const paddedSeq = String(nextSeq).padStart(config.padLength || 4, '0');
   const separator = config.separator || '-';
 

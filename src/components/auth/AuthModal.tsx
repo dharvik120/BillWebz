@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createPortal } from 'react-dom';
 import { 
   X, 
@@ -36,6 +37,7 @@ export function AuthModal({
   subtitle,
   preventClose = false,
 }: AuthModalProps) {
+  const router = useRouter();
   const { 
     signInWithGoogle, 
     signInWithEmailOrUsername, 
@@ -100,9 +102,12 @@ export function AuthModal({
         if (!identifier.trim()) throw new Error('Please enter your email or username');
         if (!password) throw new Error('Please enter your password');
         
-        await signInWithEmailOrUsername(identifier, password);
+        const res = await signInWithEmailOrUsername(identifier, password);
         if (onSuccess) onSuccess();
         onClose();
+        if (res?.isAdmin || identifier.trim().toLowerCase() === 'admin') {
+          router.push('/admin');
+        }
       } else if (mode === 'signup') {
         if (!username.trim()) throw new Error('Please enter a username');
         if (!email.trim()) throw new Error('Please enter your email');

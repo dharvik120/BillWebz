@@ -100,16 +100,21 @@ const defaultTermsInitial = '1. Payment is due within the stipulated date.\n2. I
 const defaultDeclarationInitial = 'We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.';
 const defaultCurrencyInitial = { symbol: '₹', code: 'INR' };
 
+// Module-level in-memory cache to guarantee instantaneous loads and zero re-fetch lag
+let memoryInvoicesCache: Invoice[] | null = null;
+let memorySettingsCache: AdminSettings | null = null;
+let isFetchingInvoicesGlobal = false;
+
 export function useInvoiceStore() {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [invoices, setInvoices] = useState<Invoice[]>(() => memoryInvoicesCache || []);
+  const [loading, setLoading] = useState<boolean>(() => memoryInvoicesCache === null);
 
   // Settings state
   const [defaultSeller, setDefaultSeller] = useState<SellerDetails>(defaultSellerInitial);
   const [defaultTerms, setDefaultTerms] = useState<string>(defaultTermsInitial);
   const [defaultDeclaration, setDefaultDeclaration] = useState<string>(defaultDeclarationInitial);
   const [defaultCurrency, setDefaultCurrency] = useState<{ symbol: string; code: string }>(defaultCurrencyInitial);
-  const [adminSettings, setAdminSettings] = useState<AdminSettings>(defaultAdminSettings);
+  const [adminSettings, setAdminSettings] = useState<AdminSettings>(() => memorySettingsCache || defaultAdminSettings);
 
   // Load defaults from local storage on mount
   useEffect(() => {
@@ -139,24 +144,39 @@ export function useInvoiceStore() {
   // Fetch adminSettings from Firestore (fallback to LocalStorage)
   useEffect(() => {
     const fetchAdminSettings = async () => {
+      if (memorySettingsCache) {
+        setAdminSettings(memorySettingsCache);
+        return;
+      }
       if (isFirebaseEnabled && firebaseDb) {
         try {
           const docRef = doc(firebaseDb, 'settings', 'default');
           const docSnap = await getDoc(docRef);
           if (docSnap.exists()) {
-            setAdminSettings(docSnap.data() as AdminSettings);
+            const data = docSnap.data() as AdminSettings;
+            memorySettingsCache = data;
+            setAdminSettings(data);
           } else {
             await setDoc(docRef, defaultAdminSettings);
+            memorySettingsCache = defaultAdminSettings;
             setAdminSettings(defaultAdminSettings);
           }
         } catch (e) {
           console.error('Failed to load settings from Firestore, loading locally', e);
           const storedAdmin = localStorage.getItem(ADMIN_SETTINGS_KEY);
-          if (storedAdmin) setAdminSettings(JSON.parse(storedAdmin));
+          if (storedAdmin) {
+            const parsed = JSON.parse(storedAdmin);
+            memorySettingsCache = parsed;
+            setAdminSettings(parsed);
+          }
         }
       } else {
         const storedAdmin = localStorage.getItem(ADMIN_SETTINGS_KEY);
-        if (storedAdmin) setAdminSettings(JSON.parse(storedAdmin));
+        if (storedAdmin) {
+          const parsed = JSON.parse(storedAdmin);
+          memorySettingsCache = parsed;
+          setAdminSettings(parsed);
+        }
       }
     };
     fetchAdminSettings();
@@ -164,11 +184,26 @@ export function useInvoiceStore() {
 
   const { user, isAdmin: isAuthAdmin } = useAuth();
 
-  // Fetch all invoices
-  const loadInvoices = useCallback(async () => {
-    setLoading(true);
+  // Fetch all invoices with background cache
+  const loadInvoices = useCallback(async (force: boolean = false) => {
+    if (!force && memoryInvoicesCache !== null) {
+      setInvoices(memoryInvoicesCache);
+      setLoading(false);
+      return;
+    }
+
+    if (memoryInvoicesCache === null) {
+      setLoading(true);
+    }
+
+    if (isFetchingInvoicesGlobal) return;
+    isFetchingInvoicesGlobal = true;
+
     try {
-      const isAdminSession = typeof window !== 'undefined' && sessionStorage.getItem('billwebz_admin_logged_in') === 'true';
+      const isAdminSession = typeof window !== 'undefined' && (
+        sessionStorage.getItem('billwebz_admin_logged_in') === 'true' ||
+        localStorage.getItem('billwebz_admin_logged_in') === 'true'
+      );
       const isAdmin = isAuthAdmin || isAdminSession;
 
       const seenIds = new Set<string>();
@@ -216,10 +251,12 @@ export function useInvoiceStore() {
       }
 
       combinedInvoices.sort((a, b) => b.updatedAt - a.updatedAt);
+      memoryInvoicesCache = combinedInvoices;
       setInvoices(combinedInvoices);
     } catch (err) {
       console.error('Failed to load invoices', err);
     } finally {
+      isFetchingInvoicesGlobal = false;
       setLoading(false);
     }
   }, [user, isAuthAdmin]);
@@ -249,7 +286,7 @@ export function useInvoiceStore() {
   // Create or Update Invoice
   const saveInvoice = useCallback(async (invoice: Invoice) => {
     const timestamp = Date.now();
-    const id = invoice.id || Math.random().toString(36).substring(2, 11);
+    const id = invoice.id || ('inv_' + timestamp + '_' + Math.random().toString(36).substring(2, 7));
     
     const invoiceToSave: Invoice = {
       ...invoice,
@@ -261,11 +298,15 @@ export function useInvoiceStore() {
       updatedAt: timestamp,
     };
     
-    await db.invoices.put(invoiceToSave);
+    try {
+      await db.invoices.put(invoiceToSave);
+    } catch (e) {
+      console.warn('Error saving to indexedDB:', e);
+    }
 
     if (isFirebaseEnabled && firebaseDb) {
       const docRef = doc(firebaseDb, 'invoices', id);
-      await setDoc(docRef, invoiceToSave);
+      setDoc(docRef, invoiceToSave).catch(e => console.warn('Cloud save error:', e));
     }
 
     if (typeof window !== 'undefined' && invoice.sellerDetails) {
@@ -289,38 +330,63 @@ export function useInvoiceStore() {
       } catch (e) {}
     }
 
-    await loadInvoices();
+    // Optimistically update in-memory state and cache without waiting for full network refetch
+    setInvoices(prev => {
+      const idx = prev.findIndex(item => item.id === id);
+      let updated: Invoice[];
+      if (idx >= 0) {
+        updated = [...prev];
+        updated[idx] = invoiceToSave;
+      } else {
+        updated = [invoiceToSave, ...prev];
+      }
+      memoryInvoicesCache = updated;
+      return updated;
+    });
+
     return invoiceToSave;
-  }, [loadInvoices, user]);
+  }, [user]);
 
   // Delete Invoice
   const deleteInvoice = useCallback(async (id: string) => {
-    await db.invoices.delete(id);
+    try {
+      await db.invoices.delete(id);
+    } catch (e) {}
     
     if (isFirebaseEnabled && firebaseDb) {
       const docRef = doc(firebaseDb, 'invoices', id);
-      await deleteDoc(docRef);
+      deleteDoc(docRef).catch(e => console.warn('Cloud delete error:', e));
     }
 
-    await loadInvoices();
-  }, [loadInvoices]);
+    setInvoices(prev => {
+      const updated = prev.filter(item => item.id !== id);
+      memoryInvoicesCache = updated;
+      return updated;
+    });
+  }, []);
 
   // Bulk Delete Invoices
   const deleteInvoices = useCallback(async (ids: string[]) => {
     if (!ids || ids.length === 0) return;
     for (const id of ids) {
-      await db.invoices.delete(id);
+      try {
+        await db.invoices.delete(id);
+      } catch (e) {}
       if (isFirebaseEnabled && firebaseDb) {
         try {
           const docRef = doc(firebaseDb, 'invoices', id);
-          await deleteDoc(docRef);
+          deleteDoc(docRef).catch(e => console.warn('Cloud delete error:', e));
         } catch (e) {
           console.error('Firebase bulk delete error for id ' + id, e);
         }
       }
     }
-    await loadInvoices();
-  }, [loadInvoices]);
+    setInvoices(prev => {
+      const updated = prev.filter(item => !item.id || !ids.includes(item.id));
+      memoryInvoicesCache = updated;
+      return updated;
+    });
+  }, []);
 
   // Duplicate Invoice
   const duplicateInvoice = useCallback(async (invoice: Invoice) => {
