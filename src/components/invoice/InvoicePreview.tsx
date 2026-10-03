@@ -504,45 +504,53 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                   )}
                 </div>
                 {hasPaymentInfo ? (
-                  <div className="space-y-1 text-[11px]">
-                    {(paymentDetails.bankName || sellerDetails.bankName) && (
-                      <div className="flex justify-between py-0.5 border-b border-slate-200/50">
-                        <span className="text-slate-400">Bank Name:</span>
-                        <span className="font-semibold pdf-text-dark">{paymentDetails.bankName || sellerDetails.bankName}</span>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 space-y-1 text-[11px]">
+                      {(paymentDetails.bankName || sellerDetails.bankName) && (
+                        <div className="flex justify-between py-0.5 border-b border-slate-200/50">
+                          <span className="text-slate-400">Bank Name:</span>
+                          <span className="font-semibold pdf-text-dark">{paymentDetails.bankName || sellerDetails.bankName}</span>
+                        </div>
+                      )}
+                      {(paymentDetails.accountNumber || sellerDetails.accountNumber) && (
+                        <div className="flex justify-between py-0.5 border-b border-slate-200/50">
+                          <span className="text-slate-400">Account Number:</span>
+                          <span className="font-mono font-bold pdf-text-dark">{paymentDetails.accountNumber || sellerDetails.accountNumber}</span>
+                        </div>
+                      )}
+                      {(paymentDetails.accountHolderName || sellerDetails.name) && (
+                        <div className="flex justify-between py-0.5 border-b border-slate-200/50">
+                          <span className="text-slate-400">Account Holder:</span>
+                          <span className="font-medium pdf-text-dark">{paymentDetails.accountHolderName || sellerDetails.name}</span>
+                        </div>
+                      )}
+                      {(paymentDetails.ifsc || sellerDetails.ifsc) && (
+                        <div className="flex justify-between py-0.5 border-b border-slate-200/50">
+                          <span className="text-slate-400">IFSC Code:</span>
+                          <span className="font-mono font-bold pdf-text-dark">{paymentDetails.ifsc || sellerDetails.ifsc}</span>
+                        </div>
+                      )}
+                      {(paymentDetails.branch || sellerDetails.branch) && (
+                        <div className="flex justify-between py-0.5 border-b border-slate-200/50">
+                          <span className="text-slate-400">Branch:</span>
+                          <span className="pdf-text-dark">{paymentDetails.branch || sellerDetails.branch}</span>
+                        </div>
+                      )}
+                      {(paymentDetails.upiId || sellerDetails.upiId) && (
+                        <div className="flex justify-between py-0.5 border-b border-slate-200/50">
+                          <span className="text-slate-400">UPI / VPA:</span>
+                          <span className="font-mono font-semibold text-emerald-700">{paymentDetails.upiId || sellerDetails.upiId}</span>
+                        </div>
+                      )}
+                      {paymentDetails.paymentInstructions && (
+                        <p className="text-[10px] text-slate-500 italic pt-1">{paymentDetails.paymentInstructions}</p>
+                      )}
+                    </div>
+                    {upiQrUrl && (
+                      <div className="flex flex-col items-center justify-center p-2 bg-white border pdf-border-light rounded-lg shrink-0 shadow-xs">
+                        <img src={upiQrUrl} alt="UPI QR" className="w-20 h-20 object-contain" />
+                        <span className="text-[8px] font-bold text-slate-600 mt-1 uppercase tracking-tight">Scan to Pay</span>
                       </div>
-                    )}
-                    {(paymentDetails.accountNumber || sellerDetails.accountNumber) && (
-                      <div className="flex justify-between py-0.5 border-b border-slate-200/50">
-                        <span className="text-slate-400">Account Number:</span>
-                        <span className="font-mono font-bold pdf-text-dark">{paymentDetails.accountNumber || sellerDetails.accountNumber}</span>
-                      </div>
-                    )}
-                    {(paymentDetails.accountHolderName || sellerDetails.name) && (
-                      <div className="flex justify-between py-0.5 border-b border-slate-200/50">
-                        <span className="text-slate-400">Account Holder:</span>
-                        <span className="font-medium pdf-text-dark">{paymentDetails.accountHolderName || sellerDetails.name}</span>
-                      </div>
-                    )}
-                    {(paymentDetails.ifsc || sellerDetails.ifsc) && (
-                      <div className="flex justify-between py-0.5 border-b border-slate-200/50">
-                        <span className="text-slate-400">IFSC Code:</span>
-                        <span className="font-mono font-bold pdf-text-dark">{paymentDetails.ifsc || sellerDetails.ifsc}</span>
-                      </div>
-                    )}
-                    {(paymentDetails.branch || sellerDetails.branch) && (
-                      <div className="flex justify-between py-0.5 border-b border-slate-200/50">
-                        <span className="text-slate-400">Branch:</span>
-                        <span className="pdf-text-dark">{paymentDetails.branch || sellerDetails.branch}</span>
-                      </div>
-                    )}
-                    {(paymentDetails.upiId || sellerDetails.upiId) && (
-                      <div className="flex justify-between py-0.5 border-b border-slate-200/50">
-                        <span className="text-slate-400">UPI / VPA:</span>
-                        <span className="font-mono font-semibold text-emerald-700">{paymentDetails.upiId || sellerDetails.upiId}</span>
-                      </div>
-                    )}
-                    {paymentDetails.paymentInstructions && (
-                      <p className="text-[10px] text-slate-500 italic pt-1">{paymentDetails.paymentInstructions}</p>
                     )}
                   </div>
                 ) : (
@@ -715,14 +723,8 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
               </div>
 
               <div className="flex flex-col items-end justify-end space-y-4">
-                {/* QR Code and Barcode */}
+                {/* Barcode */}
                 <div className="flex items-center gap-4">
-                  {upiQrUrl && (
-                    <div className="flex flex-col items-center">
-                      <img src={upiQrUrl} alt="UPI QR" className="w-20 h-20 border pdf-border-light rounded p-1 bg-white" />
-                      <span className="text-[8px] pdf-text-light mt-1 font-semibold">UPI Payment QR</span>
-                    </div>
-                  )}
                   <Barcode value={metadata.invoiceNumber || 'INV-001'} />
                 </div>
 

@@ -171,39 +171,52 @@ export function useInvoiceStore() {
       const isAdminSession = typeof window !== 'undefined' && sessionStorage.getItem('billwebz_admin_logged_in') === 'true';
       const isAdmin = isAuthAdmin || isAdminSession;
 
+      const seenIds = new Set<string>();
+      const combinedInvoices: Invoice[] = [];
+
       if (isFirebaseEnabled && firebaseDb) {
-        const invoicesCol = collection(firebaseDb, 'invoices');
-        let q;
-        if (isAdmin) {
-          // Admin sees all invoices
-          q = query(invoicesCol);
-        } else if (user?.uid) {
-          // Authenticated user sees invoices saved under their account
-          q = query(invoicesCol, where('userId', '==', user.uid));
-        } else {
-          // Unauthenticated fallback by client device ID
-          q = query(invoicesCol, where('clientId', '==', localClientId));
+        try {
+          const invoicesCol = collection(firebaseDb, 'invoices');
+          let q;
+          if (isAdmin) {
+            // Admin sees all invoices
+            q = query(invoicesCol);
+          } else if (user?.uid) {
+            // Authenticated user sees invoices saved under their account
+            q = query(invoicesCol, where('userId', '==', user.uid));
+          } else {
+            // Unauthenticated fallback by client device ID
+            q = query(invoicesCol, where('clientId', '==', localClientId));
+          }
+
+          const querySnapshot = await getDocs(q);
+          querySnapshot.forEach((docSnap) => {
+            const inv = { id: docSnap.id, ...docSnap.data() } as Invoice;
+            combinedInvoices.push(inv);
+            if (inv.id) seenIds.add(inv.id);
+          });
+        } catch (cloudErr) {
+          console.warn('Could not fetch cloud invoices, falling back to local:', cloudErr);
         }
-
-        const querySnapshot = await getDocs(q);
-        const cloudInvoices: Invoice[] = [];
-        querySnapshot.forEach((docSnap) => {
-          cloudInvoices.push({ id: docSnap.id, ...docSnap.data() } as Invoice);
-        });
-
-        cloudInvoices.sort((a, b) => b.updatedAt - a.updatedAt);
-        setInvoices(cloudInvoices);
-
-        // Sync local IndexedDB cache with firestore state
-        await db.invoices.clear();
-        for (const inv of cloudInvoices) {
-          await db.invoices.put(inv);
-        }
-      } else {
-        const allInvoices = await db.invoices.toArray();
-        allInvoices.sort((a, b) => b.updatedAt - a.updatedAt);
-        setInvoices(allInvoices);
       }
+
+      // Also merge IndexedDB invoices for admin or current user so nothing is ever lost
+      try {
+        const localInvoices = await db.invoices.toArray();
+        for (const localInv of localInvoices) {
+          if (localInv.id && !seenIds.has(localInv.id)) {
+            if (isAdmin || !user?.uid || localInv.userId === user.uid || localInv.clientId === localClientId) {
+              combinedInvoices.push(localInv);
+              seenIds.add(localInv.id);
+            }
+          }
+        }
+      } catch (localErr) {
+        console.warn('Error reading local indexedDB invoices:', localErr);
+      }
+
+      combinedInvoices.sort((a, b) => b.updatedAt - a.updatedAt);
+      setInvoices(combinedInvoices);
     } catch (err) {
       console.error('Failed to load invoices', err);
     } finally {

@@ -77,7 +77,9 @@ export function AuthModal({
     } catch (err: any) {
       console.error('Google Sign In Error:', err);
       if (err.code !== 'auth/popup-closed-by-user') {
-        if (err.code === 'auth/configuration-not-found' || err.code === 'auth/operation-not-allowed') {
+        if (err.code === 'auth/unauthorized-domain') {
+          setErrorMessage('This domain is not authorized in Firebase yet. Please add "bill-webz.vercel.app" in Firebase Console > Authentication > Settings > Authorized domains. In the meantime, you can Sign In with Email/Username & Password below!');
+        } else if (err.code === 'auth/configuration-not-found' || err.code === 'auth/operation-not-allowed') {
           setErrorMessage('Google Sign-In is not enabled yet in your Firebase Console. Please go to Firebase Console > Authentication > Sign-in method and enable Google.');
         } else {
           setErrorMessage(err.message || 'Failed to sign in with Google. Please try again.');
