@@ -201,24 +201,24 @@ export default function LandingPage() {
           </nav>
 
           {/* Action CTAs */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             {/* Android APK Download Button */}
             <Link
               href="/BillWebz.apk"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary hover:bg-secondary/80 border border-border/60 text-xs font-bold text-foreground transition-colors shadow-sm"
+              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-secondary hover:bg-secondary/80 border border-border/60 text-xs font-bold text-foreground transition-colors shadow-xs"
               title="Download Android App APK"
             >
-              <Smartphone className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <Smartphone className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>Android APK</span>
             </Link>
 
             {/* Theme Toggle */}
             <button 
               onClick={toggleTheme} 
-              className="p-2 rounded-lg bg-secondary hover:bg-secondary/80 border border-border/60 transition-colors"
+              className="h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center rounded-xl bg-secondary hover:bg-secondary/80 border border-border/60 transition-colors shrink-0 cursor-pointer active:scale-95"
               aria-label="Toggle Theme"
             >
-              {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-primary" />}
+              {theme === 'dark' ? <Sun className="h-3.5 w-3.5 text-amber-400" /> : <Moon className="h-3.5 w-3.5 text-primary" />}
             </button>
             
             {/* User Account / Login */}
@@ -227,9 +227,11 @@ export default function LandingPage() {
             {/* Create Invoice Primary Button */}
             <Link 
               href="/invoice/gst" 
-              className="inline-flex items-center justify-center px-4 py-2 text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary/90 rounded-xl shadow-md transition-all hover:shadow-lg"
+              className="h-8 sm:h-9 px-2.5 sm:px-4 text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary/90 rounded-xl shadow-md transition-all hover:shadow-lg flex items-center gap-1 active:scale-95 whitespace-nowrap shrink-0 cursor-pointer"
             >
-              Create Invoice
+              <Plus className="h-3.5 w-3.5 sm:hidden" />
+              <span className="hidden sm:inline">Create Invoice</span>
+              <span className="sm:hidden font-bold">Invoice</span>
             </Link>
           </div>
         </div>

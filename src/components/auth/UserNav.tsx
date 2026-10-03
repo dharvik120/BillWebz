@@ -36,7 +36,7 @@ export function UserNav() {
 
   if (loading) {
     return (
-      <div className="h-9 w-24 bg-secondary animate-pulse rounded-xl" />
+      <div className="h-8 sm:h-9 w-18 sm:w-24 bg-secondary/80 animate-pulse rounded-xl" />
     );
   }
 
@@ -46,10 +46,10 @@ export function UserNav() {
         <button
           type="button"
           onClick={() => setAuthModalOpen(true)}
-          className="h-9 px-3.5 bg-primary text-white hover:bg-primary/90 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+          className="h-8 sm:h-9 px-2.5 sm:px-3.5 bg-secondary hover:bg-secondary/80 text-foreground border border-border/80 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer active:scale-95 whitespace-nowrap"
         >
-          <User className="h-3.5 w-3.5" />
-          <span>Sign In</span>
+          <User className="h-3.5 w-3.5 text-primary shrink-0" />
+          <span className="font-semibold">Sign In</span>
         </button>
 
         <AuthModal
@@ -74,17 +74,17 @@ export function UserNav() {
       <button
         type="button"
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 bg-secondary hover:bg-secondary/80 border border-border/80 rounded-xl transition-all cursor-pointer text-xs font-bold text-foreground"
+        className="h-8 sm:h-9 flex items-center gap-1.5 px-2 sm:px-3 bg-secondary hover:bg-secondary/80 border border-border/80 rounded-xl transition-all cursor-pointer text-xs font-bold text-foreground active:scale-95"
       >
         {user.photoURL ? (
-          <img src={user.photoURL} alt={displayName} className="w-6 h-6 rounded-full object-cover" />
+          <img src={user.photoURL} alt={displayName} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover shrink-0" />
         ) : (
-          <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-black">
+          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary text-white flex items-center justify-center text-[10px] sm:text-xs font-black shrink-0">
             {initial}
           </div>
         )}
-        <span className="hidden sm:inline-block max-w-[120px] truncate">{displayName}</span>
-        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+        <span className="hidden sm:inline-block max-w-[110px] truncate">{displayName}</span>
+        <ChevronDown className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground shrink-0" />
       </button>
 
       {dropdownOpen && (

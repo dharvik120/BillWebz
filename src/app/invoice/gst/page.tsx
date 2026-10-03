@@ -650,28 +650,33 @@ function GstInvoiceForm() {
           {/* Save Status triggers */}
           <button
             onClick={() => handleSaveDraft(true)}
-            className="h-10 px-4 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+            className="h-8.5 sm:h-10 px-2.5 sm:px-4 text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl flex items-center gap-1 sm:gap-1.5 shadow-xs transition-colors cursor-pointer active:scale-95 shrink-0"
+            title="Save Invoice Draft"
           >
-            {saveSuccess ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />}
-            <span>{saveSuccess ? 'Saved!' : 'Save Draft'}</span>
+            {saveSuccess ? <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Save className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+            <span className="hidden sm:inline">{saveSuccess ? 'Saved!' : 'Save Draft'}</span>
+            <span className="sm:hidden">{saveSuccess ? 'Saved' : 'Save'}</span>
           </button>
 
           <button
             onClick={handleDownloadPdf}
             disabled={isExporting}
-            className="h-10 px-4 text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl flex items-center gap-1.5 shadow-sm transition-colors disabled:opacity-50 cursor-pointer"
+            className="h-8.5 sm:h-10 px-2.5 sm:px-4 text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl flex items-center gap-1 sm:gap-1.5 shadow-xs transition-colors disabled:opacity-50 cursor-pointer active:scale-95 shrink-0"
+            title="Download PDF Invoice"
           >
-            {isExporting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-            <span>{isExporting ? 'Generating...' : 'Export PDF'}</span>
+            {isExporting ? <RefreshCw className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" /> : <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+            <span className="hidden sm:inline">{isExporting ? 'Generating...' : 'Export PDF'}</span>
+            <span className="sm:hidden">{isExporting ? '...' : 'PDF'}</span>
           </button>
 
           <button
             onClick={handleShareWhatsApp}
             disabled={isSharingWhatsApp}
-            className="h-10 px-4 text-xs sm:text-sm font-bold bg-green-600 hover:bg-green-700 text-white rounded-xl flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+            className="h-8.5 sm:h-10 px-2 sm:px-4 text-xs sm:text-sm font-bold bg-green-600 hover:bg-green-700 text-white rounded-xl flex items-center gap-1 sm:gap-1.5 shadow-xs transition-colors cursor-pointer disabled:opacity-50 active:scale-95 shrink-0"
+            title="Share via WhatsApp"
           >
-            {isSharingWhatsApp ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
-            <span>{isSharingWhatsApp ? 'Sharing...' : 'WhatsApp'}</span>
+            {isSharingWhatsApp ? <RefreshCw className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" /> : <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+            <span className="hidden md:inline">{isSharingWhatsApp ? 'Sharing...' : 'WhatsApp'}</span>
           </button>
 
           <UserNav />
