@@ -78,12 +78,12 @@ export function PaymentSection({
 
         <div>
           <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-            Account Holder Name
+            Account Name
           </label>
           <input
             type="text"
-            placeholder="e.g. Acme Technologies LLP"
-            value={paymentDetails?.accountHolderName || sellerDetails?.name || ''}
+            placeholder="e.g. Webz Technologies"
+            value={paymentDetails?.accountHolderName || sellerDetails?.accountHolderName || sellerDetails?.name || ''}
             onChange={(e) => onUpdatePaymentField('accountHolderName', e.target.value)}
             className="w-full h-11 px-3.5 bg-background border border-border/80 rounded-xl text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs"
           />
