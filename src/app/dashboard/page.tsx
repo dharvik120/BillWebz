@@ -35,6 +35,8 @@ import {
 } from 'lucide-react';
 import { useInvoiceStore } from '@/hooks/useInvoiceStore';
 import { useTheme } from '@/components/ThemeProvider';
+import { useAuth } from '@/context/AuthContext';
+import { UserNav } from '@/components/auth/UserNav';
 import { Invoice, InvoiceStatus, InvoiceType } from '@/types/invoice';
 
 export default function Dashboard() {
@@ -51,43 +53,41 @@ export default function Dashboard() {
   } = useInvoiceStore();
   
   const { theme, toggleTheme } = useTheme();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
   // Bulk Selection State
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>([]);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
-  // Authentication check
+  // Authentication check: redirect to /login if unauthenticated
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const isLoggedIn = sessionStorage.getItem('billwebz_admin_logged_in') === 'true';
-      if (!isLoggedIn) {
-        router.push('/admin');
-      }
+    if (!authLoading && !user) {
+      router.push('/login?returnUrl=/dashboard');
     }
-  }, [router]);
+  }, [authLoading, user, router]);
 
   // Search & Filter State
   const [searchTerm, setSearchTerm] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'gst' | 'proforma' | 'quotation'>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'gst' | 'proforma' | 'quotation' | 'nongst'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | InvoiceStatus>('all');
   const [showBackupRestore, setShowBackupRestore] = useState(false);
   const [statusDropId, setStatusDropId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Filtered Invoices (Only show successfully exported/downloaded ones)
+  // Filtered Invoices
   const filteredInvoices = useMemo(() => {
     return invoices.filter((inv) => {
       const matchesSearch = 
-        inv.buyerDetails.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (inv.buyerDetails.companyName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        inv.metadata.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase());
+        (inv.buyerDetails?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (inv.buyerDetails?.companyName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (inv.metadata?.invoiceNumber || '').toLowerCase().includes(searchTerm.toLowerCase());
         
       const matchesType = typeFilter === 'all' || inv.type === typeFilter;
       const matchesStatus = statusFilter === 'all' || inv.status === statusFilter;
       
-      return matchesSearch && matchesType && matchesStatus && inv.isExported === true;
+      return matchesSearch && matchesType && matchesStatus;
     });
   }, [invoices, searchTerm, typeFilter, statusFilter]);
 
@@ -209,6 +209,9 @@ export default function Dashboard() {
               {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-primary" />}
             </button>
             
+            {/* User Account / Navigation */}
+            <UserNav />
+
             {/* Quick Generator Buttons */}
             <div className="flex items-center gap-1 bg-primary/10 p-1 rounded-xl border border-primary/20">
               <Link 
@@ -217,6 +220,12 @@ export default function Dashboard() {
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>GST Bill</span>
+              </Link>
+              <Link 
+                href="/invoice/nongst" 
+                className="hidden sm:inline-flex px-2.5 py-1.5 text-xs font-bold text-foreground hover:bg-card rounded-lg transition-colors"
+              >
+                Non-GST
               </Link>
               <Link 
                 href="/invoice/quotation" 

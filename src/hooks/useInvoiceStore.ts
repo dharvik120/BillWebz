@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { db } from '../lib/db';
 import { Invoice, SellerDetails, InvoiceStatus, InvoiceType, AdminSettings } from '../types/invoice';
 import { isFirebaseEnabled, db as firebaseDb } from '../lib/firebase';
+import { useAuth } from '../context/AuthContext';
 import { 
   doc, 
   getDoc, 
@@ -161,11 +162,14 @@ export function useInvoiceStore() {
     fetchAdminSettings();
   }, []);
 
+  const { user, isAdmin: isAuthAdmin } = useAuth();
+
   // Fetch all invoices
   const loadInvoices = useCallback(async () => {
     setLoading(true);
     try {
-      const isAdmin = typeof window !== 'undefined' && sessionStorage.getItem('billwebz_admin_logged_in') === 'true';
+      const isAdminSession = typeof window !== 'undefined' && sessionStorage.getItem('billwebz_admin_logged_in') === 'true';
+      const isAdmin = isAuthAdmin || isAdminSession;
 
       if (isFirebaseEnabled && firebaseDb) {
         const invoicesCol = collection(firebaseDb, 'invoices');
@@ -173,8 +177,11 @@ export function useInvoiceStore() {
         if (isAdmin) {
           // Admin sees all invoices
           q = query(invoicesCol);
+        } else if (user?.uid) {
+          // Authenticated user sees invoices saved under their account
+          q = query(invoicesCol, where('userId', '==', user.uid));
         } else {
-          // Public clients see only their own invoices
+          // Unauthenticated fallback by client device ID
           q = query(invoicesCol, where('clientId', '==', localClientId));
         }
 
@@ -202,7 +209,7 @@ export function useInvoiceStore() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user, isAuthAdmin]);
 
   useEffect(() => {
     loadInvoices();
@@ -231,9 +238,11 @@ export function useInvoiceStore() {
     const timestamp = Date.now();
     const id = invoice.id || Math.random().toString(36).substring(2, 11);
     
-    const invoiceToSave = {
+    const invoiceToSave: Invoice = {
       ...invoice,
       id,
+      userId: user?.uid || (invoice as any).userId || undefined,
+      userEmail: user?.email || (invoice as any).userEmail || undefined,
       clientId: (invoice as any).clientId || localClientId,
       createdAt: invoice.createdAt || timestamp,
       updatedAt: timestamp,
@@ -269,7 +278,7 @@ export function useInvoiceStore() {
 
     await loadInvoices();
     return invoiceToSave;
-  }, [loadInvoices]);
+  }, [loadInvoices, user]);
 
   // Delete Invoice
   const deleteInvoice = useCallback(async (id: string) => {

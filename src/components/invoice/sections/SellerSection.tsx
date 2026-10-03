@@ -13,6 +13,7 @@ interface SellerSectionProps {
     email?: string;
     website?: string;
     address?: string;
+    city?: string;
     country?: string;
     state?: string;
     pincode?: string;
@@ -126,13 +127,13 @@ export function SellerSection({
 
         <div>
           <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-            Country
+            City
           </label>
           <input
             type="text"
-            placeholder="e.g. India"
-            value={sellerDetails.country || ''}
-            onChange={(e) => onUpdateField('country', e.target.value)}
+            placeholder="e.g. Mundra, Mumbai, Delhi..."
+            value={sellerDetails.city || ''}
+            onChange={(e) => onUpdateField('city', e.target.value)}
             className="w-full h-11 px-3.5 bg-background border border-border/80 rounded-xl text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs"
           />
         </div>
@@ -158,6 +159,19 @@ export function SellerSection({
 
         <div>
           <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+            Country
+          </label>
+          <input
+            type="text"
+            placeholder="e.g. India"
+            value={sellerDetails.country || ''}
+            onChange={(e) => onUpdateField('country', e.target.value)}
+            className="w-full h-11 px-3.5 bg-background border border-border/80 rounded-xl text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
             PIN Code
           </label>
           <input
@@ -169,24 +183,43 @@ export function SellerSection({
           />
         </div>
 
-        <div>
+        <div className="sm:col-span-2">
           <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-            Upload Logo
+            Upload Business Logo (Full Quality Print Output)
           </label>
-          <div className="flex items-center gap-3">
-            {sellerDetails.logoUrl && (
-              <img 
-                src={sellerDetails.logoUrl} 
-                alt="Logo Preview" 
-                className="w-10 h-10 object-contain rounded-lg border border-border bg-white p-1"
-              />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3 bg-secondary/40 border border-border/70 rounded-2xl">
+            {sellerDetails.logoUrl ? (
+              <div className="relative group flex-shrink-0">
+                <img 
+                  src={sellerDetails.logoUrl} 
+                  alt="Logo Preview" 
+                  className="h-16 w-auto max-w-[150px] object-contain rounded-xl border border-border bg-white p-2 shadow-2xs"
+                />
+                <button
+                  type="button"
+                  onClick={() => onUpdateField('logoUrl', '')}
+                  className="absolute -top-2 -right-2 p-1 bg-red-600 text-white rounded-full shadow-md text-xs hover:bg-red-700 transition-colors"
+                  title="Remove Logo"
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <div className="h-16 w-24 border-2 border-dashed border-border rounded-xl flex flex-col items-center justify-center text-muted-foreground text-[10px] font-semibold flex-shrink-0">
+                No Logo
+              </div>
             )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => onImageUpload(e, 'logoUrl')}
-              className="w-full text-xs text-muted-foreground file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 dark:file:bg-blue-950 dark:file:text-blue-300 hover:file:bg-blue-100 cursor-pointer"
-            />
+            <div className="flex-1 w-full min-w-0">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => onImageUpload(e, 'logoUrl')}
+                className="w-full text-xs text-muted-foreground file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer transition-all"
+              />
+              <p className="text-[11px] text-muted-foreground mt-1.5">
+                Upload your company or brand logo in PNG, JPG, or SVG format. The original resolution will be rendered cleanly on your invoices.
+              </p>
+            </div>
           </div>
         </div>
 

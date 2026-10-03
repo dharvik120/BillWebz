@@ -183,6 +183,15 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
           <h2 className="text-sm font-black uppercase tracking-wider">{sellerDetails.name}</h2>
           {sellerDetails.gstin && <p className="text-[10px]">GSTIN: {sellerDetails.gstin}</p>}
           <p className="text-[9px]">{sellerDetails.address}</p>
+          {(sellerDetails.city || sellerDetails.state || sellerDetails.country) && (
+            <p className="text-[9px]">
+              {[
+                sellerDetails.city ? `City: ${sellerDetails.city}` : '',
+                sellerDetails.state ? `State: ${sellerDetails.state}` : '',
+                sellerDetails.country ? `Country: ${sellerDetails.country}` : ''
+              ].filter(Boolean).join(' | ')}
+            </p>
+          )}
           <p className="text-[9px]">Ph: {sellerDetails.phone} | {sellerDetails.email}</p>
           <div className="border-b border-dashed border-black my-2" />
           <h3 className="text-xs font-bold uppercase">
@@ -200,6 +209,15 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
           {buyerDetails.companyName && <p>{buyerDetails.companyName}</p>}
           {buyerDetails.gstin && <p>GSTIN: {buyerDetails.gstin}</p>}
           <p>{buyerDetails.billingAddress}</p>
+          {(buyerDetails.city || buyerDetails.state || buyerDetails.country) && (
+            <p>
+              {[
+                buyerDetails.city ? `City: ${buyerDetails.city}` : '',
+                buyerDetails.state ? `State: ${buyerDetails.state}` : '',
+                buyerDetails.country ? `Country: ${buyerDetails.country}` : ''
+              ].filter(Boolean).join(' | ')}
+            </p>
+          )}
         </div>
 
         <div className="border-b border-dashed border-black my-2" />
@@ -322,7 +340,7 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                   <img 
                     src={sellerDetails.logoUrl} 
                     alt="Logo" 
-                    className="max-h-16 max-w-28 object-contain rounded flex-shrink-0" 
+                    className="max-h-24 max-w-56 object-contain rounded flex-shrink-0" 
                   />
                 ) : (
                   <div className={`h-12 w-12 rounded-xl ${activeColor.primary} flex items-center justify-center text-white font-extrabold text-xl flex-shrink-0`}>
@@ -336,6 +354,12 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                   )}
                   {sellerDetails.address && (
                     <p className="text-xs pdf-text-muted mt-1 break-words">{sellerDetails.address}</p>
+                  )}
+                  {sellerDetails.city && (
+                    <p className="text-xs pdf-text-muted mt-0.5">
+                      <span className="text-slate-400 font-medium">City: </span>
+                      <span className="pdf-text-dark font-medium">{sellerDetails.city}</span>
+                    </p>
                   )}
                   {(sellerDetails.state || sellerDetails.country) && (
                     <p className="text-xs pdf-text-muted mt-0.5 break-words">
@@ -404,15 +428,39 @@ export function InvoicePreview({ invoice, id = 'invoice-render-sheet' }: Invoice
                   )}
                   {buyerDetails.gstin && <p className="font-mono text-[11px]">GSTIN: {buyerDetails.gstin}</p>}
                   {buyerDetails.billingAddress && <p className="break-words">{buyerDetails.billingAddress}</p>}
-                  {(buyerDetails.state || buyerDetails.stateCode || buyerDetails.pincode || buyerDetails.country) && (
+                  {buyerDetails.city && (
                     <p className="text-[11px]">
-                      {[
-                        buyerDetails.state && buyerDetails.state !== 'NONE' && buyerDetails.state !== 'OTHER' ? buyerDetails.state : '',
-                        buyerDetails.stateCode ? `(Code: ${buyerDetails.stateCode})` : '',
-                        buyerDetails.pincode ? `- ${buyerDetails.pincode}` : '',
-                        buyerDetails.country && buyerDetails.country !== 'OTHER' && buyerDetails.country !== 'NONE' ? buyerDetails.country : ''
-                      ].filter(Boolean).join(' ')}
+                      <span className="text-slate-400 font-medium">City: </span>
+                      <span className="font-medium pdf-text-dark">{buyerDetails.city}</span>
                     </p>
+                  )}
+                  {(buyerDetails.state || buyerDetails.country || buyerDetails.stateCode || buyerDetails.pincode) && (
+                    <div className="text-[11px] pdf-text-muted space-y-0.5">
+                      {buyerDetails.state && buyerDetails.state !== 'NONE' && buyerDetails.state !== 'OTHER' && (
+                        <p>
+                          <span className="text-slate-400 font-medium">State: </span>
+                          <span className="font-medium pdf-text-dark">
+                            {buyerDetails.state}
+                            {buyerDetails.stateCode ? ` (Code: ${buyerDetails.stateCode})` : ''}
+                          </span>
+                        </p>
+                      )}
+                      {buyerDetails.country && buyerDetails.country !== 'OTHER' && buyerDetails.country !== 'NONE' && (
+                        <p>
+                          <span className="text-slate-400 font-medium">Country: </span>
+                          <span className="font-medium pdf-text-dark">
+                            {buyerDetails.country}
+                            {buyerDetails.pincode ? ` (${buyerDetails.pincode})` : ''}
+                          </span>
+                        </p>
+                      )}
+                      {!buyerDetails.country && buyerDetails.pincode && (
+                        <p>
+                          <span className="text-slate-400 font-medium">PIN: </span>
+                          <span className="font-medium pdf-text-dark">{buyerDetails.pincode}</span>
+                        </p>
+                      )}
+                    </div>
                   )}
                   {(buyerDetails.phone || buyerDetails.email || buyerDetails.website) && (
                     <div className="mt-2 pt-1.5 border-t border-slate-200/60 text-[11px] pdf-text-muted space-y-0.5">

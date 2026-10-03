@@ -15,6 +15,7 @@ interface BuyerSectionProps {
     email?: string;
     website?: string;
     billingAddress?: string;
+    city?: string;
     state?: string;
     stateCode?: string;
     country?: string;
@@ -137,22 +138,9 @@ export function BuyerSection({
           />
         </div>
 
-        <div>
-          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-            Country
-          </label>
-          <input
-            type="text"
-            placeholder="e.g. India"
-            value={buyerDetails.country || ''}
-            onChange={(e) => onUpdateField('country', e.target.value)}
-            className="w-full h-11 px-3.5 bg-background border border-border/80 rounded-xl text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs"
-          />
-        </div>
-
         <div className="sm:col-span-2">
           <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-            Billing Address
+            Billing Street Address
           </label>
           <textarea
             placeholder="Complete street address, unit, building..."
@@ -160,6 +148,19 @@ export function BuyerSection({
             onChange={(e) => onUpdateField('billingAddress', e.target.value)}
             rows={2}
             className="w-full p-3 bg-background border border-border/80 rounded-xl text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs resize-none"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+            City
+          </label>
+          <input
+            type="text"
+            placeholder="e.g. Mundra, Mumbai, Ahmedabad..."
+            value={buyerDetails.city || ''}
+            onChange={(e) => onUpdateField('city', e.target.value)}
+            className="w-full h-11 px-3.5 bg-background border border-border/80 rounded-xl text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs"
           />
         </div>
 
@@ -194,10 +195,23 @@ export function BuyerSection({
           </label>
           <input
             type="text"
-            placeholder="e.g. 07"
+            placeholder="e.g. 24"
             value={buyerDetails.stateCode || ''}
             onChange={(e) => onUpdateField('stateCode', e.target.value)}
             className="w-full h-11 px-3.5 bg-background border border-border/80 rounded-xl text-sm font-mono font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+            Country
+          </label>
+          <input
+            type="text"
+            placeholder="e.g. India"
+            value={buyerDetails.country || ''}
+            onChange={(e) => onUpdateField('country', e.target.value)}
+            className="w-full h-11 px-3.5 bg-background border border-border/80 rounded-xl text-sm font-medium text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs"
           />
         </div>
 

@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from '@/components/ThemeProvider';
 import { useInvoiceStore } from '@/hooks/useInvoiceStore';
+import { UserNav } from '@/components/auth/UserNav';
 
 export default function LandingPage() {
   const { theme, toggleTheme } = useTheme();
@@ -121,7 +122,7 @@ export default function LandingPage() {
       title: "Regular Bill (Non-GST)",
       badge: "Simple Retail",
       desc: "Clean, streamlined billing for small retailers, service providers, and freelancers without GST registration requirements.",
-      link: "/invoice/gst",
+      link: "/invoice/nongst",
       color: "from-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-400"
     }
   ];
@@ -220,6 +221,9 @@ export default function LandingPage() {
               {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-primary" />}
             </button>
             
+            {/* User Account / Login */}
+            <UserNav />
+
             {/* Create Invoice Primary Button */}
             <Link 
               href="/invoice/gst" 
@@ -523,94 +527,73 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* SECTION 5: Dynamic Pricing Plans (Preserving Admin Customizations) */}
-      <section id="pricing" className="py-24 border-b border-border/70">
+      {/* SECTION 5: 100% Free Lifetime Billing (No Subscriptions Required) */}
+      <section id="pricing" className="py-24 border-b border-border/70 bg-secondary/10">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase tracking-wider">
-              Transparent Pricing
+            <span className="px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-full uppercase tracking-wider">
+              100% Free Forever
             </span>
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight mt-3 text-foreground">
-              Simple, Accessible Plans
+              Zero Subscriptions. Completely Free.
             </h2>
             <p className="mt-3 max-w-xl mx-auto text-base text-muted-foreground">
-              Select the best business plan to streamline your sales invoicing and quote workflows.
+              All features, document generators, PDF downloads, and cloud sync are 100% free with no paywalls or hidden fees.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
-            {(adminSettings?.pricingPlans || [
-              {
-                id: 'starter',
-                name: 'Free Forever',
-                price: '₹0',
-                period: 'unlimited',
-                features: [
-                  'Full GST Tax Invoice creation',
-                  'Quotation & Proforma generation',
-                  'Unlimited PDF downloads',
-                  'Offline IndexedDB storage',
-                  'WhatsApp direct sharing'
-                ],
-                buttonText: 'Start Generating Free',
-                isPopular: false
-              },
-              {
-                id: 'pro',
-                name: 'Business Pro',
-                price: '₹499',
-                period: 'one-time setup',
-                features: [
-                  'Everything in Free Plan',
-                  'Multi-business profile switcher',
-                  'Custom watermark & logos',
-                  'Automated monthly JSON backup',
-                  'Dedicated WhatsApp support'
-                ],
-                buttonText: 'Upgrade to Business Pro',
-                isPopular: true
-              }
-            ]).map((plan) => (
-              <div 
-                key={plan.id} 
-                className={`bg-card border p-8 rounded-3xl shadow-sm flex flex-col justify-between gap-6 relative transition-all duration-300 hover:shadow-lg ${
-                  plan.isPopular 
-                    ? 'border-primary ring-2 ring-primary/20 md:-translate-y-2' 
-                    : 'border-border/80'
-                }`}
-              >
-                {plan.isPopular && (
-                  <span className="absolute top-0 right-8 -translate-y-1/2 px-3 py-1 bg-primary text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-md">
-                    RECOMMENDED
-                  </span>
-                )}
-                <div>
-                  <h3 className="text-xl font-black text-foreground">{plan.name}</h3>
-                  <div className="flex items-baseline mt-4">
-                    <span className="text-4xl sm:text-5xl font-black tracking-tight text-foreground">{plan.price}</span>
-                    <span className="ml-2 text-xs text-muted-foreground font-semibold">/ {plan.period}</span>
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-card border-2 border-primary/40 p-8 sm:p-10 rounded-3xl shadow-xl flex flex-col justify-between gap-8 relative">
+              <span className="absolute top-0 right-8 -translate-y-1/2 px-3.5 py-1 bg-primary text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-md">
+                UNLIMITED FREE ACCESS
+              </span>
+              <div>
+                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                  <h3 className="text-2xl font-black text-foreground">BillWebz Community Edition</h3>
+                  <div className="flex items-baseline">
+                    <span className="text-4xl sm:text-5xl font-black tracking-tight text-emerald-600 dark:text-emerald-400">₹0</span>
+                    <span className="ml-2 text-xs text-muted-foreground font-semibold">/ Lifetime Free</span>
                   </div>
-                  <ul className="mt-6 space-y-3.5">
-                    {plan.features.map((feat, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-muted-foreground">
-                        <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
-                <button
-                  onClick={() => alert(`Upgrading to ${plan.name} plans...`)}
-                  className={`w-full py-3.5 text-xs font-black rounded-xl transition-all ${
-                    plan.isPopular 
-                      ? 'bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20' 
-                      : 'bg-secondary hover:bg-secondary/80 text-foreground border border-border'
-                  }`}
-                >
-                  {plan.buttonText}
-                </button>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-2">
+                  Built for everyday business operations. Unlimited GST Tax Invoices, Non-GST Bills, Quotations, and Proforma documents.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-8 border-t border-border/60 pt-6">
+                  {[
+                    'Full GST & Non-GST Invoicing',
+                    'Quotation & Proforma Generator',
+                    'High-Res Multi-Format PDF Export',
+                    'Zero Subscription Locks or Limits',
+                    'Custom Logo & Signature Upload',
+                    'Dynamic UPI QR Payment Codes',
+                    'WhatsApp & Email Direct Sharing',
+                    'Secure Firebase Cloud Backup & Sync'
+                  ].map((feat, idx) => (
+                    <div key={idx} className="flex items-center gap-2.5 text-xs sm:text-sm text-foreground font-medium">
+                      <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                      <span>{feat}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
+
+              <div className="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-border/60">
+                <Link
+                  href="/invoice/gst"
+                  className="w-full sm:flex-1 py-3.5 bg-primary hover:bg-primary/90 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md text-center transition-all flex items-center justify-center gap-2"
+                >
+                  <span>Start Creating Invoices</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="/invoice/nongst"
+                  className="w-full sm:flex-1 py-3.5 bg-secondary hover:bg-secondary/80 text-foreground border border-border font-bold text-xs sm:text-sm rounded-xl text-center transition-all"
+                >
+                  Create Non-GST Bill
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>

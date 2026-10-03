@@ -19,6 +19,7 @@ export interface SellerDetails {
   email?: string;
   website?: string;
   address?: string;
+  city?: string;
   state?: string;
   country?: string;
   pincode?: string;
@@ -45,6 +46,7 @@ export interface BuyerDetails {
   website?: string;
   billingAddress?: string;
   shippingAddress?: string;
+  city?: string;
   state?: string;
   stateCode?: string;
   country?: string;
@@ -141,6 +143,10 @@ export interface Invoice {
   quotationNotes?: string;
   showTax: boolean; // Proforma / Non-GST option to hide tax details
   isExported?: boolean; // Marks if PDF has been downloaded
+  // User association
+  userId?: string;
+  userEmail?: string;
+  clientId?: string;
   createdAt: number;
   updatedAt: number;
 }

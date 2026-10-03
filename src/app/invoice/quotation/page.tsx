@@ -50,6 +50,9 @@ import { Invoice, LineItem, InvoiceStatus, InvoiceTheme, PaperSize } from '@/typ
 import { countriesList, statesByCountry } from '@/utils/locationData';
 import { getNextDocumentNumber } from '@/utils/documentNumbering';
 import confetti from 'canvas-confetti';
+import { useAuth } from '@/context/AuthContext';
+import { AuthModal } from '@/components/auth/AuthModal';
+import { UserNav } from '@/components/auth/UserNav';
 
 const getInitialSellerProfile = (fallback: any) => {
   if (typeof window !== 'undefined') {
@@ -175,7 +178,8 @@ function QuotationForm() {
     adminSettings
   } = useInvoiceStore();
 
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const { user } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // 1. Initial State Load
   const [initialData, setInitialData] = useState<Invoice | null>(null);
@@ -220,10 +224,8 @@ function QuotationForm() {
   const handleDownloadPdf = async () => {
     if (!invoiceData) return;
 
-    // Subscription Lock check
-    const isAdmin = sessionStorage.getItem('billwebz_admin_logged_in') === 'true';
-    if (adminSettings?.isSubscriptionLocked && !isAdmin) {
-      setShowUpgradeModal(true);
+    if (!user) {
+      setShowAuthModal(true);
       return;
     }
 
@@ -462,6 +464,10 @@ function QuotationForm() {
 
   const handleShareWhatsApp = async () => {
     if (!invoiceData) return;
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
     setIsSharingWhatsApp(true);
     try {
       const clientName = invoiceData.buyerDetails?.name || 'Customer';
@@ -654,6 +660,8 @@ function QuotationForm() {
             {isSharingWhatsApp ? <RefreshCw className="h-4.5 w-4.5 animate-spin" /> : <Share2 className="h-4.5 w-4.5" />}
             <span>{isSharingWhatsApp ? 'Sharing...' : 'WhatsApp'}</span>
           </button>
+
+          <UserNav />
         </div>
       </header>
 
@@ -919,65 +927,13 @@ function QuotationForm() {
       <div className="absolute left-[-9999px] top-0 pointer-events-none no-print">
         <InvoicePreview invoice={invoiceData} id="invoice-pdf-export-sheet" />
       </div>
-      {/* Premium Upgrade Modal */}
-      {showUpgradeModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm no-print">
-          <div className="bg-card border border-border rounded-2xl max-w-lg w-full p-6 shadow-2xl relative animate-in fade-in zoom-in duration-200">
-            <button 
-              onClick={() => setShowUpgradeModal(false)}
-              className="absolute top-4 right-4 p-1.5 hover:bg-secondary rounded-lg transition-colors"
-            >
-              <X className="h-5 w-5 text-muted-foreground" />
-            </button>
-            <div className="text-center mb-6">
-              <span className="px-3 py-1 bg-amber-500/10 text-amber-500 text-xs font-bold rounded-full uppercase tracking-wider">Premium Feature</span>
-              <h3 className="text-2xl font-extrabold mt-2">Subscription Required</h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                To download and share professional invoices, please upgrade to one of our business plans below:
-              </p>
-            </div>
-            
-            <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
-              {adminSettings?.pricingPlans?.map((plan) => (
-                <div key={plan.id} className={`border p-4 rounded-xl flex flex-col justify-between gap-3 relative ${plan.isPopular ? 'border-blue-500 bg-blue-500/5' : 'border-border'}`}>
-                  {plan.isPopular && (
-                    <span className="absolute top-0 right-4 -translate-y-1/2 px-2.5 py-0.5 bg-blue-600 text-white text-[9px] font-black rounded-full uppercase tracking-widest">
-                      POPULAR
-                    </span>
-                  )}
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-extrabold text-sm text-foreground">{plan.name}</h4>
-                      <p className="text-2xl font-black text-foreground mt-1">
-                        {plan.price}
-                        <span className="text-xs text-muted-foreground font-normal"> / {plan.period}</span>
-                      </p>
-                    </div>
-                    <button 
-                      onClick={() => alert(`Redirecting to payment checkout for ${plan.name}...`)}
-                      className={`px-4 py-2 text-xs font-extrabold rounded-lg transition-all ${plan.isPopular ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md' : 'bg-secondary hover:bg-secondary/80 text-foreground border border-border'}`}
-                    >
-                      {plan.buttonText}
-                    </button>
-                  </div>
-                  <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 border-t border-border/40 pt-3 text-[10px] text-muted-foreground">
-                    {plan.features.map((feat, i) => (
-                      <li key={i} className="flex items-center gap-1.5">
-                        <Check className="h-3 w-3 text-blue-500 flex-shrink-0" />
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-            
-            <div className="mt-6 text-center text-xs text-slate-400">
-              Need assistance? Contact us at <a href={`mailto:${adminSettings?.contactEmail}`} className="text-blue-500 font-semibold">{adminSettings?.contactEmail}</a>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Authentication Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        title="Sign In to Save & Export Quotations"
+        subtitle="Please log in or sign up to safely generate, store, and download your billing documents."
+      />
 
       {/* Autocomplete Datalists */}
       <datalist id="countries-list">

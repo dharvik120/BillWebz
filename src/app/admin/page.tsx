@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { useInvoiceStore } from '@/hooks/useInvoiceStore';
 import { AdminSettings, PricingPlan, Invoice, NumberingSettings, InvoiceType } from '@/types/invoice';
+import { useAuth } from '@/context/AuthContext';
 import { 
   getStoredNumberingSettings, 
   saveStoredNumberingSettings, 
@@ -53,6 +54,8 @@ export default function AdminPortal() {
     loadInvoices,
     getMetrics
   } = useInvoiceStore();
+
+  const { user, isAdmin: isFirebaseAdmin, signInWithGoogle } = useAuth();
 
   // Bulk Selection State for Ledger
   const [selectedLedgerIds, setSelectedLedgerIds] = useState<string[]>([]);
@@ -97,13 +100,15 @@ export default function AdminPortal() {
   // Metrics from real database data
   const metrics = getMetrics();
 
-  // Load state check on session
+  // Load state check on session or Firebase Auth
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const logged = sessionStorage.getItem('billwebz_admin_logged_in') === 'true';
-      setIsLoggedIn(logged);
+      if (logged || isFirebaseAdmin) {
+        setIsLoggedIn(true);
+      }
     }
-  }, []);
+  }, [isFirebaseAdmin]);
 
   // Sync settings state on store load
   useEffect(() => {
@@ -349,6 +354,29 @@ export default function AdminPortal() {
                 className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow transition-colors flex items-center justify-center gap-2"
               >
                 <Lock className="h-4 w-4" /> Authenticate Admin
+              </button>
+
+              <div className="relative my-3">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-800" />
+                </div>
+                <div className="relative flex justify-center text-[10px] uppercase font-bold text-slate-500">
+                  <span className="bg-slate-900 px-2">Or Admin Google Sign-In</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await signInWithGoogle();
+                  } catch (err: any) {
+                    setLoginError(err.message || 'Google Sign-in failed.');
+                  }
+                }}
+                className="w-full py-2.5 px-4 border border-slate-700 bg-slate-950 hover:bg-slate-800 text-slate-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              >
+                <span>Sign in with Google Admin</span>
               </button>
             </form>
           </div>
@@ -680,25 +708,17 @@ export default function AdminPortal() {
                 <p className="text-xs text-slate-400 mt-1">Configure pricing plans and toggle the subscription lock check on invoice PDF downloads.</p>
               </div>
 
-              {/* Download Lock status */}
+              {/* Download Lock status - 100% Free Forever */}
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex items-center justify-between gap-4">
                 <div>
-                  <h3 className="font-extrabold text-sm text-white uppercase tracking-wider">Subscription Block Lock</h3>
+                  <h3 className="font-extrabold text-sm text-white uppercase tracking-wider">Subscription Free Lifetime Mode</h3>
                   <p className="text-xs text-slate-400 mt-1">
-                    When enabled, public users will be blocked from downloading/exporting PDFs and will be prompted with the Pricing Upgrade plan dialog.
+                    BillWebz is set to 100% Free Lifetime access. All GST Invoices, Non-GST Bills, Quotations, and Proforma documents are free without download paywalls.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsSubscriptionLocked(!isSubscriptionLocked)}
-                  className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all ${
-                    isSubscriptionLocked 
-                      ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/20' 
-                      : 'bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/20'
-                  }`}
-                >
-                  {isSubscriptionLocked ? 'LOCK ACTIVE (LOCKED)' : 'LOCK DISABLED (FREE)'}
-                </button>
+                <div className="px-5 py-2.5 rounded-xl text-xs font-black bg-emerald-600/20 text-emerald-400 border border-emerald-500/30">
+                  LIFETIME FREE ACTIVE
+                </div>
               </div>
 
               {/* Plans Loop Editor */}
